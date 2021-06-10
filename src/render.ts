@@ -202,7 +202,7 @@ function posZIndex(pos: cg.Pos, asWhite: boolean): string {
 }
 
 function pieceNameOf(piece: cg.Piece): string {
-  return `${piece.color} ${piece.role}`;
+  return `${piece.color} test ${piece.role}`;
 }
 
 function computeSquareClasses(s: State): SquareClasses {
