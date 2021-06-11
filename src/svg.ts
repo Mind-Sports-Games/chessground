@@ -316,7 +316,7 @@ export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SV
 }
 
 function orient(pos: cg.Pos, color: cg.Orientation): cg.Pos {
-  return T.mapToWhite[color](pos);
+  return T.mapToWhiteInverse[color](pos);
 }
 
 function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {

@@ -49,7 +49,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   }
 
   if (s.coordinates) {
-    const orientClass = s.orientation === 'black' ? ' black' : '';
+    const orientClass = ' ' + s.orientation;
     container.appendChild(renderCoords(ranks, 'ranks' + orientClass));
     container.appendChild(renderCoords(files, 'files' + orientClass));
   }
