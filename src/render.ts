@@ -197,7 +197,7 @@ function removeNodes(s: State, nodes: HTMLElement[]): void {
 
 function posZIndex(pos: cg.Pos, orientation: cg.Orientation): string {
   pos = T.mapToWhite[orientation](pos);
-  let z = 2 + pos[1] * 8 + (7 - pos[0]);
+  const z = 2 + pos[1] * 8 + (7 - pos[0]);
   return z + '';
 }
 
