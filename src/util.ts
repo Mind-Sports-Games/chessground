@@ -107,7 +107,7 @@ export const createEl = (tagName: string, className?: string): HTMLElement => {
 };
 
 export function computeSquareCenter(key: cg.Key, orientation: cg.Orientation, bounds: ClientRect): cg.NumberPair {
-  const pos = T.mapToWhite[orientation](key2pos(key));
+  const pos = T.mapToWhiteInverse[orientation](key2pos(key));
   return [
     bounds.left + (bounds.width * pos[0]) / 8 + bounds.width / 16,
     bounds.top + (bounds.height * (7 - pos[1])) / 8 + bounds.height / 16,
