@@ -23,7 +23,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   const bounds = s.dom.bounds(),
     position = util.eventPosition(e)!,
-    orig = board.getKeyAtDomPos(position, board.whitePov(s), bounds);
+    orig = board.getKeyAtDomPos(position, s.orientation, bounds);
   if (!orig) return;
   const piece = s.pieces.get(orig);
   const previouslySelected = s.selected;
@@ -65,7 +65,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     const ghost = s.dom.elements.ghost;
     if (ghost) {
       ghost.className = `ghost ${piece.color} ${piece.role}`;
-      util.translateAbs(ghost, util.posToTranslateAbs(bounds)(util.key2pos(orig), board.whitePov(s)));
+      util.translateAbs(ghost, util.posToTranslateAbs(bounds)(util.key2pos(orig), s.orientation));
       util.setVisible(ghost, true);
     }
     processDrag(s);
@@ -77,11 +77,11 @@ export function start(s: State, e: cg.MouchEvent): void {
 }
 
 function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
-  const asWhite = board.whitePov(s),
+  const orientation = s.orientation,
     bounds = s.dom.bounds(),
     radiusSq = Math.pow(bounds.width / 8, 2);
   for (const key in s.pieces) {
-    const center = util.computeSquareCenter(key as cg.Key, asWhite, bounds);
+    const center = util.computeSquareCenter(key as cg.Key, orientation, bounds);
     if (util.distanceSq(center, pos) <= radiusSq) return true;
   }
   return false;
@@ -163,7 +163,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   board.unsetPredrop(s);
   // touchend has no position; so use the last touchmove position instead
   const eventPos = util.eventPosition(e) || cur.pos;
-  const dest = board.getKeyAtDomPos(eventPos, board.whitePov(s), s.dom.bounds());
+  const dest = board.getKeyAtDomPos(eventPos, s.orientation, s.dom.bounds());
   if (dest && cur.started && cur.orig !== dest) {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
     else {

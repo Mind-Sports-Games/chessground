@@ -2,6 +2,7 @@ import { State } from './state';
 import { key2pos } from './util';
 import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifiers } from './draw';
 import * as cg from './types';
+import * as T from './transformations';
 
 export function createElement(tagName: string): SVGElement {
   return document.createElementNS('http://www.w3.org/2000/svg', tagName);
@@ -70,8 +71,20 @@ export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement):
   const customSvgsEl = customSvg.querySelector('g') as SVGElement;
 
   syncDefs(d, shapes, defsEl);
-  syncShapes(state, shapes.filter(s => !s.shape.customSvg), d.brushes, arrowDests, shapesEl);
-  syncShapes(state, shapes.filter(s =>  s.shape.customSvg), d.brushes, arrowDests, customSvgsEl);
+  syncShapes(
+    state,
+    shapes.filter(s => !s.shape.customSvg),
+    d.brushes,
+    arrowDests,
+    shapesEl
+  );
+  syncShapes(
+    state,
+    shapes.filter(s => s.shape.customSvg),
+    d.brushes,
+    arrowDests,
+    customSvgsEl
+  );
 }
 
 // append only. Don't try to update/remove.
@@ -102,7 +115,7 @@ function syncShapes(
   shapes: Shape[],
   brushes: DrawBrushes,
   arrowDests: ArrowDests,
-  root: SVGElement,
+  root: SVGElement
 ): void {
   const bounds = state.dom.bounds(),
     hashesInDom = new Map(), // by hash
@@ -160,7 +173,7 @@ function customSvgHash(s: string): Hash {
   // Rolling hash with base 31 (cf. https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript)
   let h = 0;
   for (let i = 0; i < s.length; i++) {
-    h = (((h << 5) - h) + s.charCodeAt(i)) >>> 0;
+    h = ((h << 5) - h + s.charCodeAt(i)) >>> 0;
   }
   return 'custom-' + h.toString();
 }
@@ -174,10 +187,9 @@ function renderShape(
 ): SVGElement {
   let el: SVGElement;
   if (shape.customSvg) {
-    const orig = orient(key2pos(shape.orig), state.orientation)
+    const orig = orient(key2pos(shape.orig), state.orientation);
     el = renderCustomSvg(shape.customSvg, orig, bounds);
-  }
-  else if (shape.piece)
+  } else if (shape.piece)
     el = renderPiece(
       state.drawable.pieces.baseUrl,
       orient(key2pos(shape.orig), state.orientation),
@@ -303,8 +315,8 @@ export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SV
   return el;
 }
 
-function orient(pos: cg.Pos, color: cg.Color): cg.Pos {
-  return color === 'white' ? pos : [7 - pos[0], 7 - pos[1]];
+function orient(pos: cg.Pos, color: cg.Orientation): cg.Pos {
+  return T.mapToWhite[color](pos);
 }
 
 function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {

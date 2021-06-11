@@ -23,6 +23,10 @@ export type NumberPair = [number, number];
 
 export type NumberQuad = [number, number, number, number];
 
+export type Orientation = typeof colors[number] | 'left' | 'right';
+export type TransformToWhite = (_: Pos) => Pos;
+export type TranslateBase = (pos: Pos, xFactor: number, yFactor: number) => NumberPair;
+
 export interface Rect {
   left: number;
   top: number;

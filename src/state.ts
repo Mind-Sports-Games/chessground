@@ -7,7 +7,7 @@ import * as cg from './types';
 
 export interface HeadlessState {
   pieces: cg.Pieces;
-  orientation: cg.Color; // board orientation. white | black
+  orientation: cg.Orientation; // board orientation. white | black
   turnColor: cg.Color; // turn to play. white | black
   check?: cg.Key; // square currently in check "a2"
   lastMove?: cg.Key[]; // squares part of the last move ["c3"; "c4"]
