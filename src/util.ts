@@ -51,6 +51,14 @@ const flipOrientationLookup: Record<cg.Orientation, cg.Orientation> = {
   right: 'left',
 };
 export const oppositeOrientation = (c: cg.Orientation): cg.Orientation => flipOrientationLookup[c];
+const flipOrientationLookupLOA: Record<cg.Orientation, cg.Orientation> = {
+  white: 'right',
+  right: 'white',
+  black: 'left',
+  left: 'black',
+};
+export const oppositeOrientationLOA = (c: cg.Orientation): cg.Orientation => flipOrientationLookupLOA[c];
+export const isColor = (c: cg.Orientation): c is cg.Color => c === 'white' || c === 'black';
 
 export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number => {
   const dx = pos1[0] - pos2[0],
