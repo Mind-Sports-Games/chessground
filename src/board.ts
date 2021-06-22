@@ -17,9 +17,13 @@ export function callUserFunction<T extends (...args: any[]) => void>(f: T | unde
   if (f) setTimeout(() => f(...args), 1);
 }
 
-export function toggleOrientation(state: HeadlessState): void {
-  state.orientation = oppositeOrientation(state.orientation);
+export function setOrientation(state: HeadlessState, o: cg.Orientation): void {
+  state.orientation = o;
   state.animation.current = state.draggable.current = state.selected = undefined;
+}
+
+export function toggleOrientation(state: HeadlessState): void {
+  setOrientation(state, oppositeOrientation(state.orientation));
 }
 
 export function reset(state: HeadlessState): void {
