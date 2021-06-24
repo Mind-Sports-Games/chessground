@@ -1,4 +1,5 @@
 import * as cg from './types';
+import * as T from './transformations';
 
 export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
 
@@ -9,6 +10,8 @@ export const pos2key = (pos: cg.Pos): cg.Key => allKeys[8 * pos[0] + pos[1]];
 export const key2pos = (k: cg.Key): cg.Pos => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
 
 export const allPos: readonly cg.Pos[] = allKeys.map(key2pos);
+
+export const validPos = (pos: cg.Pos) => pos[0] >= 0 && pos[0] < 8 && pos[1] >= 0 && pos[1] < 8;
 
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
@@ -41,6 +44,24 @@ export const timer = (): cg.Timer => {
 };
 
 export const opposite = (c: cg.Color): cg.Color => (c === 'white' ? 'black' : 'white');
+const flipOrientationLookup: Record<cg.Orientation, cg.Orientation> = {
+  white: 'black',
+  black: 'white',
+  left: 'right',
+  right: 'left',
+};
+export const oppositeOrientation = (c: cg.Orientation): cg.Orientation => flipOrientationLookup[c];
+const flipOrientationLookupForLOA: Record<cg.Color, cg.Orientation> = {
+  white: 'right',
+  black: 'white',
+};
+export const oppositeOrientationForLOA = (c: cg.Color): cg.Orientation => flipOrientationLookupForLOA[c];
+const orientationLookupForLOA: Record<cg.Color, cg.Orientation> = {
+  white: 'white',
+  black: 'right',
+};
+export const orientationForLOA = (c: cg.Color): cg.Orientation => orientationLookupForLOA[c];
+export const isColor = (c: cg.Orientation): c is cg.Color => c === 'white' || c === 'black';
 
 export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number => {
   const dx = pos1[0] - pos2[0],
@@ -50,19 +71,25 @@ export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number => {
 
 export const samePiece = (p1: cg.Piece, p2: cg.Piece): boolean => p1.role === p2.role && p1.color === p2.color;
 
-const posToTranslateBase = (pos: cg.Pos, asWhite: boolean, xFactor: number, yFactor: number): cg.NumberPair => [
-  (asWhite ? pos[0] : 7 - pos[0]) * xFactor,
-  (asWhite ? 7 - pos[1] : pos[1]) * yFactor,
-];
-
-export const posToTranslateAbs = (bounds: ClientRect): ((pos: cg.Pos, asWhite: boolean) => cg.NumberPair) => {
-  const xFactor = bounds.width / 8,
-    yFactor = bounds.height / 8;
-  return (pos, asWhite) => posToTranslateBase(pos, asWhite, xFactor, yFactor);
+const posToTranslateBase = (
+  pos: cg.Pos,
+  orientation: cg.Orientation,
+  xFactor: number,
+  yFactor: number
+): cg.NumberPair => {
+  return T.translateBase[orientation](pos, xFactor, yFactor);
 };
 
-export const posToTranslateRel = (pos: cg.Pos, asWhite: boolean): cg.NumberPair =>
-  posToTranslateBase(pos, asWhite, 100, 100);
+export const posToTranslateAbs = (
+  bounds: ClientRect
+): ((pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair) => {
+  const xFactor = bounds.width / 8,
+    yFactor = bounds.height / 8;
+  return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor);
+};
+
+export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation): cg.NumberPair =>
+  posToTranslateBase(pos, orientation, 100, 100);
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
@@ -90,12 +117,8 @@ export const createEl = (tagName: string, className?: string): HTMLElement => {
   return el;
 };
 
-export function computeSquareCenter(key: cg.Key, asWhite: boolean, bounds: ClientRect): cg.NumberPair {
-  const pos = key2pos(key);
-  if (!asWhite) {
-    pos[0] = 7 - pos[0];
-    pos[1] = 7 - pos[1];
-  }
+export function computeSquareCenter(key: cg.Key, orientation: cg.Orientation, bounds: ClientRect): cg.NumberPair {
+  const pos = T.mapToWhiteInverse[orientation](key2pos(key));
   return [
     bounds.left + (bounds.width * pos[0]) / 8 + bounds.width / 16,
     bounds.top + (bounds.height * (7 - pos[1])) / 8 + bounds.height / 16,

@@ -78,6 +78,11 @@ export interface Api {
 
 // see API types and documentations in dts/api.d.ts
 export function start(state: State, redrawAll: cg.Redraw): Api {
+  function setOrientation(o: cg.Orientation): void {
+    board.setOrientation(state, o);
+    redrawAll();
+  }
+
   function toggleOrientation(): void {
     board.toggleOrientation(state);
     redrawAll();
@@ -85,7 +90,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
   return {
     set(config): void {
-      if (config.orientation && config.orientation !== state.orientation) toggleOrientation();
+      if (config.orientation && config.orientation !== state.orientation) setOrientation(config.orientation);
       (config.fen ? anim : render)(state => configure(state, config), state);
     },
 
@@ -168,7 +173,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     getKeyAtDomPos(pos): cg.Key | undefined {
-      return board.getKeyAtDomPos(pos, board.whitePov(state), state.dom.bounds());
+      return board.getKeyAtDomPos(pos, state.orientation, state.dom.bounds());
     },
 
     redrawAll,

@@ -1,15 +1,29 @@
 import { HeadlessState } from './state';
-import { pos2key, key2pos, opposite, distanceSq, allPos, computeSquareCenter } from './util';
+import {
+  pos2key,
+  key2pos,
+  validPos,
+  opposite,
+  oppositeOrientation,
+  distanceSq,
+  allPos,
+  computeSquareCenter,
+} from './util';
 import { premove, queen, knight } from './premove';
 import * as cg from './types';
+import * as T from './transformations';
 
 export function callUserFunction<T extends (...args: any[]) => void>(f: T | undefined, ...args: Parameters<T>): void {
   if (f) setTimeout(() => f(...args), 1);
 }
 
-export function toggleOrientation(state: HeadlessState): void {
-  state.orientation = opposite(state.orientation);
+export function setOrientation(state: HeadlessState, o: cg.Orientation): void {
+  state.orientation = o;
   state.animation.current = state.draggable.current = state.selected = undefined;
+}
+
+export function toggleOrientation(state: HeadlessState): void {
+  setOrientation(state, oppositeOrientation(state.orientation));
 }
 
 export function reset(state: HeadlessState): void {
@@ -321,33 +335,34 @@ export function stop(state: HeadlessState): void {
   cancelMove(state);
 }
 
-export function getKeyAtDomPos(pos: cg.NumberPair, asWhite: boolean, bounds: ClientRect): cg.Key | undefined {
-  let file = Math.floor((8 * (pos[0] - bounds.left)) / bounds.width);
-  if (!asWhite) file = 7 - file;
-  let rank = 7 - Math.floor((8 * (pos[1] - bounds.top)) / bounds.height);
-  if (!asWhite) rank = 7 - rank;
-  return file >= 0 && file < 8 && rank >= 0 && rank < 8 ? pos2key([file, rank]) : undefined;
+export function getKeyAtDomPos(
+  pos: cg.NumberPair,
+  orientation: cg.Orientation,
+  bounds: ClientRect
+): cg.Key | undefined {
+  pos = [
+    Math.floor((8 * (pos[0] - bounds.left)) / bounds.width),
+    7 - Math.floor((8 * (pos[1] - bounds.top)) / bounds.height),
+  ];
+  pos = T.mapToWhite[orientation](pos);
+  return validPos(pos) ? pos2key(pos) : undefined;
 }
 
 export function getSnappedKeyAtDomPos(
   orig: cg.Key,
   pos: cg.NumberPair,
-  asWhite: boolean,
+  orientation: cg.Orientation,
   bounds: ClientRect
 ): cg.Key | undefined {
   const origPos = key2pos(orig);
   const validSnapPos = allPos.filter(pos2 => {
     return queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]);
   });
-  const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), asWhite, bounds));
+  const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), orientation, bounds));
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
   const [, closestSnapIndex] = validSnapDistances.reduce((a, b, index) => (a[0] < b ? a : [b, index]), [
     validSnapDistances[0],
     0,
   ]);
   return pos2key(validSnapPos[closestSnapIndex]);
-}
-
-export function whitePov(s: HeadlessState): boolean {
-  return s.orientation === 'white';
 }

@@ -6,7 +6,7 @@ import * as cg from './types';
 
 export interface Config {
   fen?: cg.FEN; // chess position in Forsyth notation
-  orientation?: cg.Color; // board orientation. white | black
+  orientation?: cg.Orientation; // board orientation. white | black
   turnColor?: cg.Color; // turn to play. white | black
   check?: cg.Color | boolean; // true for current color, false to unset
   lastMove?: cg.Key[]; // squares part of the last move ["c3", "c4"]
