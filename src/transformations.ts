@@ -15,8 +15,34 @@ export const mapToWhiteInverse: Record<cg.Orientation, cg.TransformToWhite> = {
 };
 
 export const translateBase: Record<cg.Orientation, cg.TranslateBase> = {
-  white: (pos: cg.Pos, xScale: number, yScale: number) => [pos[0] * xScale, (7 - pos[1]) * yScale],
-  black: (pos: cg.Pos, xScale: number, yScale: number) => [(7 - pos[0]) * xScale, pos[1] * yScale],
-  right: (pos: cg.Pos, xScale: number, yScale: number) => [pos[1] * xScale, pos[0] * yScale],
-  left: (pos: cg.Pos, xScale: number, yScale: number) => [(7 - pos[0]) * xScale, pos[1] * yScale],
+  white: (pos: cg.Pos,
+          xScale: number,
+          yScale: number,
+          asWhite:Boolean,
+          bt: cg.BoardDimensions
+          ) => [
+            (asWhite ? pos[0] - 1 : bt.width - pos[0]) * xScale,
+            (asWhite ? bt.height - pos[1] : pos[1] - 1) * yScale
+          ],
+  black: (pos: cg.Pos,
+          xScale: number,
+          yScale: number,
+          asWhite:Boolean,
+          bt: cg.BoardDimensions
+          ) => [
+            (asWhite ? pos[0] - 1 : bt.width - pos[0]) * xScale,
+            (asWhite ? bt.height - pos[1] : pos[1] - 1) * yScale
+          ],
+  right: (pos: cg.Pos,
+          xScale: number,
+          yScale: number,
+          asWhite:Boolean,
+          bt: cg.BoardDimensions
+          ) => [pos[1] * xScale, pos[0] * yScale],
+  left: (pos: cg.Pos,
+         xScale: number,
+         yScale: number,
+         asWhite:Boolean,
+         bt: cg.BoardDimensions
+         ) => [(bt.width - pos[0]) * xScale, pos[1] * yScale],
 };
