@@ -78,7 +78,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     const ghost = s.dom.elements.ghost;
     if (ghost) {
       const promoted = piece.promoted ? "promoted " : "";
-      const side = piece.color === s.orientation ? "ally" : "enemy";
+      const side = piece.color === s.turnColor ? "ally" : "enemy";
       ghost.className = `ghost ${piece.color} ${promoted}${piece.role} ${side}`;
       util.translateAbs(ghost, util.posToTranslateAbs(bounds, s.dimensions)(util.key2pos(orig), s.orientation, board.whitePov(s)));
       util.setVisible(ghost, true);

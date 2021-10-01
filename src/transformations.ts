@@ -36,13 +36,13 @@ export const translateBase: Record<cg.Orientation, cg.TranslateBase> = {
   right: (pos: cg.Pos,
           xScale: number,
           yScale: number,
-          asWhite:Boolean,
-          bt: cg.BoardDimensions
+          _,
+          __
           ) => [pos[1] * xScale, pos[0] * yScale],
   left: (pos: cg.Pos,
          xScale: number,
          yScale: number,
-         asWhite:Boolean,
+         _,
          bt: cg.BoardDimensions
          ) => [(bt.width - pos[0]) * xScale, pos[1] * yScale],
 };

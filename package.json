@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "7.11.1-pstrat2_1",
+  "version": "7.11.1-pstrat2.1",
   "description": "playstrategy.org chess ui, forked from lichess.org",
   "type": "commonjs",
   "main": "chessground.js",
@@ -31,11 +31,11 @@
     "pretest": "npm run compile",
     "test": "mocha -r ts-node/register -r jsdom-global/register 'tests/**/*.test.ts'",
     "prepublish": "npm run compile",
-    "compile": "tsc --outDir . --sourceMap --declaration",
-    "lint": "eslint src/*.ts",
+    "compile": "tsc",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
-    "dist": "rollup --config"
+    "dev": "gulp dev",
+    "prod": "gulp prod"
   },
   "files": [
     "/*.js",
@@ -43,7 +43,7 @@
     "/*.js.map",
     "/assets/*.css",
     "/src/*.ts",
-    "!/rollup.config.js"
+    "!/gulpfile.js"
   ],
   "repository": "https://github.com/Mind-Sports-Games/chessground",
   "keywords": [

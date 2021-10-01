@@ -38,6 +38,17 @@ export const loachecker: Mobility = (x1, y1, x2, y2) => {
   return bishop(x1, y1, x2, y2) || rook(x1, y1, x2, y2);
 };
 
+// function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobility {
+//   return (x1, y1, x2, y2) =>
+//     (diff(x1, x2) < 2 && diff(y1, y2) < 2) ||
+//     (canCastle &&
+//       y1 === y2 &&
+//       y1 === (color === 'white' ? 1 : 8) &&
+//       (x1 === 5 && ((util.containsX(rookFiles, 1) && x2 === 3) || (util.containsX(rookFiles, 8) && x2 === 7))) ||
+//       util.containsX(rookFiles, x2)
+//     );
+// }
+
 function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobility {
   return (x1, y1, x2, y2) =>
     (diff(x1, x2) < 2 && diff(y1, y2) < 2) ||
@@ -48,6 +59,16 @@ function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobilit
       util.containsX(rookFiles, x2)
     );
 }
+
+// function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobility {
+//   return (x1, y1, x2, y2) =>
+//     (diff(x1, x2) < 2 && diff(y1, y2) < 2) ||
+//     (canCastle &&
+//       y1 === y2 &&
+//       y1 === (color === 'white' ? 0 : 7) &&
+//       ((x1 === 4 && ((x2 === 2 && rookFiles.includes(0)) || (x2 === 6 && rookFiles.includes(7)))) ||
+//         rookFiles.includes(x2)));
+// }
 
 function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
   const backrank = color === 'white' ? '1' : '8';
