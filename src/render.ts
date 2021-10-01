@@ -91,35 +91,38 @@ export function render(s: State): void {
             el.classList.add('fading');
             el.cgFading = true;
           } else {
-            appendValue(movedPieces, elPieceName, el);
+            if (movedPieces[elPieceName]) movedPieces[elPieceName].push(el);
+            else movedPieces[elPieceName] = [el];
           }
         }
       }
       // no piece: flag as moved
       else {
-        appendValue(movedPieces, elPieceName, el);
+        if (movedPieces[elPieceName]) movedPieces[elPieceName].push(el);
+        else movedPieces[elPieceName] = [el];
       }
     } else if (isSquareNode(el)) {
       const cn = el.className;
-      if (squares.get(k) === cn) sameSquares.add(k);
-      else appendValue(movedSquares, cn, el);
+      if (squares[k] === cn) sameSquares[k] = true;
+      else if (movedSquares[cn]) movedSquares[cn].push(el);
+      else movedSquares[cn] = [el];
     }
     el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }
 
   // walk over all squares in current set, apply dom changes to moved squares
   // or append new squares
-  for (const [sk, className] of squares) {
-    if (!sameSquares.has(sk)) {
-      sMvdset = movedSquares.get(className);
+  for (const sk in squares) {
+    if (!sameSquares[sk]) {
+      sMvdset = movedSquares[squares[sk]];
       sMvd = sMvdset && sMvdset.pop();
-      const translation = posToTranslate(key2pos(sk), orientation);
+      const translation = posToTranslate(key2pos(sk as cg.Key), orientation, asWhite, s.dimensions);
       if (sMvd) {
-        sMvd.cgKey = sk;
+        sMvd.cgKey = sk as cg.Key;
         translate(sMvd, translation);
       } else {
-        const squareNode = createEl('square', className) as cg.SquareNode;
-        squareNode.cgKey = sk;
+        const squareNode = createEl('square', squares[sk]) as cg.SquareNode;
+        squareNode.cgKey = sk as cg.Key;
         translate(squareNode, translation);
         boardEl.insertBefore(squareNode, boardEl.firstChild);
       }
@@ -128,10 +131,12 @@ export function render(s: State): void {
 
   // walk over all pieces in current set, apply dom changes to moved pieces
   // or append new pieces
-  for (const [k, p] of pieces) {
-    anim = anims.get(k);
-    if (!samePieces.has(k)) {
-      pMvdset = movedPieces.get(pieceNameOf(p, s.orientation));
+  for (const j in piecesKeys) {
+    k = piecesKeys[j];
+    p = pieces[k]!;
+    anim = anims[k];
+    if (!samePieces[k]) {
+      pMvdset = movedPieces[pieceNameOf(p, s.orientation)];
       pMvd = pMvdset && pMvdset.pop();
       // a same piece was moved
       if (pMvd) {
@@ -142,14 +147,14 @@ export function render(s: State): void {
           pMvd.cgFading = false;
         }
         const pos = key2pos(k);
-        if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, orientation);
+        if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, orientation, asWhite);
         if (anim) {
           pMvd.cgAnimating = true;
           pMvd.classList.add('anim');
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        translate(pMvd, posToTranslate(pos, orientation));
+        translate(pMvd, posToTranslate(pos, orientation, asWhite, s.dimensions));
       }
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
@@ -165,9 +170,9 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        translate(pieceNode, posToTranslate(pos, orientation));
+        translate(pieceNode, posToTranslate(pos, orientation, asWhite, s.dimensions));
 
-        if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, orientation);
+        if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, orientation, asWhite);
 
         boardEl.appendChild(pieceNode);
       }
@@ -175,18 +180,18 @@ export function render(s: State): void {
   }
 
   // remove any element that remains in the moved sets
-  for (const nodes of movedPieces.values()) removeNodes(s, nodes);
-  for (const nodes of movedSquares.values()) removeNodes(s, nodes);
+  for (const i in movedPieces) removeNodes(s, movedPieces[i]);
+  for (const i in movedSquares) removeNodes(s, movedSquares[i]);
 }
 
 export function updateBounds(s: State): void {
   if (s.dom.relative) return;
   const orientation = s.orientation,
-    posToTranslate = posToTranslateAbs(s.dom.bounds());
+    posToTranslate = posToTranslateAbs(s.dom.bounds(), s.dimensions);
   let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;
   while (el) {
     if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el)) {
-      translateAbs(el, posToTranslate(key2pos(el.cgKey), orientation));
+      translateAbs(el, posToTranslate(key2pos(el.cgKey), orientation, whitePov(s)));
     }
     el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }
@@ -218,45 +223,63 @@ function pieceNameOf(piece: cg.Piece, orientation: cg.Orientation): string {
 }
 
 function computeSquareClasses(s: State): SquareClasses {
-  const squares: SquareClasses = new Map();
-  if (s.lastMove && s.highlight.lastMove)
-    for (const k of s.lastMove) {
-      addSquare(squares, k, 'last-move');
+  const squares: SquareClasses = {};
+  let i: any, k: cg.Key;
+  if (s.lastMove && s.highlight.lastMove) for (i in s.lastMove) {
+    if (s.lastMove[i] != 'a0') {
+      addSquare(squares, s.lastMove[i], 'last-move');
     }
+  }
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');
     if (s.movable.showDests) {
-      const dests = s.movable.dests?.get(s.selected);
-      if (dests)
-        for (const k of dests) {
-          addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
-        }
+      const dests = s.movable.dests && s.movable.dests[s.selected];
+      if (dests) for (i in dests) {
+        k = dests[i];
+        addSquare(squares, k, 'move-dest' + (s.pieces[k] ? ' oc' : ''));
+      }
       const pDests = s.premovable.dests;
-      if (pDests)
-        for (const k of pDests) {
-          addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
-        }
+      if (pDests) for (i in pDests) {
+        k = pDests[i];
+        addSquare(squares, k, 'premove-dest' + (s.pieces[k] ? ' oc' : ''));
+      }
+    }
+  } else if (s.dropmode.active || s.draggable.current?.orig === 'a0') {
+    const piece = s.dropmode.active ? s.dropmode.piece : s.draggable.current?.piece;
+
+    if (piece) {
+      // TODO: there was a function called isPredroppable that was used in drag.ts or drop.ts or both.
+      //       Maybe use the same here to decide what to render instead of potentially making it possible both
+      //       kinds of highlighting to happen if something was not cleared up in the state.
+      //       In other place (pocket.ts) this condition is used ot decide similar question: ctrl.mycolor === ctrl.turnColor
+      if (s.dropmode.showDropDests) {
+        const dests = s.dropmode.dropDests?.get(piece.role);
+        if (dests)
+          for (const k of dests) {
+            addSquare(squares, k, 'move-dest');
+          }
+      }
+      if (s.predroppable.showDropDests) {
+        const pDests = s.predroppable.dropDests;
+        if (pDests)
+          for (const k of pDests) {
+            addSquare(squares, k, 'premove-dest' + (s.pieces[k] ? ' oc' : ''));
+          }
+      }
     }
   }
   const premove = s.premovable.current;
-  if (premove) for (const k of premove) addSquare(squares, k, 'current-premove');
+  if (premove) for (i in premove) addSquare(squares, premove[i], 'current-premove');
   else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
 
   const o = s.exploding;
-  if (o) for (const k of o.keys) addSquare(squares, k, 'exploding' + o.stage);
+  if (o) for (i in o.keys) addSquare(squares, o.keys[i], 'exploding' + o.stage);
 
   return squares;
 }
 
 function addSquare(squares: SquareClasses, key: cg.Key, klass: string): void {
-  const classes = squares.get(key);
-  if (classes) squares.set(key, `${classes} ${klass}`);
-  else squares.set(key, klass);
-}
-
-function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {
-  const arr = map.get(key);
-  if (arr) arr.push(value);
-  else map.set(key, [value]);
+  if (squares[key]) squares[key] += ' ' + klass;
+  else squares[key] = klass;
 }
