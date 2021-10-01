@@ -4,7 +4,7 @@ import * as T from './transformations';
 export const colors: cg.Color[] = ['white', 'black'];
 
 export const NRanks: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-export const invRanks: number[] = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+export const invNRanks: number[] = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 
 function files(n: number) {
   return cg.files.slice(0, n);

@@ -107,7 +107,7 @@ export interface HeadlessState {
   };
   drawable: Drawable;
   exploding?: cg.Exploding;
-  dom: cg.Dom,
+  //dom: cg.Dom,
   hold: cg.Timer,
   dimensions: cg.BoardDimensions, // number of lines and ranks of the board {width: 10, height: 8}
   geometry: cg.Geometry, // dim8x8 | dim9x9 | dim10x8 | dim9x10
@@ -120,7 +120,7 @@ export interface State extends HeadlessState {
   dom: cg.Dom;
 }
 
-export function defaults(): Partial<HeadlessState> {
+export function defaults(): HeadlessState {
   return {
     pieces: fen.read(fen.initial),
     orientation: 'white',

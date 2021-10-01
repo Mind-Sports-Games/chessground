@@ -1,5 +1,6 @@
 import { State } from './state';
 import { key2pos, createEl, posToTranslateRel, posToTranslateAbs, translateRel, translateAbs } from './util';
+import { whitePov } from './board'
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim';
 import { DragCurrent } from './drag';
 import * as cg from './types';
@@ -7,26 +8,33 @@ import * as T from './transformations';
 
 type PieceName = string; // `$color $role`
 
-type SquareClasses = Map<cg.Key, string>;
+interface SamePieces { [key: string]: boolean }
+interface SameSquares { [key: string]: boolean }
+interface MovedPieces { [pieceName: string]: cg.PieceNode[] }
+interface MovedSquares { [className: string]: cg.SquareNode[] }
+interface SquareClasses { [key: string]: string }
 
 // ported from https://github.com/veloce/lichobile/blob/master/src/js/chessground/view.js
 // in case of bugs, blame @veloce
 export function render(s: State): void {
   const orientation = s.orientation,
-    posToTranslate = s.dom.relative ? posToTranslateRel : posToTranslateAbs(s.dom.bounds()),
+    asWhite: boolean = whitePov(s),
+    posToTranslate = s.dom.relative ? posToTranslateRel : posToTranslateAbs(s.dom.bounds(), s.dimensions),
     translate = s.dom.relative ? translateRel : translateAbs,
     boardEl: HTMLElement = s.dom.elements.board,
     pieces: cg.Pieces = s.pieces,
     curAnim: AnimCurrent | undefined = s.animation.current,
-    anims: AnimVectors = curAnim ? curAnim.plan.anims : new Map(),
-    fadings: AnimFadings = curAnim ? curAnim.plan.fadings : new Map(),
+    anims: AnimVectors = curAnim ? curAnim.plan.anims : {},
+    fadings: AnimFadings = curAnim ? curAnim.plan.fadings : {},
     curDrag: DragCurrent | undefined = s.draggable.current,
     squares: SquareClasses = computeSquareClasses(s),
-    samePieces: Set<cg.Key> = new Set(),
-    sameSquares: Set<cg.Key> = new Set(),
-    movedPieces: Map<PieceName, cg.PieceNode[]> = new Map(),
-    movedSquares: Map<string, cg.SquareNode[]> = new Map(); // by class name
+    samePieces: SamePieces = {},
+    sameSquares: SameSquares = {},
+    movedPieces: MovedPieces = {},
+    movedSquares: MovedSquares = {},
+    piecesKeys: cg.Key[] = Object.keys(pieces) as cg.Key[];
   let k: cg.Key,
+    p: cg.Piece | undefined,
     el: cg.PieceNode | cg.SquareNode | undefined,
     pieceAtKey: cg.Piece | undefined,
     elPieceName: PieceName,
@@ -42,14 +50,14 @@ export function render(s: State): void {
   while (el) {
     k = el.cgKey;
     if (isPieceNode(el)) {
-      pieceAtKey = pieces.get(k);
-      anim = anims.get(k);
-      fading = fadings.get(k);
+      pieceAtKey = pieces[k];
+      anim = anims[k];
+      fading = fadings[k];
       elPieceName = el.cgPiece;
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
-        translate(el, posToTranslate(key2pos(k), orientation));
+        translate(el, posToTranslate(key2pos(k), orientation, asWhite, s.dimensions));
         el.cgDragging = false;
       }
       // remove fading class if it still remains
@@ -61,25 +69,25 @@ export function render(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey)) {
+        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey, s.orientation)) {
           const pos = key2pos(k);
           pos[0] += anim[2];
           pos[1] += anim[3];
           el.classList.add('anim');
-          translate(el, posToTranslate(pos, orientation));
+          translate(el, posToTranslate(pos, orientation, asWhite, s.dimensions));
         } else if (el.cgAnimating) {
           el.cgAnimating = false;
           el.classList.remove('anim');
-          translate(el, posToTranslate(key2pos(k), orientation));
-          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation);
+          translate(el, posToTranslate(key2pos(k), orientation, asWhite, s.dimensions));
+          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asWhite);
         }
         // same piece: flag as same
-        if (elPieceName === pieceNameOf(pieceAtKey) && (!fading || !el.cgFading)) {
-          samePieces.add(k);
+        if (elPieceName === pieceNameOf(pieceAtKey, s.orientation) && (!fading || !el.cgFading)) {
+          samePieces[k] = true;
         }
         // different piece: flag as moved unless it is a fading piece
         else {
-          if (fading && elPieceName === pieceNameOf(fading)) {
+          if (fading && elPieceName === pieceNameOf(fading, s.orientation)) {
             el.classList.add('fading');
             el.cgFading = true;
           } else {
@@ -123,7 +131,7 @@ export function render(s: State): void {
   for (const [k, p] of pieces) {
     anim = anims.get(k);
     if (!samePieces.has(k)) {
-      pMvdset = movedPieces.get(pieceNameOf(p));
+      pMvdset = movedPieces.get(pieceNameOf(p, s.orientation));
       pMvd = pMvdset && pMvdset.pop();
       // a same piece was moved
       if (pMvd) {
@@ -146,7 +154,7 @@ export function render(s: State): void {
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
       else {
-        const pieceName = pieceNameOf(p),
+        const pieceName = pieceNameOf(p, s.orientation),
           pieceNode = createEl('piece', pieceName) as cg.PieceNode,
           pos = key2pos(k);
 
@@ -195,14 +203,18 @@ function removeNodes(s: State, nodes: HTMLElement[]): void {
   for (const node of nodes) s.dom.elements.board.removeChild(node);
 }
 
-function posZIndex(pos: cg.Pos, orientation: cg.Orientation): string {
+function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asWhite: boolean): string {
   pos = T.mapToWhite[orientation](pos);
-  const z = 2 + pos[1] * 8 + (7 - pos[0]);
+  let z = 2 + (pos[1] - 1) * 8 + (8 - pos[0]);
+  if (asWhite) z = 67 - z;
   return z + '';
 }
 
-function pieceNameOf(piece: cg.Piece): string {
-  return `${piece.color} ${piece.role}`;
+function pieceNameOf(piece: cg.Piece, orientation: cg.Orientation): string {
+  const colourOrientation : cg.Color = (orientation == "white" || orientation == "left") ? "white" : "black"
+  const promoted = piece.promoted ? "promoted " : "";
+  const side = piece.color === colourOrientation ? "ally" : "enemy";
+  return `${piece.color} ${promoted}${piece.role} ${side}`;
 }
 
 function computeSquareClasses(s: State): SquareClasses {
