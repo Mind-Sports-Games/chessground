@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "7.11.1-pstrat2.1",
+  "version": "7.11.1-pstrat2.2",
   "description": "playstrategy.org chess ui, forked from lichess.org",
   "type": "commonjs",
   "main": "chessground.js",
