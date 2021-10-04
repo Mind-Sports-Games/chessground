@@ -2,7 +2,7 @@ import * as cg from './types';
 import * as T from './transformations';
 
 export const colors: cg.Color[] = ['white', 'black'];
-
+export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
 export const NRanks: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 export const invNRanks: number[] = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 
@@ -14,7 +14,7 @@ function ranks(n: number) {
   return cg.ranks.slice(0, n);
 }
 
-export function allKeys(geom: cg.Geometry) {
+export function allKeys(geom: cg.Geometry = cg.Geometry.dim8x8) {
   const bd = cg.dimensions[geom];
   return Array.prototype.concat(...files(bd.width).map(c => ranks(bd.height).map(r => c+r)));
 }
