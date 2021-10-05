@@ -8,13 +8,9 @@ export type Mutation<A> = (state: State) => A;
 // 2,3 animation current status
 export type AnimVector = cg.NumberQuad;
 
-export interface AnimVectors {
-  [key: string]: AnimVector
-}
+export type AnimVectors = Map<cg.Key, AnimVector>;
 
-export interface AnimFadings {
-  [key: string]: cg.Piece
-}
+export type AnimFadings = Map<cg.Key, cg.Piece>;
 
 export interface AnimPlan {
   anims: AnimVectors;
@@ -42,9 +38,7 @@ interface AnimPiece {
   pos: cg.Pos;
   piece: cg.Piece;
 }
-interface AnimPieces {
-  [key: string]: AnimPiece
-}
+type AnimPieces = Map<cg.Key, AnimPiece>;
 
 function makePiece(key: cg.Key, piece: cg.Piece): AnimPiece {
   return {
@@ -54,26 +48,26 @@ function makePiece(key: cg.Key, piece: cg.Piece): AnimPiece {
   };
 }
 
-function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece {
+function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece | undefined {
   return pieces.sort((p1, p2) => {
     return util.distanceSq(piece.pos, p1.pos) - util.distanceSq(piece.pos, p2.pos);
   })[0];
 }
 
 function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
-  const anims: AnimVectors = {},
+  const anims: AnimVectors = new Map(),
   animedOrigs: cg.Key[] = [],
-  fadings: AnimFadings = {},
+  fadings: AnimFadings = new Map(),
   missings: AnimPiece[] = [],
   news: AnimPiece[] = [],
-  prePieces: AnimPieces = {};
-  let curP: cg.Piece | undefined, preP: AnimPiece | undefined, i: any, vector: cg.NumberPair;
-  for (i in prevPieces) {
-    prePieces[i] = makePiece(i as cg.Key, prevPieces[i]!);
+  prePieces: AnimPieces = new Map();
+  let curP: cg.Piece | undefined, preP: AnimPiece | undefined, vector: cg.NumberPair;
+  for (const [k, p] of prevPieces) {
+    prePieces.set(k, makePiece(k, p));
   }
   for (const key of util.allKeys(current.geometry)) {
-    curP = current.pieces[key];
-    preP = prePieces[key];
+    curP = current.pieces.get(key);
+    preP = prePieces.get(key);
     if (curP) {
       if (preP) {
         if (!util.samePiece(curP, preP.piece)) {
@@ -83,17 +77,17 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
       } else news.push(makePiece(key, curP));
     } else if (preP) missings.push(preP);
   }
-  news.forEach(newP => {
+  for (const newP of news) {
     preP = closer(newP, missings.filter(p => util.samePiece(newP.piece, p.piece)));
     if (preP) {
       vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
-      anims[newP.key] = vector.concat(vector) as AnimVector;
+      anims.set(newP.key, vector.concat(vector) as AnimVector);
       animedOrigs.push(preP.key);
     }
-  });
-  missings.forEach(p => {
-    if (!util.containsX(animedOrigs, p.key)) fadings[p.key] = p.piece;
-  });
+  };
+  for (const p of missings) {
+    if (!animedOrigs.includes(p.key)) fadings.set(p.key, p.piece);
+  }
 
   return {
     anims: anims,
@@ -113,8 +107,7 @@ function step(state: State, now: DOMHighResTimeStamp): void {
     state.dom.redrawNow();
   } else {
     const ease = easing(rest);
-    for (let i in cur.plan.anims) {
-      const cfg = cur.plan.anims[i];
+    for (const cfg of cur.plan.anims.values()) {
       cfg[2] = cfg[0] * ease;
       cfg[3] = cfg[1] * ease;
     }
@@ -125,11 +118,11 @@ function step(state: State, now: DOMHighResTimeStamp): void {
 
 function animate<A>(mutation: Mutation<A>, state: State): A {
   // clone state before mutating it
-  const prevPieces: cg.Pieces = {...state.pieces};
+  const prevPieces: cg.Pieces = new Map(state.pieces);
 
   const result = mutation(state);
   const plan = computePlan(prevPieces, state);
-  if (!isObjectEmpty(plan.anims) || !isObjectEmpty(plan.fadings)) {
+  if (plan.anims.size || plan.fadings.size) {
     const alreadyRunning = state.animation.current && state.animation.current.start;
     state.animation.current = {
       start: performance.now(),
@@ -142,11 +135,6 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
     state.dom.redraw();
   }
   return result;
-}
-
-function isObjectEmpty(o: any): boolean {
-  for (let _ in o) return false;
-  return true;
 }
 
 // https://gist.github.com/gre/1650294

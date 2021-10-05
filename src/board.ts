@@ -38,20 +38,20 @@ export function reset(state: HeadlessState): void {
 }
 
 export function setPieces(state: HeadlessState, pieces: cg.PiecesDiff): void {
-  for (let key in pieces) {
-    const piece = pieces[key];
-    if (piece) state.pieces[key] = piece;
-    else delete state.pieces[key];
+  for (const [key, piece] of pieces) {
+    if (piece) state.pieces.set(key, piece);
+    else state.pieces.delete(key);
   }
 }
 
 export function setCheck(state: HeadlessState, color: cg.Color | boolean): void {
   state.check = undefined;
   if (color === true) color = state.turnColor;
-  if (color) for (let k in state.pieces) {
-    if (state.pieces[k]!.role === 'k-piece' && state.pieces[k]!.color === color) {
-      state.check = k as cg.Key;
-    }
+  if (color)
+    for (const [k, p] of state.pieces) {
+      if (p.role === 'k-piece' && p.color === color) {
+        state.check = k;
+      }
   }
 }
 
@@ -84,7 +84,7 @@ export function unsetPredrop(state: HeadlessState): void {
 
 function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   if (!state.autoCastle) return false;
-  const king = state.pieces[orig];
+  const king = state.pieces.get(orig);
   if (!king || king.role !== 'k-piece') return false;
   const origPos = key2pos(orig);
   if (origPos[0] !== 5) return false;
@@ -101,26 +101,26 @@ function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolea
     newKingPos = pos2key([3, origPos[1]]);
   } else return false;
 
-  const rook = state.pieces[oldRookPos];
+  const rook = state.pieces.get(oldRookPos);
   if (!rook || rook.role !== 'r-piece') return false;
 
-  delete state.pieces[orig];
-  delete state.pieces[oldRookPos];
+  state.pieces.delete(orig);
+  state.pieces.delete(oldRookPos);
 
-  state.pieces[newKingPos] = king
-  state.pieces[newRookPos] = rook;
+  state.pieces.set(newKingPos, king);
+  state.pieces.set(newRookPos, rook);
   return true;
 }
 
 export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
-  const origPiece = state.pieces[orig], destPiece = state.pieces[dest];
+  const origPiece = state.pieces.get(orig), destPiece = state.pieces.get(dest);
   if (orig === dest || !origPiece) return false;
   const captured = (destPiece && destPiece.color !== origPiece.color) ? destPiece : undefined;
-  if (dest == state.selected) unselect(state);
+  if (dest === state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captured);
   if (!tryAutoCastle(state, orig, dest)) {
-    state.pieces[dest] = origPiece;
-    delete state.pieces[orig];
+    state.pieces.set(dest, origPiece);
+    state.pieces.delete(orig);
   }
   state.lastMove = [orig, dest];
   state.check = undefined;
@@ -129,12 +129,12 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
 }
 
 export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key, force?: boolean): boolean {
-  if (state.pieces[key]) {
-    if (force) delete state.pieces[key];
+  if (state.pieces.has(key)) {
+    if (force) state.pieces.delete(key);
     else return false;
   }
   callUserFunction(state.events.dropNewPiece, piece, key);
-  state.pieces[key] = piece;
+  state.pieces.set(key, piece);
   state.lastMove = [key];
   state.check = undefined;
   callUserFunction(state.events.change);
@@ -189,22 +189,22 @@ export function userMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): bool
  *       regular chess movements dynamics
  * */
 export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, force?: boolean): void {
-  const piece = state.pieces[orig]!;
+  const piece = state.pieces.get(orig);
   if (piece && (canDrop(state, orig, dest) || force)) {
-    delete state.pieces[orig];
+    state.pieces.delete(orig);
     baseNewPiece(state, piece, dest, force);
     callUserFunction(state.movable.events.afterNewPiece, piece.role, dest, {
       premove: false,
       predrop: false,
     });
   } else if (piece && canPredrop(state, orig, dest)) {
-    setPredrop(state, state.pieces[orig]!.role, dest);
+    setPredrop(state, piece.role, dest);
   } else {
     unsetPremove(state);
     unsetPredrop(state);
     cancelDropMode(state);
   }
-  delete state.pieces[orig];
+  state.pieces.delete(orig);
   unselect(state);
 }
 
@@ -246,7 +246,7 @@ export function unselect(state: HeadlessState): void {
 }
 
 function isMovable(state: HeadlessState, orig: cg.Key): boolean {
-  const piece = state.pieces[orig];
+  const piece = state.pieces.get(orig);
   return (
     !!piece &&
     (state.movable.color === 'both' || (state.movable.color === piece.color && state.turnColor === piece.color))
@@ -255,13 +255,13 @@ function isMovable(state: HeadlessState, orig: cg.Key): boolean {
 
 export function canMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   return (
-    orig !== dest && isMovable(state, orig) && (state.movable.free || (!!state.movable.dests && containsX(state.movable.dests[orig], dest)))
+    orig !== dest && isMovable(state, orig) && (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest))
   );
 }
 
 function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
-  const piece = state.pieces[orig];
-  return !!piece && dest && (orig === dest || !state.pieces[dest]) && (
+  const piece = state.pieces.get(orig);
+  return !!piece && dest && (orig === dest || !state.pieces.has(dest)) && (
     state.movable.color === 'both' || (
       state.movable.color === piece.color &&
         state.turnColor === piece.color
@@ -269,7 +269,7 @@ function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
 }
 
 function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
-  const piece = state.pieces[orig];
+  const piece = state.pieces.get(orig);
   return !!piece && state.premovable.enabled && state.movable.color === piece.color && state.turnColor !== piece.color;
 }
 
@@ -294,8 +294,8 @@ function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
  * TODO: orig is probably always equal to a0 and only used for getting the piece - consider replacing that param with "piece" (see also dropNewPiece(...) )
  **/
 function canPredrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
-  const piece = state.pieces[orig];
-  const destPiece = state.pieces[dest];
+  const piece = state.pieces.get(orig);
+  const destPiece = state.pieces.get(dest);
   if (!piece){
     return false;
   }
@@ -311,7 +311,7 @@ function canPredrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
 }
 
 export function isDraggable(state: HeadlessState, orig: cg.Key): boolean {
-  const piece = state.pieces[orig];
+  const piece = state.pieces.get(orig);
   return (
     !!piece &&
     state.draggable.enabled &&

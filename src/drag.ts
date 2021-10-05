@@ -30,7 +30,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     position = util.eventPosition(e)!,
     orig = board.getKeyAtDomPos(position, s.orientation, board.whitePov(s), bounds, s.geometry);
   if (!orig) return;
-  const piece = s.pieces[orig];
+  const piece = s.pieces.get(orig);
   const previouslySelected = s.selected;
   if (!previouslySelected && s.drawable.enabled && (
     s.drawable.eraseOnClick || (!piece || piece.color !== s.turnColor)
@@ -109,7 +109,7 @@ function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
 
 export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?: boolean): void {
   const key: cg.Key = 'a0';
-  s.pieces[key] = piece;
+  s.pieces.set(key, piece);
   s.dom.redraw();
 
   const position = util.eventPosition(e)!,
@@ -149,9 +149,9 @@ function processDrag(s: State): void {
     const cur = s.draggable.current;
     if (!cur) return;
     // cancel animations while dragging
-    if (s.animation.current && s.animation.current.plan.anims[cur.orig]) s.animation.current = undefined;
+    if (s.animation.current?.plan.anims.has(cur.orig)) s.animation.current = undefined;
     // if moving piece is gone, cancel
-    const origPiece = s.pieces[cur.orig];
+    const origPiece = s.pieces.get(cur.orig);
     if (!origPiece || !util.samePiece(origPiece, cur.piece)) cancel(s);
     else {
       if (!cur.started && util.distanceSq(cur.epos, cur.rel) >= Math.pow(s.draggable.distance, 2))
@@ -212,9 +212,9 @@ export function end(s: State, e: cg.MouchEvent): void {
       if (board.userMove(s, cur.orig, dest)) s.stats.dragged = true;
     }
   } else if (cur.newPiece) {
-    delete s.pieces[cur.orig];
+    s.pieces.delete(cur.orig);
   } else if (s.draggable.deleteOnDropOff && !dest) {
-    delete s.pieces[cur.orig];
+    s.pieces.delete(cur.orig);
     board.callUserFunction(s.events.change);
   }
   if (cur && cur.orig === cur.previouslySelected && (cur.orig === dest || !dest)) board.unselect(s);
@@ -229,7 +229,7 @@ export function end(s: State, e: cg.MouchEvent): void {
 export function cancel(s: State): void {
   const cur = s.draggable.current;
   if (cur) {
-    if (cur.newPiece) delete s.pieces[cur.orig];
+    if (cur.newPiece) s.pieces.delete(cur.orig);
     s.draggable.current = undefined;
     board.unselect(s);
     removeDragElements(s);

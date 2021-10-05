@@ -51,10 +51,13 @@ function king(color: cg.Color, rookFiles: number[], canCastle: boolean): Mobilit
 
 function rookFilesOf(pieces: cg.Pieces, color: cg.Color) {
   const backrank = color === 'white' ? '1' : '8';
-  return Object.keys(pieces).filter(key => {
-    const piece = pieces[key];
-    return key[1] === backrank && piece && piece.color === color && piece.role === 'r-piece';
-  }).map((key: string ) => util.key2pos(key as cg.Key)[0]);
+  const files = [];
+  for (const [key, piece] of pieces) {
+    if (key[1] === backrank && piece && piece.color === color && piece.role === 'r-piece') {
+      files.push(util.key2pos(key)[0]);
+    }
+  }
+  return files;
 }
 
 // king without castling
@@ -90,10 +93,13 @@ function kingShako(color: cg.Color, rookFiles: number[], canCastle: boolean): Mo
 }
 function rookFilesOfShako(pieces: cg.Pieces, color: cg.Color) {
   const backrank = color === 'white' ? '2' : '9';
-  return Object.keys(pieces).filter(key => {
-    const piece = pieces[key];
-    return key[1] === backrank && piece && piece.color === color && piece.role === 'r-piece';
-  }).map((key: string ) => util.key2pos(key as cg.Key)[0]);
+  const files = [];
+  for (const [key, piece] of pieces) {
+    if (key[1] === backrank && piece && piece.color === color && piece.role === 'r-piece') {
+      files.push(util.key2pos(key)[0]);
+    }
+  }
+  return files;
 }
 
 // wazir
@@ -461,7 +467,7 @@ function toriEagle(color: cg.Color): Mobility {
 }
 
 export function premove(pieces: cg.Pieces, key: cg.Key, canCastle: boolean, geom: cg.Geometry, variant: cg.Variant, chess960: Boolean): cg.Key[] {
-  const piece = pieces[key]!;
+  const piece = pieces.get(key)!;
   const role = piece.role;
   const color = piece.color;
   if (!piece) return [];

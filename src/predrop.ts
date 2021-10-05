@@ -110,7 +110,7 @@ export default function predrop(pieces: cg.Pieces, piece: cg.Piece, geom: cg.Geo
 	}
 
 	return util.allKeys(geom).map(util.key2pos).filter(pos => {
-        return pieces[util.pos2key(pos)]?.color !== color && mobility(pos[0], pos[1]);
+        return pieces.get(util.pos2key(pos))?.color !== color && mobility(pos[0], pos[1]);
     }).map(util.pos2key);
 
 }

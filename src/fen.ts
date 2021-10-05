@@ -15,7 +15,7 @@ function letters(role: cg.Role) {
 export function read(fen: cg.FEN): cg.Pieces {
   if (fen === 'start') fen = initial;
   if (fen.indexOf('[') !== -1) fen = fen.slice(0, fen.indexOf('['));
-  const pieces: cg.Pieces = {};
+  const pieces: cg.Pieces = new Map();
   let row: number = fen.split("/").length;
   let col: number = 0;
   let promoted: boolean = false;
@@ -35,7 +35,7 @@ export function read(fen: cg.FEN): cg.Pieces {
         promoted = true;
         break;
       case '~': {
-        const piece = pieces[pos2key([col, row])];
+        const piece = pieces.get(pos2key([col, row]));
         if (piece) piece.promoted = true;
         break;
       }
@@ -56,7 +56,7 @@ export function read(fen: cg.FEN): cg.Pieces {
             piece.promoted = true;
             promoted = false;
           };
-          pieces[pos2key([col, row])] = piece;
+          pieces.set(pos2key([col, row]), piece);
         }
     }
   }
@@ -66,7 +66,7 @@ export function read(fen: cg.FEN): cg.Pieces {
 export function write(pieces: cg.Pieces, geom: cg.Geometry): cg.FEN {
   const bd = cg.dimensions[geom];
   return invNRanks.slice(-bd.height).map(y => NRanks.slice(0, bd.width).map(x => {
-      const piece = pieces[pos2key([x, y])];
+      const piece = pieces.get(pos2key([x, y]));
       if (piece) {
         const letter: string = letters(piece.role) + ((piece.promoted && (letters(piece.role).charAt(0) !== '+')) ? '~' : '');
         return (piece.color === 'white') ? letter.toUpperCase() : letter;

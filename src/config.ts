@@ -29,9 +29,7 @@ export interface Config {
   movable?: {
     free?: boolean; // all moves are valid - board editor
     color?: cg.Color | 'both'; // color that can move. white | black | both | undefined
-    dests?: {
-      [key: string]: cg.Key[]
-    }; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
+    dests?: cg.Dests; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     showDests?: boolean; // whether to add the move-dest class on squares
     events?: {
       after?: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => void; // called after the move has been played
@@ -125,7 +123,7 @@ export function configure(state: HeadlessState, config: Config): void {
   if (config.fen) {
     const pieces = fenRead(config.fen);
     // prevent to cancel() already started piece drag from pocket!
-    if (state.pieces['a0'] !== undefined) pieces['a0'] = state.pieces['a0'];
+    if (state.pieces.get('a0') !== undefined) pieces.set('a0', state.pieces.get('a0')!);
     state.pieces = pieces;
     state.drawable.shapes = [];
   }
@@ -147,12 +145,15 @@ export function configure(state: HeadlessState, config: Config): void {
   if (!state.movable.rookCastle && state.movable.dests) {
     const rank = state.movable.color === 'white' ? 1 : 8,
       kingStartPos = ('e' + rank) as cg.Key,
-      dests = state.movable.dests[kingStartPos],
-      king = state.pieces[kingStartPos];
+      dests = state.movable.dests.get(kingStartPos),
+      king = state.pieces.get(kingStartPos);
     if (!dests || !king || king.role !== 'k-piece') return;
-    state.movable.dests[kingStartPos] = dests.filter(d =>
-      !((d === 'a' + rank) && dests.indexOf('c' + rank as cg.Key) !== -1) &&
-        !((d === 'h' + rank) && dests.indexOf('g' + rank as cg.Key) !== -1)
+    state.movable.dests.set(
+      kingStartPos, 
+      dests.filter(d =>
+      !((d === 'a' + rank) && dests.includes(('c' + rank) as cg.Key)) &&
+        !((d === 'h' + rank) && dests.includes(('g' + rank) as cg.Key))
+      )
     );
   }
 }
