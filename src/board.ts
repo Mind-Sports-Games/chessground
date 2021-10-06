@@ -13,7 +13,6 @@ import {
 import { premove, queen, knight } from './premove';
 import predrop from './predrop'
 import * as cg from './types';
-import { cancelDropMode } from "./drop";
 import * as T from './transformations';
 
 
@@ -76,6 +75,11 @@ export function unsetPredrop(state: HeadlessState): void {
     pd.current = undefined;
     callUserFunction(pd.events.unset);
   }
+}
+
+function cancelDropMode(s: HeadlessState): void {
+  s.dropmode.active = false;
+  callUserFunction(s.dropmode.events?.cancel);
 }
 
 function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
