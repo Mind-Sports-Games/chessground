@@ -151,3 +151,9 @@ export function computeSquareCenter(key: cg.Key, orientation: cg.Orientation, bo
     bounds.top + (bounds.height * (7 - pos[1])) / 8 + bounds.height / 16,
   ];
 }
+
+export type Callback = (...args: any[]) => void;
+
+export function callUserFunction(f: Callback | undefined, ...args: any[]): void {
+  if (f) setTimeout(() => f(...args), 1);
+}

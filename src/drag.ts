@@ -215,7 +215,7 @@ export function end(s: State, e: cg.MouchEvent): void {
     s.pieces.delete(cur.orig);
   } else if (s.draggable.deleteOnDropOff && !dest) {
     s.pieces.delete(cur.orig);
-    board.callUserFunction(s.events.change);
+    util.callUserFunction(s.events.change);
   }
   if (cur && cur.orig === cur.previouslySelected && (cur.orig === dest || !dest)) board.unselect(s);
   else if (!s.selectable.enabled) board.unselect(s);

@@ -7,7 +7,8 @@ import {
   distanceSq,
   allPos,
   computeSquareCenter,
-  containsX
+  containsX,
+  callUserFunction
 } from './util';
 import { premove, queen, knight } from './premove';
 import predrop from './predrop'
@@ -15,11 +16,6 @@ import * as cg from './types';
 import { cancelDropMode } from "./drop";
 import * as T from './transformations';
 
-export type Callback = (...args: any[]) => void;
-
-export function callUserFunction(f: Callback | undefined, ...args: any[]): void {
-  if (f) setTimeout(() => f(...args), 1);
-}
 
 export function setOrientation(state: HeadlessState, o: cg.Orientation): void {
   state.orientation = o;
