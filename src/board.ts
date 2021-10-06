@@ -40,16 +40,16 @@ export function setPieces(state: HeadlessState, pieces: cg.PiecesDiff): void {
   }
 }
 
-export function setCheck(state: HeadlessState, color: cg.Color | boolean): void {
-  state.check = undefined;
-  if (color === true) color = state.turnColor;
-  if (color)
-    for (const [k, p] of state.pieces) {
-      if (p.role === 'k-piece' && p.color === color) {
-        state.check = k;
-      }
-  }
-}
+// export function setCheck(state: HeadlessState, color: cg.Color | boolean): void {
+//   state.check = undefined;
+//   if (color === true) color = state.turnColor;
+//   if (color)
+//     for (const [k, p] of state.pieces) {
+//       if (p.role === 'k-piece' && p.color === color) {
+//         state.check = k;
+//       }
+//   }
+// }
 
 function setPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key, meta: cg.SetPremoveMetadata): void {
   unsetPredrop(state);

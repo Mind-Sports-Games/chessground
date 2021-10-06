@@ -1,5 +1,5 @@
 import { HeadlessState } from './state';
-import { setCheck, setSelected } from './board';
+import { setSelected } from './board';
 import { read as fenRead } from './fen';
 import { DrawShape, DrawBrush } from './draw';
 import * as cg from './types';
@@ -157,6 +157,17 @@ export function configure(state: HeadlessState, config: Config): void {
         !((d === 'h' + rank) && dests.includes(('g' + rank) as cg.Key))
       )
     );
+  }
+}
+
+function setCheck(state: HeadlessState, color: cg.Color | boolean): void {
+  state.check = undefined;
+  if (color === true) color = state.turnColor;
+  if (color)
+    for (const [k, p] of state.pieces) {
+      if (p.role === 'k-piece' && p.color === color) {
+        state.check = k;
+      }
   }
 }
 
