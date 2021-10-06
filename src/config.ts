@@ -128,6 +128,8 @@ export function configure(state: HeadlessState, config: Config): void {
     state.drawable.shapes = [];
   }
 
+  console.log("state: ", state);
+  console.log("config.check: ", config.check);
   // apply config values that could be undefined yet meaningful
   if ('check' in config) setCheck(state, config.check || false);
   if ('lastMove' in config && !config.lastMove) state.lastMove = undefined;
