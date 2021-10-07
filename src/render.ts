@@ -63,7 +63,7 @@ export function render(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey, s.turnColor)) {
+        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey, s.myColor)) {
           const pos = key2pos(k);
           pos[0] += anim[2];
           pos[1] += anim[3];
@@ -76,12 +76,12 @@ export function render(s: State): void {
           if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asWhite);
         }
         // same piece: flag as same
-        if (elPieceName === pieceNameOf(pieceAtKey, s.turnColor) && (!fading || !el.cgFading)) {
+        if (elPieceName === pieceNameOf(pieceAtKey, s.myColor) && (!fading || !el.cgFading)) {
           samePieces.add(k);
         }
         // different piece: flag as moved unless it is a fading piece
         else {
-          if (fading && elPieceName === pieceNameOf(fading, s.turnColor)) {
+          if (fading && elPieceName === pieceNameOf(fading, s.myColor)) {
             el.classList.add('fading');
             el.cgFading = true;
           } else {
@@ -126,7 +126,7 @@ export function render(s: State): void {
   for (const [k, p] of pieces) {
     anim = anims.get(k);
     if (!samePieces.has(k)) {
-      pMvdset = movedPieces.get(pieceNameOf(p, s.turnColor));
+      pMvdset = movedPieces.get(pieceNameOf(p, s.myColor));
       pMvd = pMvdset && pMvdset.pop();
       // a same piece was moved
       if (pMvd) {
@@ -149,7 +149,7 @@ export function render(s: State): void {
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
       else {
-        const pieceName = pieceNameOf(p, s.turnColor),
+        const pieceName = pieceNameOf(p, s.myColor),
           pieceNode = createEl('piece', pieceName) as cg.PieceNode,
           pos = key2pos(k);
 
@@ -205,9 +205,9 @@ function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asWhite: boolean): 
   return z + '';
 }
 
-function pieceNameOf(piece: cg.Piece, turnColor: cg.Color): string {
+function pieceNameOf(piece: cg.Piece, myColor: cg.Color): string {
   const promoted = piece.promoted ? "promoted " : "";
-  const side = piece.color === turnColor ? "ally" : "enemy";
+  const side = piece.color === myColor ? "ally" : "enemy";
   return `${piece.color} ${promoted}${piece.role} ${side}`;
 }
 

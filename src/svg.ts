@@ -196,7 +196,7 @@ function renderShape(
       shape.piece,
       bounds,
       state.dimensions,
-      state.turnColor
+      state.myColor
     );
   else {
     const orig = orient(key2pos(shape.orig), state.orientation, state.dimensions);
@@ -281,7 +281,7 @@ function renderArrow(
   });
 }
 
-function renderPiece(baseUrl: string, pos: cg.Pos, piece: DrawShapePiece, bounds: ClientRect, bd: cg.BoardDimensions, turnColor: cg.Color): SVGElement {
+function renderPiece(baseUrl: string, pos: cg.Pos, piece: DrawShapePiece, bounds: ClientRect, bd: cg.BoardDimensions, myColor: cg.Color): SVGElement {
   const o = pos2px(pos, bounds, bd),
   width = bounds.width / bd.width * (piece.scale || 1),
   height = bounds.height / bd.height * (piece.scale || 1),
@@ -289,7 +289,7 @@ function renderPiece(baseUrl: string, pos: cg.Pos, piece: DrawShapePiece, bounds
   // If baseUrl doesn't end with '/' use it as full href
   // This is needed when drop piece suggestion .svg image file names are different than "name" produces
   const href = (baseUrl.endsWith('/') ? baseUrl + name + '.svg' : baseUrl);
-  const side = piece.color === turnColor ? "ally" : "enemy";
+  const side = piece.color === myColor ? "ally" : "enemy";
   return setAttributes(createElement('image'), {
     className: `${piece.role} ${piece.color} ${side}`,
     x: o[0] - width / 2,

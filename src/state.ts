@@ -7,7 +7,9 @@ import * as cg from './types';
 
 export interface HeadlessState {
   pieces: cg.Pieces;
-  orientation: cg.Orientation; // board orientation. white | black
+  orientation: cg.Orientation; // board orientation. white | black | left | right
+  myColor: cg.Color; // to determine piece is ally or enemy
+  startColor: cg.Color; //starting color
   turnColor: cg.Color; // turn to play. white | black
   check?: cg.Key; // square currently in check "a2"
   lastMove?: cg.Key[]; // squares part of the last move ["c3"; "c4"]
@@ -124,6 +126,8 @@ export function defaults(): HeadlessState {
   return {
     pieces: fen.read(fen.initial),
     orientation: 'white',
+    myColor: 'white',
+    startColor: 'white',
     turnColor: 'white',
     coordinates: true,
     autoCastle: true,
