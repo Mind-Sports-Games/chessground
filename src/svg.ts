@@ -289,6 +289,8 @@ function renderPiece(baseUrl: string, pos: cg.Pos, piece: DrawShapePiece, bounds
   // If baseUrl doesn't end with '/' use it as full href
   // This is needed when drop piece suggestion .svg image file names are different than "name" produces
   const href = (baseUrl.endsWith('/') ? baseUrl + name + '.svg' : baseUrl);
+  console.log("svg, piece.color: ", piece.color);
+  console.log("svg, myColor: ", myColor);
   const side = piece.color === myColor ? "ally" : "enemy";
   return setAttributes(createElement('image'), {
     className: `${piece.role} ${piece.color} ${side}`,

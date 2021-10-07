@@ -206,6 +206,8 @@ function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asWhite: boolean): 
 }
 
 function pieceNameOf(piece: cg.Piece, myColor: cg.Color): string {
+  console.log("render, piece.color: ", piece.color);
+  console.log("render, myColor: ", myColor);
   const promoted = piece.promoted ? "promoted " : "";
   const side = piece.color === myColor ? "ally" : "enemy";
   return `${piece.color} ${promoted}${piece.role} ${side}`;
