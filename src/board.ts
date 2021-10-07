@@ -389,7 +389,7 @@ export function getKeyAtDomPos(
 
 
 export function whitePov(s: HeadlessState): boolean {
-  return s.orientation === 'white';
+  return s.myColor === 'white';
 }
 
 export function getSnappedKeyAtDomPos(

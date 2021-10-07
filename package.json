@@ -33,6 +33,7 @@
     "prepublish": "npm run compile",
     "compile": "tsc",
     "format": "prettier --write .",
+    "lint": "eslint src/*.ts",
     "check-format": "prettier --check .",
     "dev": "gulp dev",
     "prod": "gulp prod"
