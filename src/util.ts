@@ -144,8 +144,8 @@ export const createEl = (tagName: string, className?: string): HTMLElement => {
   return el;
 };
 
-export function computeSquareCenter(key: cg.Key, orientation: cg.Orientation, bounds: ClientRect): cg.NumberPair {
-  const pos = T.mapToWhiteInverse[orientation](key2pos(key));
+export function computeSquareCenter(key: cg.Key, orientation: cg.Orientation, bounds: ClientRect, bd:cg.BoardDimensions): cg.NumberPair {
+  const pos = T.mapToWhiteInverse[orientation](key2pos(key), bd);
   return [
     bounds.left + (bounds.width * pos[0]) / 8 + bounds.width / 16,
     bounds.top + (bounds.height * (7 - pos[1])) / 8 + bounds.height / 16,
