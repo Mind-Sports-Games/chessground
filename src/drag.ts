@@ -80,6 +80,7 @@ export function start(s: State, e: cg.MouchEvent): void {
       const promoted = piece.promoted ? "promoted " : "";
       console.log("drag, piece.color: ", piece.color);
       console.log("drag, s.myColor: ", s.myColor);
+      console.log("drag - key2pos: ", util.key2pos(orig));
       const side = piece.color === s.myColor ? "ally" : "enemy";
       ghost.className = `ghost ${piece.color} ${promoted}${piece.role} ${side}`;
       util.translateAbs(ghost, util.posToTranslateAbs(bounds, s.dimensions)(util.key2pos(orig), s.orientation));
@@ -244,12 +245,12 @@ function removeDragElements(s: State): void {
   if (e.ghost) util.setVisible(e.ghost, false);
 }
 
-function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect, bd: cg.BoardDimensions, orientation:cg.Orientation) {
+function computeSquareBounds(key: cg.Key, _: boolean, bounds: ClientRect, bd: cg.BoardDimensions, orientation:cg.Orientation) {
   const pos = T.mapToWhiteInverse[orientation](util.key2pos(key), bd);
-  if (!asWhite) {
-    pos[0] = bd.width + 1 - pos[0];
-    pos[1] = bd.height + 1 - pos[1];
-  }
+  // if (!asWhite) {
+  //   pos[0] = bd.width + 1 - pos[0];
+  //   pos[1] = bd.height + 1 - pos[1];
+  // }
   return {
     left: bounds.left + bounds.width * (pos[0] - 1) / bd.width,
     top: bounds.top + bounds.height * (bd.height - pos[1]) / bd.height,
