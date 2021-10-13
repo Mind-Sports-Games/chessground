@@ -384,7 +384,7 @@ export function getKeyAtDomPos(
   if (!asWhite) rank = bd.height + 1 - rank;
   pos = [file, rank]
   console.log("getKeyAtDom: ", pos)
-  pos = T.mapToWhite[orientation](pos);
+  pos = T.mapToWhite[orientation](pos, bd);
   console.log("getKeyAtDom - map to white: ", pos)
   console.log("getKeyAtDom - map to white - pos2key: ", pos2key(pos))
   return (pos[0] > 0 && pos[0] < bd.width + 1 && pos[1] > 0 && pos[1] < bd.height + 1) ? pos2key(pos) : undefined;
@@ -402,11 +402,12 @@ export function getSnappedKeyAtDomPos(
   bounds: ClientRect,
   geom: cg.Geometry
 ): cg.Key | undefined {
+  const bd = cg.dimensions[geom];
   const origPos = key2pos(orig);
   const validSnapPos = allPos(geom).filter(pos2 => {
     return queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]);
   });
-  const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), orientation, bounds));
+  const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), orientation, bounds, bd));
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
   const [, closestSnapIndex] = validSnapDistances.reduce((a, b, index) => (a[0] < b ? a : [b, index]), [
     validSnapDistances[0],

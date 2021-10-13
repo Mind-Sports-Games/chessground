@@ -1,17 +1,33 @@
 import * as cg from './types';
 
 export const mapToWhite: Record<cg.Orientation, cg.TransformToWhite> = {
-  white: pos => pos,
-  black: pos => [7 - pos[0], 7 - pos[1]],
-  right: pos => [7 - pos[1], pos[0]],
-  left: pos => [pos[1], 7 - pos[0]],
+  white: (pos: cg.Pos,
+          _: cg.BoardDimensions
+         ) => pos,
+  black: (pos: cg.Pos,
+          bt: cg.BoardDimensions
+         ) => [bt.width - pos[0], bt.height - pos[1]],
+  right: (pos: cg.Pos,
+          bt: cg.BoardDimensions
+         ) => [bt.height - pos[1], pos[0]],
+  left: (pos: cg.Pos,
+         bt: cg.BoardDimensions
+        ) => [pos[1], bt.width - pos[0]],
 };
 
 export const mapToWhiteInverse: Record<cg.Orientation, cg.TransformToWhite> = {
-  white: pos => pos,
-  black: pos => [7 - pos[0], 7 - pos[1]],
-  right: pos => [pos[1], 7 - pos[0]],
-  left: pos => [7 - pos[0], pos[1]],
+  white: (pos: cg.Pos,
+          _: cg.BoardDimensions
+         ) => pos,
+  black: (pos: cg.Pos,
+          bt: cg.BoardDimensions
+        ) => [bt.width - pos[0], bt.height - pos[1]],
+  right: (pos: cg.Pos,
+          bt: cg.BoardDimensions
+         ) => [pos[1], bt.width - pos[0]],
+  left: (pos: cg.Pos,
+         bt: cg.BoardDimensions
+        ) => [bt.width - pos[0], pos[1]],
 };
 
 export const translateBase: Record<cg.Orientation, cg.TranslateBase> = {

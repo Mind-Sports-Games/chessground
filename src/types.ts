@@ -26,7 +26,7 @@ export type NumberPair = [number, number];
 export type NumberQuad = [number, number, number, number];
 
 export type Orientation = typeof orientations[number];
-export type TransformToWhite = (_: Pos) => Pos;
+export type TransformToWhite = (_: Pos, bt: BoardDimensions) => Pos;
 export type TranslateBase = (pos: Pos, xFactor: number, yFactor: number, asWhite:Boolean, bt: BoardDimensions) => NumberPair;
 
 export interface Rect {

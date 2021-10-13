@@ -73,7 +73,7 @@ export function render(s: State): void {
           el.cgAnimating = false;
           el.classList.remove('anim');
           translate(el, posToTranslate(key2pos(k), orientation, asWhite, s.dimensions));
-          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asWhite);
+          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asWhite, s.dimensions);
         }
         // same piece: flag as same
         if (elPieceName === pieceNameOf(pieceAtKey, s.myColor) && (!fading || !el.cgFading)) {
@@ -137,7 +137,7 @@ export function render(s: State): void {
           pMvd.cgFading = false;
         }
         const pos = key2pos(k);
-        if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, orientation, asWhite);
+        if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, orientation, asWhite, s.dimensions);
         if (anim) {
           pMvd.cgAnimating = true;
           pMvd.classList.add('anim');
@@ -162,7 +162,7 @@ export function render(s: State): void {
         }
         translate(pieceNode, posToTranslate(pos, orientation, asWhite, s.dimensions));
 
-        if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, orientation, asWhite);
+        if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, orientation, asWhite, s.dimensions);
 
         boardEl.appendChild(pieceNode);
       }
@@ -198,8 +198,8 @@ function removeNodes(s: State, nodes: HTMLElement[]): void {
   for (const node of nodes) s.dom.elements.board.removeChild(node);
 }
 
-function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asWhite: boolean): string {
-  pos = T.mapToWhite[orientation](pos);
+function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asWhite: boolean, bd:cg.BoardDimensions): string {
+  pos = T.mapToWhite[orientation](pos, bd);
   let z = 2 + (pos[1] - 1) * 8 + (8 - pos[0]);
   if (asWhite) z = 67 - z;
   return z + '';

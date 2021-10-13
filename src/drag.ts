@@ -245,7 +245,7 @@ function removeDragElements(s: State): void {
 }
 
 function computeSquareBounds(key: cg.Key, asWhite: boolean, bounds: ClientRect, bd: cg.BoardDimensions, orientation:cg.Orientation) {
-  const pos = T.mapToWhiteInverse[orientation](util.key2pos(key));
+  const pos = T.mapToWhiteInverse[orientation](util.key2pos(key), bd);
   if (!asWhite) {
     pos[0] = bd.width + 1 - pos[0];
     pos[1] = bd.height + 1 - pos[1];
