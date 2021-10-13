@@ -373,15 +373,15 @@ export function stop(state: HeadlessState): void {
 export function getKeyAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
-  asWhite: boolean,
+  _: boolean,
   bounds: ClientRect,
   geom: cg.Geometry
 ): cg.Key | undefined {
   const bd = cg.dimensions[geom];
   let file = Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
-  if (!asWhite) file = bd.width + 1 - file;
+  //if (!asWhite) file = bd.width + 1 - file;
   let rank = Math.ceil(bd.height - (bd.height * ((pos[1] - bounds.top) / bounds.height)));
-  if (!asWhite) rank = bd.height + 1 - rank;
+  //if (!asWhite) rank = bd.height + 1 - rank;
   pos = [file, rank]
   console.log("getKeyAtDom: ", pos)
   pos = T.mapToWhite[orientation](pos, bd);

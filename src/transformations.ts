@@ -6,13 +6,13 @@ export const mapToWhite: Record<cg.Orientation, cg.TransformToWhite> = {
          ) => pos,
   black: (pos: cg.Pos,
           bt: cg.BoardDimensions
-         ) => [bt.width - pos[0], bt.height - pos[1]],
+         ) => [bt.width + 1 - pos[0], bt.height + 1 - pos[1]],
   right: (pos: cg.Pos,
           bt: cg.BoardDimensions
-         ) => [bt.height - pos[1], pos[0]],
+         ) => [bt.height + 1 - pos[1], pos[0]],
   left: (pos: cg.Pos,
          bt: cg.BoardDimensions
-        ) => [pos[1], bt.width - pos[0]],
+        ) => [pos[1], bt.width + 1 - pos[0]],
 };
 
 export const mapToWhiteInverse: Record<cg.Orientation, cg.TransformToWhite> = {
@@ -21,13 +21,13 @@ export const mapToWhiteInverse: Record<cg.Orientation, cg.TransformToWhite> = {
          ) => pos,
   black: (pos: cg.Pos,
           bt: cg.BoardDimensions
-        ) => [bt.width - pos[0], bt.height - pos[1]],
+        ) => [bt.width + 1 - pos[0], bt.height + 1 - pos[1]],
   right: (pos: cg.Pos,
           bt: cg.BoardDimensions
-         ) => [pos[1], bt.width - pos[0]],
+         ) => [pos[1], bt.width + 1 - pos[0]],
   left: (pos: cg.Pos,
          bt: cg.BoardDimensions
-        ) => [bt.width - pos[0], pos[1]],
+        ) => [bt.width + 1 - pos[0], pos[1]],
 };
 
 export const translateBase: Record<cg.Orientation, cg.TranslateBase> = {
