@@ -173,7 +173,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     getKeyAtDomPos(pos): cg.Key | undefined {
-      return board.getKeyAtDomPos(pos, state.orientation, board.whitePov(state), state.dom.bounds(), state.geometry);
+      return board.getKeyAtDomPos(pos, state.orientation, state.dom.bounds(), state.geometry);
     },
 
     redrawAll,
@@ -186,6 +186,6 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
       board.stop(state);
       state.dom.unbind && state.dom.unbind();
       state.dom.destroyed = true;
-    }
+    },
   };
 }

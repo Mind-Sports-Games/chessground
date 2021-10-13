@@ -52,17 +52,17 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
 
   if (s.coordinates) {
     const orientClass = ' ' + s.orientation;
-    const shogi = (shogiVariants.includes(s.variant));
+    const shogi = shogiVariants.includes(s.variant);
     if (shogi) {
       container.appendChild(renderCoords(ranks.slice(0, s.dimensions.height).reverse(), 'files' + orientClass));
       container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'ranks' + orientClass));
-  } else if (s.notation === Notation.JANGGI) {
-      container.appendChild(renderCoords((['0']).concat(ranks.slice(0, 9).reverse()), 'ranks' + orientClass));
+    } else if (s.notation === Notation.JANGGI) {
+      container.appendChild(renderCoords(['0'].concat(ranks.slice(0, 9).reverse()), 'ranks' + orientClass));
       container.appendChild(renderCoords(ranks.slice(0, 9), 'files' + orientClass));
-  } else {
+    } else {
       container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.height), 'ranks' + orientClass));
       container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
-  }
+    }
   }
 
   let ghost: HTMLElement | undefined;

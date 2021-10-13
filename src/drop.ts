@@ -2,8 +2,8 @@ import { HeadlessState, State } from './state';
 import * as cg from './types';
 import * as board from './board';
 import * as util from './util';
-import { cancel as cancelDrag } from './drag'
-import predrop from "./predrop";
+import { cancel as cancelDrag } from './drag';
+import predrop from './predrop';
 
 export function setDropMode(s: State, piece?: cg.Piece): void {
   s.dropmode.active = true;
@@ -34,8 +34,7 @@ export function drop(s: State, e: cg.MouchEvent): void {
   if (piece) {
     s.pieces.set('a0', piece);
     const position = util.eventPosition(e);
-    const dest = position && board.getKeyAtDomPos(
-      position, s.orientation, board.whitePov(s), s.dom.bounds(), s.geometry);
+    const dest = position && board.getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.geometry);
     if (dest) board.dropNewPiece(s, 'a0', dest);
   }
   s.dom.redraw();

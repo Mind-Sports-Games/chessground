@@ -1,6 +1,6 @@
 import { State } from './state';
 import { key2pos, createEl, posToTranslateRel, posToTranslateAbs, translateRel, translateAbs } from './util';
-import { whitePov } from './board'
+import { whitePov } from './board';
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim';
 import { DragCurrent } from './drag';
 import * as cg from './types';
@@ -27,7 +27,7 @@ export function render(s: State): void {
     sameSquares: Set<cg.Key> = new Set(),
     movedPieces: Map<PieceName, cg.PieceNode[]> = new Map(),
     movedSquares: Map<string, cg.SquareNode[]> = new Map(); // by class name
-    
+
   let k: cg.Key,
     el: cg.PieceNode | cg.SquareNode | undefined,
     pieceAtKey: cg.Piece | undefined,
@@ -198,7 +198,7 @@ function removeNodes(s: State, nodes: HTMLElement[]): void {
   for (const node of nodes) s.dom.elements.board.removeChild(node);
 }
 
-function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asWhite: boolean, bd:cg.BoardDimensions): string {
+function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asWhite: boolean, bd: cg.BoardDimensions): string {
   pos = T.mapToWhite[orientation](pos, bd);
   let z = 2 + (pos[1] - 1) * 8 + (8 - pos[0]);
   if (asWhite) z = 67 - z;
@@ -206,30 +206,33 @@ function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asWhite: boolean, b
 }
 
 function pieceNameOf(piece: cg.Piece, myColor: cg.Color): string {
-  const promoted = piece.promoted ? "promoted " : "";
-  const side = piece.color === myColor ? "ally" : "enemy";
+  const promoted = piece.promoted ? 'promoted ' : '';
+  const side = piece.color === myColor ? 'ally' : 'enemy';
   return `${piece.color} ${promoted}${piece.role} ${side}`;
 }
 
 function computeSquareClasses(s: State): SquareClasses {
   const squares: SquareClasses = new Map();
-  if (s.lastMove && s.highlight.lastMove) for (const k of s.lastMove) {
-    if (k != 'a0') {
-      addSquare(squares, k, 'last-move');
+  if (s.lastMove && s.highlight.lastMove)
+    for (const k of s.lastMove) {
+      if (k != 'a0') {
+        addSquare(squares, k, 'last-move');
+      }
     }
-  }
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');
     if (s.movable.showDests) {
       const dests = s.movable.dests?.get(s.selected);
-      if (dests) for (const k of dests) {
-        addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
-      }
+      if (dests)
+        for (const k of dests) {
+          addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
+        }
       const pDests = s.premovable.dests;
-      if (pDests) for (const k of pDests) {
-        addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
-      }
+      if (pDests)
+        for (const k of pDests) {
+          addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
+        }
     }
   } else if (s.dropmode.active || s.draggable.current?.orig === 'a0') {
     const piece = s.dropmode.active ? s.dropmode.piece : s.draggable.current?.piece;

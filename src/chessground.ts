@@ -10,7 +10,6 @@ import * as util from './util';
 
 export function Chessground(element: HTMLElement, config?: Config): Api {
   const maybeState: State | HeadlessState = defaults();
-  console.log("mayebeState: ", maybeState);
   configure(maybeState, config || {});
 
   function redrawAll(): State {

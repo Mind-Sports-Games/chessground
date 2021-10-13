@@ -4,8 +4,8 @@ import * as draw from './draw';
 import { cancelDropMode, drop } from './drop';
 import { eventPosition, isRightButton } from './util';
 import * as cg from './types';
-import { getKeyAtDomPos, whitePov } from './board';
-import { Piece } from "./types";
+import { getKeyAtDomPos } from './board';
+import { Piece } from './types';
 
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
@@ -74,10 +74,14 @@ function startDragOrDraw(s: State): MouchBind {
     else if (e.shiftKey || isRightButton(e)) {
       if (s.drawable.enabled) draw.start(s, e);
     } else if (!s.viewOnly) {
-      if (s.dropmode.active && undefined == squareOccupied(s, e) ) {
+      if (s.dropmode.active && undefined == squareOccupied(s, e)) {
         // this case covers normal drop when it is our turn or pre-drop on empty scare
         drop(s, e);
-      } else if (s.dropmode.active && s.movable.color != s.turnColor /*not our turn*/ &&  squareOccupied(s, e)?.color==s.turnColor/*occupied by opp's piece*/) {
+      } else if (
+        s.dropmode.active &&
+        s.movable.color != s.turnColor /*not our turn*/ &&
+        squareOccupied(s, e)?.color == s.turnColor /*occupied by opp's piece*/
+      ) {
         // this case is for predrop on opp's piece
         drop(s, e);
       } else {
@@ -100,7 +104,7 @@ function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind
 
 function squareOccupied(s: State, e: cg.MouchEvent): Piece | undefined {
   const position = eventPosition(e);
-  const dest = position && getKeyAtDomPos(position, s.orientation, whitePov(s), s.dom.bounds(), s.geometry);
+  const dest = position && getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.geometry);
   if (dest && s.pieces.get(dest)) return s.pieces.get(dest);
   return undefined;
 }

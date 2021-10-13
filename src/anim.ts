@@ -44,7 +44,7 @@ function makePiece(key: cg.Key, piece: cg.Piece): AnimPiece {
   return {
     key: key,
     pos: util.key2pos(key),
-    piece: piece
+    piece: piece,
   };
 }
 
@@ -56,11 +56,11 @@ function closer(piece: AnimPiece, pieces: AnimPiece[]): AnimPiece | undefined {
 
 function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
   const anims: AnimVectors = new Map(),
-  animedOrigs: cg.Key[] = [],
-  fadings: AnimFadings = new Map(),
-  missings: AnimPiece[] = [],
-  news: AnimPiece[] = [],
-  prePieces: AnimPieces = new Map();
+    animedOrigs: cg.Key[] = [],
+    fadings: AnimFadings = new Map(),
+    missings: AnimPiece[] = [],
+    news: AnimPiece[] = [],
+    prePieces: AnimPieces = new Map();
   let curP: cg.Piece | undefined, preP: AnimPiece | undefined, vector: cg.NumberPair;
   for (const [k, p] of prevPieces) {
     prePieces.set(k, makePiece(k, p));
@@ -78,26 +78,30 @@ function computePlan(prevPieces: cg.Pieces, current: State): AnimPlan {
     } else if (preP) missings.push(preP);
   }
   for (const newP of news) {
-    preP = closer(newP, missings.filter(p => util.samePiece(newP.piece, p.piece)));
+    preP = closer(
+      newP,
+      missings.filter(p => util.samePiece(newP.piece, p.piece))
+    );
     if (preP) {
       vector = [preP.pos[0] - newP.pos[0], preP.pos[1] - newP.pos[1]];
       anims.set(newP.key, vector.concat(vector) as AnimVector);
       animedOrigs.push(preP.key);
     }
-  };
+  }
   for (const p of missings) {
     if (!animedOrigs.includes(p.key)) fadings.set(p.key, p.piece);
   }
 
   return {
     anims: anims,
-    fadings: fadings
+    fadings: fadings,
   };
 }
 
 function step(state: State, now: DOMHighResTimeStamp): void {
   const cur = state.animation.current;
-  if (cur === undefined) { // animation was canceled :(
+  if (cur === undefined) {
+    // animation was canceled :(
     if (!state.dom.destroyed) state.dom.redrawNow();
     return;
   }
@@ -127,7 +131,7 @@ function animate<A>(mutation: Mutation<A>, state: State): A {
     state.animation.current = {
       start: performance.now(),
       frequency: 1 / state.animation.duration,
-      plan: plan
+      plan: plan,
     };
     if (!alreadyRunning) step(state, performance.now());
   } else {

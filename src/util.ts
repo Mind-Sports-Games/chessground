@@ -16,7 +16,7 @@ function ranks(n: number) {
 
 export function allKeys(geom: cg.Geometry = cg.Geometry.dim8x8) {
   const bd = cg.dimensions[geom];
-  return Array.prototype.concat(...files(bd.width).map(c => ranks(bd.height).map(r => c+r)));
+  return Array.prototype.concat(...files(bd.width).map(c => ranks(bd.height).map(r => c + r)));
 }
 
 export function pos2key(pos: cg.Pos) {
@@ -27,7 +27,7 @@ export function key2pos(k: cg.Key) {
   return [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as cg.Pos;
 }
 
-export const allPos = (geom : cg.Geometry): cg.Pos[] => (allKeys(geom).map(key2pos));
+export const allPos = (geom: cg.Geometry): cg.Pos[] => allKeys(geom).map(key2pos);
 
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
@@ -99,11 +99,8 @@ const posToTranslateBase = (
   yFactor: number,
   bt: cg.BoardDimensions
 ): cg.NumberPair => {
-  console.log("translatebase: before pos ", pos);
-  console.log("translatebase: after pos ", T.translateBase[orientation](pos, xFactor, yFactor, bt));
   return T.translateBase[orientation](pos, xFactor, yFactor, bt);
 };
-
 
 export const posToTranslateAbs = (
   bounds: ClientRect,
@@ -114,10 +111,8 @@ export const posToTranslateAbs = (
   return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor, bt);
 };
 
-
-export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation, bt: cg.BoardDimensions ): cg.NumberPair =>
+export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation, bt: cg.BoardDimensions): cg.NumberPair =>
   posToTranslateBase(pos, orientation, 100, 100, bt);
-
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
@@ -145,7 +140,12 @@ export const createEl = (tagName: string, className?: string): HTMLElement => {
   return el;
 };
 
-export function computeSquareCenter(key: cg.Key, orientation: cg.Orientation, bounds: ClientRect, bd:cg.BoardDimensions): cg.NumberPair {
+export function computeSquareCenter(
+  key: cg.Key,
+  orientation: cg.Orientation,
+  bounds: ClientRect,
+  bd: cg.BoardDimensions
+): cg.NumberPair {
   const pos = T.mapToWhiteInverse[orientation](key2pos(key), bd);
   return [
     bounds.left + (bounds.width * pos[0]) / 8 + bounds.width / 16,

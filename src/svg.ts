@@ -236,7 +236,13 @@ function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect): SV
   return g;
 }
 
-function renderCircle(brush: DrawBrush, pos: cg.Pos, current: boolean, bounds: ClientRect, bd: cg.BoardDimensions): SVGElement {
+function renderCircle(
+  brush: DrawBrush,
+  pos: cg.Pos,
+  current: boolean,
+  bounds: ClientRect,
+  bd: cg.BoardDimensions
+): SVGElement {
   const o = pos2px(pos, bounds, bd),
     widths = circleWidth(bounds, bd),
     radius = (bounds.width + bounds.height) / 2;
@@ -257,7 +263,7 @@ function renderArrow(
   dest: cg.Pos,
   current: boolean,
   shorten: boolean,
-  bounds: ClientRect, 
+  bounds: ClientRect,
   bd: cg.BoardDimensions
 ): SVGElement {
   const m = arrowMargin(bounds, shorten && !current, bd),
@@ -281,24 +287,29 @@ function renderArrow(
   });
 }
 
-function renderPiece(baseUrl: string, pos: cg.Pos, piece: DrawShapePiece, bounds: ClientRect, bd: cg.BoardDimensions, myColor: cg.Color): SVGElement {
+function renderPiece(
+  baseUrl: string,
+  pos: cg.Pos,
+  piece: DrawShapePiece,
+  bounds: ClientRect,
+  bd: cg.BoardDimensions,
+  myColor: cg.Color
+): SVGElement {
   const o = pos2px(pos, bounds, bd),
-  width = bounds.width / bd.width * (piece.scale || 1),
-  height = bounds.height / bd.height * (piece.scale || 1),
-  name = piece.color[0] + piece.role[0].toUpperCase();
+    width = (bounds.width / bd.width) * (piece.scale || 1),
+    height = (bounds.height / bd.height) * (piece.scale || 1),
+    name = piece.color[0] + piece.role[0].toUpperCase();
   // If baseUrl doesn't end with '/' use it as full href
   // This is needed when drop piece suggestion .svg image file names are different than "name" produces
-  const href = (baseUrl.endsWith('/') ? baseUrl + name + '.svg' : baseUrl);
-  console.log("svg, piece.color: ", piece.color);
-  console.log("svg, myColor: ", myColor);
-  const side = piece.color === myColor ? "ally" : "enemy";
+  const href = baseUrl.endsWith('/') ? baseUrl + name + '.svg' : baseUrl;
+  const side = piece.color === myColor ? 'ally' : 'enemy';
   return setAttributes(createElement('image'), {
     className: `${piece.role} ${piece.color} ${side}`,
     x: o[0] - width / 2,
     y: o[1] - height / 2,
     width: width,
     height: height,
-    href: href
+    href: href,
   });
 }
 
@@ -328,7 +339,9 @@ export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SV
 
 function orient(pos: cg.Pos, orientation: cg.Orientation, bd: cg.BoardDimensions): cg.Pos {
   let newpos = T.mapToWhiteInverse[orientation](pos, bd);
-  return (orientation === 'white' || orientation === 'left') ? newpos : [bd.width + 1 - newpos[0], bd.height + 1 - newpos[1]];
+  return orientation === 'white' || orientation === 'left'
+    ? newpos
+    : [bd.width + 1 - newpos[0], bd.height + 1 - newpos[1]];
 }
 
 function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
@@ -346,7 +359,7 @@ function circleWidth(bounds: ClientRect, bd: cg.BoardDimensions): [number, numbe
 }
 
 function lineWidth(brush: DrawBrush, current: boolean, bounds: ClientRect, bd: cg.BoardDimensions): number {
-  return (brush.lineWidth || 10) * (current ? 0.85 : 1) / (bd.width * 64) * bounds.width;
+  return (((brush.lineWidth || 10) * (current ? 0.85 : 1)) / (bd.width * 64)) * bounds.width;
 }
 
 function opacity(brush: DrawBrush, current: boolean): number {
@@ -354,9 +367,9 @@ function opacity(brush: DrawBrush, current: boolean): number {
 }
 
 function arrowMargin(bounds: ClientRect, shorten: boolean, bd: cg.BoardDimensions): number {
-  return (shorten ? 20 : 10) / (bd.width * 64) * bounds.width;
+  return ((shorten ? 20 : 10) / (bd.width * 64)) * bounds.width;
 }
 
 function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.NumberPair {
-  return [(pos[0] - 0.5) * bounds.width / bd.width, (bd.height + 0.5 - pos[1]) * bounds.height / bd.height];
+  return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }

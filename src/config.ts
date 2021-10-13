@@ -52,7 +52,8 @@ export interface Config {
     enabled?: boolean; // allow predrops for color that can not move
     showDropDests?: boolean;
     dropDests?: cg.Key[];
-    current?: { // See corresponding type in state.ts for more comments
+    current?: {
+      // See corresponding type in state.ts for more comments
       role: cg.Role;
       key: cg.Key;
     };
@@ -88,8 +89,8 @@ export interface Config {
     showDropDests?: boolean; // whether to add the move-dest class on squares for drops
     dropDests?: cg.DropDests; // see corresponding state.ts type for comments
     events?: {
-      cancel?: () => void;// at least temporary - i need to refresh pocket on cancel of drop mode (mainly to clear the highlighting of the selected pocket piece) and pocket is currently outside chessgroundx so need to provide callback here
-    }
+      cancel?: () => void; // at least temporary - i need to refresh pocket on cancel of drop mode (mainly to clear the highlighting of the selected pocket piece) and pocket is currently outside chessgroundx so need to provide callback here
+    };
   };
   drawable?: {
     enabled?: boolean; // can draw
@@ -106,7 +107,7 @@ export interface Config {
   };
   geometry?: cg.Geometry; // dim3x4 | dim5x5 | dim7x7 | dim8x8 | dim9x9 | dim10x8 | dim9x10 | dim10x10
   variant?: cg.Variant;
-  chess960? : boolean;
+  chess960?: boolean;
   notation?: cg.Notation;
 }
 
@@ -129,8 +130,6 @@ export function configure(state: HeadlessState, config: Config): void {
     state.drawable.shapes = [];
   }
 
-  console.log("state: ", state);
-  console.log("config.check: ", config.check);
   // apply config values that could be undefined yet meaningful
   if ('check' in config) setCheck(state, config.check || false);
   if ('lastMove' in config && !config.lastMove) state.lastMove = undefined;
@@ -152,10 +151,11 @@ export function configure(state: HeadlessState, config: Config): void {
       king = state.pieces.get(kingStartPos);
     if (!dests || !king || king.role !== 'k-piece') return;
     state.movable.dests.set(
-      kingStartPos, 
-      dests.filter(d =>
-      !((d === 'a' + rank) && dests.includes(('c' + rank) as cg.Key)) &&
-        !((d === 'h' + rank) && dests.includes(('g' + rank) as cg.Key))
+      kingStartPos,
+      dests.filter(
+        d =>
+          !(d === 'a' + rank && dests.includes(('c' + rank) as cg.Key)) &&
+          !(d === 'h' + rank && dests.includes(('g' + rank) as cg.Key))
       )
     );
   }
@@ -169,7 +169,7 @@ function setCheck(state: HeadlessState, color: cg.Color | boolean): void {
       if (p.role === 'k-piece' && p.color === color) {
         state.check = k;
       }
-  }
+    }
 }
 
 function merge(base: any, extend: any): void {
