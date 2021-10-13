@@ -377,8 +377,8 @@ export function getKeyAtDomPos(
   geom: cg.Geometry
 ): cg.Key | undefined {
   const bd = cg.dimensions[geom];
-  let file = Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
-  let rank = Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height));
+  const file = Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
+  const rank = Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height));
   pos = [file, rank];
   pos = T.mapToWhite[orientation](pos, bd);
   return pos[0] > 0 && pos[0] < bd.width + 1 && pos[1] > 0 && pos[1] < bd.height + 1 ? pos2key(pos) : undefined;

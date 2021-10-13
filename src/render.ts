@@ -215,7 +215,7 @@ function computeSquareClasses(s: State): SquareClasses {
   const squares: SquareClasses = new Map();
   if (s.lastMove && s.highlight.lastMove)
     for (const k of s.lastMove) {
-      if (k != 'a0') {
+      if (k !== 'a0') {
         addSquare(squares, k, 'last-move');
       }
     }

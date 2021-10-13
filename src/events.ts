@@ -74,13 +74,13 @@ function startDragOrDraw(s: State): MouchBind {
     else if (e.shiftKey || isRightButton(e)) {
       if (s.drawable.enabled) draw.start(s, e);
     } else if (!s.viewOnly) {
-      if (s.dropmode.active && undefined == squareOccupied(s, e)) {
+      if (s.dropmode.active && undefined === squareOccupied(s, e)) {
         // this case covers normal drop when it is our turn or pre-drop on empty scare
         drop(s, e);
       } else if (
         s.dropmode.active &&
-        s.movable.color != s.turnColor /*not our turn*/ &&
-        squareOccupied(s, e)?.color == s.turnColor /*occupied by opp's piece*/
+        s.movable.color !== s.turnColor /*not our turn*/ &&
+        squareOccupied(s, e)?.color === s.turnColor /*occupied by opp's piece*/
       ) {
         // this case is for predrop on opp's piece
         drop(s, e);

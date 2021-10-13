@@ -338,7 +338,7 @@ export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SV
 }
 
 function orient(pos: cg.Pos, orientation: cg.Orientation, bd: cg.BoardDimensions): cg.Pos {
-  let newpos = T.mapToWhiteInverse[orientation](pos, bd);
+  const newpos = T.mapToWhiteInverse[orientation](pos, bd);
   return orientation === 'white' || orientation === 'left'
     ? newpos
     : [bd.width + 1 - newpos[0], bd.height + 1 - newpos[1]];

@@ -17,8 +17,8 @@ export function read(fen: cg.FEN): cg.Pieces {
   if (fen.indexOf('[') !== -1) fen = fen.slice(0, fen.indexOf('['));
   const pieces: cg.Pieces = new Map();
   let row: number = fen.split('/').length;
-  let col: number = 0;
-  let promoted: boolean = false;
+  let col = 0;
+  let promoted = false;
   let num = 0;
 
   for (const c of fen) {
@@ -39,7 +39,7 @@ export function read(fen: cg.FEN): cg.Pieces {
         if (piece) piece.promoted = true;
         break;
       }
-      default:
+      default: {
         const nb = c.charCodeAt(0);
         if (48 <= nb && nb < 58) {
           num = 10 * num + nb - 48;
@@ -47,7 +47,7 @@ export function read(fen: cg.FEN): cg.Pieces {
           col += 1 + num;
           num = 0;
           const letter = c.toLowerCase();
-          let piece = {
+          const piece = {
             role: roles(letter),
             color: (c === letter ? 'black' : 'white') as cg.Color,
           } as cg.Piece;
@@ -58,6 +58,7 @@ export function read(fen: cg.FEN): cg.Pieces {
           }
           pieces.set(pos2key([col, row]), piece);
         }
+      }
     }
   }
   return pieces;
