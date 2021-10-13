@@ -383,7 +383,10 @@ export function getKeyAtDomPos(
   let rank = Math.ceil(bd.height - (bd.height * ((pos[1] - bounds.top) / bounds.height)));
   if (!asWhite) rank = bd.height + 1 - rank;
   pos = [file, rank]
+  console.log("getKeyAtDom: ", pos)
   pos = T.mapToWhite[orientation](pos);
+  console.log("getKeyAtDom - map to white: ", pos)
+  console.log("getKeyAtDom - map to white - pos2key: ", pos2key(pos))
   return (pos[0] > 0 && pos[0] < bd.width + 1 && pos[1] > 0 && pos[1] < bd.height + 1) ? pos2key(pos) : undefined;
 }
 
