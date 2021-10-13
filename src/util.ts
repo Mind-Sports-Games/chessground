@@ -94,28 +94,29 @@ export const samePiece = (p1: cg.Piece, p2: cg.Piece): boolean => p1.role === p2
 
 const posToTranslateBase = (
   pos: cg.Pos,
-  asWhite: boolean,
   orientation: cg.Orientation,
   xFactor: number,
   yFactor: number,
   bt: cg.BoardDimensions
 ): cg.NumberPair => {
-  return T.translateBase[orientation](pos, xFactor, yFactor, asWhite, bt);
+  console.log("translatebase: before pos ", pos);
+  console.log("translatebase: after pos ", T.translateBase[orientation](pos, xFactor, yFactor, bt));
+  return T.translateBase[orientation](pos, xFactor, yFactor, bt);
 };
 
 
 export const posToTranslateAbs = (
   bounds: ClientRect,
   bt: cg.BoardDimensions
-): ((pos: cg.Pos, orientation: cg.Orientation, asWhite: boolean) => cg.NumberPair) => {
+): ((pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair) => {
   const xFactor = bounds.width / bt.width,
     yFactor = bounds.height / bt.height;
-  return (pos, orientation, asWhite: boolean) => posToTranslateBase(pos, asWhite, orientation, xFactor, yFactor, bt);
+  return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor, bt);
 };
 
 
-export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation, asWhite: boolean, bt: cg.BoardDimensions ): cg.NumberPair =>
-  posToTranslateBase(pos, asWhite, orientation, 100, 100, bt);
+export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation, bt: cg.BoardDimensions ): cg.NumberPair =>
+  posToTranslateBase(pos, orientation, 100, 100, bt);
 
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {

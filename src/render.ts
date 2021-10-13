@@ -51,7 +51,7 @@ export function render(s: State): void {
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
-        translate(el, posToTranslate(key2pos(k), orientation, asWhite, s.dimensions));
+        translate(el, posToTranslate(key2pos(k), orientation, s.dimensions));
         el.cgDragging = false;
       }
       // remove fading class if it still remains
@@ -68,11 +68,11 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
           el.classList.add('anim');
-          translate(el, posToTranslate(pos, orientation, asWhite, s.dimensions));
+          translate(el, posToTranslate(pos, orientation, s.dimensions));
         } else if (el.cgAnimating) {
           el.cgAnimating = false;
           el.classList.remove('anim');
-          translate(el, posToTranslate(key2pos(k), orientation, asWhite, s.dimensions));
+          translate(el, posToTranslate(key2pos(k), orientation, s.dimensions));
           if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asWhite, s.dimensions);
         }
         // same piece: flag as same
@@ -108,7 +108,7 @@ export function render(s: State): void {
     if (!sameSquares.has(sk)) {
       sMvdset = movedSquares.get(className);
       sMvd = sMvdset && sMvdset.pop();
-      const translation = posToTranslate(key2pos(sk), orientation, asWhite, s.dimensions);
+      const translation = posToTranslate(key2pos(sk), orientation, s.dimensions);
       if (sMvd) {
         sMvd.cgKey = sk;
         translate(sMvd, translation);
@@ -144,7 +144,7 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        translate(pMvd, posToTranslate(pos, orientation, asWhite, s.dimensions));
+        translate(pMvd, posToTranslate(pos, orientation, s.dimensions));
       }
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
@@ -160,7 +160,7 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        translate(pieceNode, posToTranslate(pos, orientation, asWhite, s.dimensions));
+        translate(pieceNode, posToTranslate(pos, orientation, s.dimensions));
 
         if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, orientation, asWhite, s.dimensions);
 
@@ -181,7 +181,7 @@ export function updateBounds(s: State): void {
   let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;
   while (el) {
     if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el)) {
-      translateAbs(el, posToTranslate(key2pos(el.cgKey), orientation, whitePov(s)));
+      translateAbs(el, posToTranslate(key2pos(el.cgKey), orientation));
     }
     el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }

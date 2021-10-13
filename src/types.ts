@@ -27,7 +27,7 @@ export type NumberQuad = [number, number, number, number];
 
 export type Orientation = typeof orientations[number];
 export type TransformToWhite = (_: Pos, bt: BoardDimensions) => Pos;
-export type TranslateBase = (pos: Pos, xFactor: number, yFactor: number, asWhite:Boolean, bt: BoardDimensions) => NumberPair;
+export type TranslateBase = (pos: Pos, xFactor: number, yFactor: number, bt: BoardDimensions) => NumberPair;
 
 export interface Rect {
   left: number;
@@ -106,7 +106,7 @@ export type Unbind = () => void;
 export type Milliseconds = number;
 export type KHz = number;
 
-export const orientations = ['white', 'black', 'left', 'right'] as const;
+export const orientations = ['white', 'black', 'left', 'right'] as const; // where the player is sat on the board with white at the bottom
 export const colors = ['white', 'black'] as const;
 export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'] as const;
 export const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', ':'] as const;
