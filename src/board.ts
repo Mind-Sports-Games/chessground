@@ -72,31 +72,30 @@ function cancelDropMode(s: HeadlessState): void {
 
 function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   if (!state.autoCastle) return false;
+
   const king = state.pieces.get(orig);
   if (!king || king.role !== 'k-piece') return false;
-  const origPos = key2pos(orig);
-  if (origPos[0] !== 5) return false;
-  if (origPos[1] !== 1 && origPos[1] !== 8) return false;
-  const destPos = key2pos(dest);
-  let oldRookPos, newRookPos, newKingPos;
-  if (destPos[0] === 7 || destPos[0] === 8) {
-    oldRookPos = pos2key([8, origPos[1]]);
-    newRookPos = pos2key([6, origPos[1]]);
-    newKingPos = pos2key([7, origPos[1]]);
-  } else if (destPos[0] === 3 || destPos[0] === 1) {
-    oldRookPos = pos2key([1, origPos[1]]);
-    newRookPos = pos2key([4, origPos[1]]);
-    newKingPos = pos2key([3, origPos[1]]);
-  } else return false;
 
-  const rook = state.pieces.get(oldRookPos);
-  if (!rook || rook.role !== 'r-piece') return false;
+  const origPos = key2pos(orig);
+  const destPos = key2pos(dest);
+  if ((origPos[1] !== 1 && origPos[1] !== 8) || origPos[1] !== destPos[1]) return false;
+  if (origPos[0] === 4 && !state.pieces.has(dest)) {
+    if (destPos[0] === 6) dest = pos2key([7, destPos[1]]);
+    else if (destPos[0] === 2) dest = pos2key([0, destPos[1]]);
+  }
+  const rook = state.pieces.get(dest);
+  if (!rook || rook.color !== king.color || rook.role !== 'r-piece') return false;
 
   state.pieces.delete(orig);
-  state.pieces.delete(oldRookPos);
+  state.pieces.delete(dest);
 
-  state.pieces.set(newKingPos, king);
-  state.pieces.set(newRookPos, rook);
+  if (origPos[0] < destPos[0]) {
+    state.pieces.set(pos2key([6, destPos[1]]), king);
+    state.pieces.set(pos2key([5, destPos[1]]), rook);
+  } else {
+    state.pieces.set(pos2key([2, destPos[1]]), king);
+    state.pieces.set(pos2key([3, destPos[1]]), rook);
+  }
   return true;
 }
 
