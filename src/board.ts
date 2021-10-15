@@ -79,9 +79,9 @@ function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolea
   const origPos = key2pos(orig);
   const destPos = key2pos(dest);
   if ((origPos[1] !== 1 && origPos[1] !== 8) || origPos[1] !== destPos[1]) return false;
-  if (origPos[0] === 4 && !state.pieces.has(dest)) {
-    if (destPos[0] === 6) dest = pos2key([7, destPos[1]]);
-    else if (destPos[0] === 2) dest = pos2key([0, destPos[1]]);
+  if (origPos[0] === 5 && !state.pieces.has(dest)) {
+    if (destPos[0] === 7) dest = pos2key([8, destPos[1]]);
+    else if (destPos[0] === 3) dest = pos2key([1, destPos[1]]);
   }
   const rook = state.pieces.get(dest);
   if (!rook || rook.color !== king.color || rook.role !== 'r-piece') return false;
@@ -90,11 +90,11 @@ function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolea
   state.pieces.delete(dest);
 
   if (origPos[0] < destPos[0]) {
-    state.pieces.set(pos2key([6, destPos[1]]), king);
-    state.pieces.set(pos2key([5, destPos[1]]), rook);
+    state.pieces.set(pos2key([7, destPos[1]]), king);
+    state.pieces.set(pos2key([6, destPos[1]]), rook);
   } else {
-    state.pieces.set(pos2key([2, destPos[1]]), king);
-    state.pieces.set(pos2key([3, destPos[1]]), rook);
+    state.pieces.set(pos2key([3, destPos[1]]), king);
+    state.pieces.set(pos2key([4, destPos[1]]), rook);
   }
   return true;
 }
