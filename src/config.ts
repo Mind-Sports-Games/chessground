@@ -1,12 +1,13 @@
 import { HeadlessState } from './state';
-import { setCheck, setSelected } from './board';
+import { setSelected } from './board';
 import { read as fenRead } from './fen';
-import { DrawShape, DrawBrushes } from './draw';
+import { DrawShape, DrawBrush } from './draw';
 import * as cg from './types';
 
 export interface Config {
   fen?: cg.FEN; // chess position in Forsyth notation
-  orientation?: cg.Orientation; // board orientation. white | black
+  orientation?: cg.Orientation; // board orientation. white | black | left | right
+  myColor?: cg.Color; // turn of player white | black
   turnColor?: cg.Color; // turn to play. white | black
   check?: cg.Color | boolean; // true for current color, false to unset
   lastMove?: cg.Key[]; // squares part of the last move ["c3", "c4"]
@@ -49,6 +50,13 @@ export interface Config {
   };
   predroppable?: {
     enabled?: boolean; // allow predrops for color that can not move
+    showDropDests?: boolean;
+    dropDests?: cg.Key[];
+    current?: {
+      // See corresponding type in state.ts for more comments
+      role: cg.Role;
+      key: cg.Key;
+    };
     events?: {
       set?: (role: cg.Role, key: cg.Key) => void; // called after the predrop has been set
       unset?: () => void; // called after the predrop has been unset
@@ -58,6 +66,7 @@ export interface Config {
     enabled?: boolean; // allow moves & premoves to use drag'n drop
     distance?: number; // minimum distance to initiate a drag; in pixels
     autoDistance?: boolean; // lets chessground set distance to zero when user drags pieces
+    centerPiece?: boolean; // center the piece on cursor at drag start
     showGhost?: boolean; // show ghost of piece being dragged
     deleteOnDropOff?: boolean; // delete a piece when it is dropped off the board
   };
@@ -74,6 +83,15 @@ export interface Config {
     select?: (key: cg.Key) => void; // called when a square is selected
     insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
   };
+  dropmode?: {
+    active?: boolean;
+    piece?: cg.Piece;
+    showDropDests?: boolean; // whether to add the move-dest class on squares for drops
+    dropDests?: cg.DropDests; // see corresponding state.ts type for comments
+    events?: {
+      cancel?: () => void; // at least temporary - i need to refresh pocket on cancel of drop mode (mainly to clear the highlighting of the selected pocket piece) and pocket is currently outside chessgroundx so need to provide callback here
+    };
+  };
   drawable?: {
     enabled?: boolean; // can draw
     visible?: boolean; // can view
@@ -81,24 +99,34 @@ export interface Config {
     eraseOnClick?: boolean;
     shapes?: DrawShape[];
     autoShapes?: DrawShape[];
-    brushes?: DrawBrushes;
+    brushes?: DrawBrush[];
     pieces?: {
       baseUrl?: string;
     };
     onChange?: (shapes: DrawShape[]) => void; // called after drawable shapes change
   };
+  geometry?: cg.Geometry; // dim3x4 | dim5x5 | dim7x7 | dim8x8 | dim9x9 | dim10x8 | dim9x10 | dim10x10
+  variant?: cg.Variant;
+  chess960?: boolean;
+  notation?: cg.Notation;
 }
 
 export function configure(state: HeadlessState, config: Config): void {
   // don't merge destinations and autoShapes. Just override.
-  if (config.movable?.dests) state.movable.dests = undefined;
+  if (config.movable && config.movable.dests) state.movable.dests = undefined;
+  if (config.dropmode?.dropDests) state.dropmode.dropDests = undefined;
   if (config.drawable?.autoShapes) state.drawable.autoShapes = [];
 
   merge(state, config);
 
+  if (config.geometry) state.dimensions = cg.dimensions[config.geometry];
+
   // if a fen was provided, replace the pieces
   if (config.fen) {
-    state.pieces = fenRead(config.fen);
+    const pieces = fenRead(config.fen);
+    // prevent to cancel() already started piece drag from pocket!
+    if (state.pieces.get('a0') !== undefined) pieces.set('a0', state.pieces.get('a0')!);
+    state.pieces = pieces;
     state.drawable.shapes = [];
   }
 
@@ -117,11 +145,11 @@ export function configure(state: HeadlessState, config: Config): void {
   if (!state.animation.duration || state.animation.duration < 100) state.animation.enabled = false;
 
   if (!state.movable.rookCastle && state.movable.dests) {
-    const rank = state.movable.color === 'white' ? '1' : '8',
+    const rank = state.movable.color === 'white' ? 1 : 8,
       kingStartPos = ('e' + rank) as cg.Key,
       dests = state.movable.dests.get(kingStartPos),
       king = state.pieces.get(kingStartPos);
-    if (!dests || !king || king.role !== 'king') return;
+    if (!dests || !king || king.role !== 'k-piece') return;
     state.movable.dests.set(
       kingStartPos,
       dests.filter(
@@ -131,6 +159,17 @@ export function configure(state: HeadlessState, config: Config): void {
       )
     );
   }
+}
+
+function setCheck(state: HeadlessState, color: cg.Color | boolean): void {
+  state.check = undefined;
+  if (color === true) color = state.turnColor;
+  if (color)
+    for (const [k, p] of state.pieces) {
+      if (p.role === 'k-piece' && p.color === color) {
+        state.check = k;
+      }
+    }
 }
 
 function merge(base: any, extend: any): void {

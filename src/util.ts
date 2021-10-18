@@ -1,17 +1,33 @@
 import * as cg from './types';
 import * as T from './transformations';
 
+export const colors: cg.Color[] = ['white', 'black'];
 export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
+export const NRanks: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+export const invNRanks: number[] = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 
-export const allKeys: readonly cg.Key[] = Array.prototype.concat(...cg.files.map(c => cg.ranks.map(r => c + r)));
+function files(n: number) {
+  return cg.files.slice(0, n);
+}
 
-export const pos2key = (pos: cg.Pos): cg.Key => allKeys[8 * pos[0] + pos[1]];
+function ranks(n: number) {
+  return cg.ranks.slice(0, n);
+}
 
-export const key2pos = (k: cg.Key): cg.Pos => [k.charCodeAt(0) - 97, k.charCodeAt(1) - 49];
+export function allKeys(geom: cg.Geometry = cg.Geometry.dim8x8) {
+  const bd = cg.dimensions[geom];
+  return Array.prototype.concat(...files(bd.width).map(c => ranks(bd.height).map(r => c + r)));
+}
 
-export const allPos: readonly cg.Pos[] = allKeys.map(key2pos);
+export function pos2key(pos: cg.Pos) {
+  return (cg.files[pos[0] - 1] + cg.ranks[pos[1] - 1]) as cg.Key;
+}
 
-export const validPos = (pos: cg.Pos) => pos[0] >= 0 && pos[0] < 8 && pos[1] >= 0 && pos[1] < 8;
+export function key2pos(k: cg.Key) {
+  return [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as cg.Pos;
+}
+
+export const allPos = (geom: cg.Geometry): cg.Pos[] => allKeys(geom).map(key2pos);
 
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
@@ -44,6 +60,7 @@ export const timer = (): cg.Timer => {
 };
 
 export const opposite = (c: cg.Color): cg.Color => (c === 'white' ? 'black' : 'white');
+
 const flipOrientationLookup: Record<cg.Orientation, cg.Orientation> = {
   white: 'black',
   black: 'white',
@@ -63,6 +80,10 @@ const orientationLookupForLOA: Record<cg.Color, cg.Orientation> = {
 export const orientationForLOA = (c: cg.Color): cg.Orientation => orientationLookupForLOA[c];
 export const isColor = (c: cg.Orientation): c is cg.Color => c === 'white' || c === 'black';
 
+export function containsX<X>(xs: X[] | undefined, x: X): boolean {
+  return xs !== undefined && xs.indexOf(x) !== -1;
+}
+
 export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number => {
   const dx = pos1[0] - pos2[0],
     dy = pos1[1] - pos2[1];
@@ -75,21 +96,23 @@ const posToTranslateBase = (
   pos: cg.Pos,
   orientation: cg.Orientation,
   xFactor: number,
-  yFactor: number
+  yFactor: number,
+  bt: cg.BoardDimensions
 ): cg.NumberPair => {
-  return T.translateBase[orientation](pos, xFactor, yFactor);
+  return T.translateBase[orientation](pos, xFactor, yFactor, bt);
 };
 
 export const posToTranslateAbs = (
-  bounds: ClientRect
+  bounds: ClientRect,
+  bt: cg.BoardDimensions
 ): ((pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair) => {
-  const xFactor = bounds.width / 8,
-    yFactor = bounds.height / 8;
-  return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor);
+  const xFactor = bounds.width / bt.width,
+    yFactor = bounds.height / bt.height;
+  return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor, bt);
 };
 
-export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation): cg.NumberPair =>
-  posToTranslateBase(pos, orientation, 100, 100);
+export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation, bt: cg.BoardDimensions): cg.NumberPair =>
+  posToTranslateBase(pos, orientation, 100, 100, bt);
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
@@ -117,10 +140,21 @@ export const createEl = (tagName: string, className?: string): HTMLElement => {
   return el;
 };
 
-export function computeSquareCenter(key: cg.Key, orientation: cg.Orientation, bounds: ClientRect): cg.NumberPair {
-  const pos = T.mapToWhiteInverse[orientation](key2pos(key));
+export function computeSquareCenter(
+  key: cg.Key,
+  orientation: cg.Orientation,
+  bounds: ClientRect,
+  bd: cg.BoardDimensions
+): cg.NumberPair {
+  const pos = T.mapToWhiteInverse[orientation](key2pos(key), bd);
   return [
     bounds.left + (bounds.width * pos[0]) / 8 + bounds.width / 16,
     bounds.top + (bounds.height * (7 - pos[1])) / 8 + bounds.height / 16,
   ];
+}
+
+export type Callback = (...args: any[]) => void;
+
+export function callUserFunction(f: Callback | undefined, ...args: any[]): void {
+  if (f) setTimeout(() => f(...args), 1);
 }

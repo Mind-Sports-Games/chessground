@@ -1,30 +1,46 @@
 {
   "name": "chessground",
-  "version": "7.11.1-pstrat1",
+  "version": "7.11.1-pstrat2.4",
   "description": "playstrategy.org chess ui, forked from lichess.org",
   "type": "commonjs",
   "main": "chessground.js",
   "typings": "chessground.d.ts",
   "dependencies": {},
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^17",
-    "@rollup/plugin-typescript": "^8",
-    "@typescript-eslint/eslint-plugin": "^4",
-    "@typescript-eslint/parser": "^4",
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.1",
+    "@typescript-eslint/eslint-plugin": "^4.32.0",
+    "@typescript-eslint/parser": "^4.32.0",
+    "browserify": "^16",
+    "chai": "^4.2.0",
     "eslint": "^7",
+    "fancy-log": "^1.3.3",
+    "gulp": "^4",
+    "gulp-size": "^3",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-terser": "^1",
+    "jsdom": "10.0.0",
+    "jsdom-global": "3.0.2",
+    "mocha": "^8.1.0",
     "prettier": "^2",
-    "rollup": "^2",
-    "rollup-plugin-terser": "^7",
-    "tslib": "^2",
-    "typescript": "^4"
+    "ts-node": "^8.10.2",
+    "tsify": "^4",
+    "typescript": "^4.4.4",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2",
+    "watchify": "^3.11.0"
   },
   "scripts": {
     "prepare": "npm run compile",
-    "compile": "tsc --outDir . --sourceMap --declaration",
-    "lint": "eslint src/*.ts",
+    "pretest": "npm run compile",
+    "test": "mocha -r ts-node/register -r jsdom-global/register 'tests/**/*.test.ts'",
+    "prepublish": "npm run compile",
+    "compile": "tsc",
     "format": "prettier --write .",
+    "lint": "eslint src/*.ts",
     "check-format": "prettier --check .",
-    "dist": "rollup --config"
+    "dev": "gulp dev",
+    "prod": "gulp prod"
   },
   "files": [
     "/*.js",
@@ -32,7 +48,7 @@
     "/*.js.map",
     "/assets/*.css",
     "/src/*.ts",
-    "!/rollup.config.js"
+    "!/gulpfile.js"
   ],
   "repository": "https://github.com/Mind-Sports-Games/chessground",
   "keywords": [

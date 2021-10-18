@@ -1,9 +1,11 @@
 import { State } from './state';
 import * as drag from './drag';
 import * as draw from './draw';
-import { drop } from './drop';
-import { isRightButton } from './util';
+import { cancelDropMode, drop } from './drop';
+import { eventPosition, isRightButton } from './util';
 import * as cg from './types';
+import { getKeyAtDomPos } from './board';
+import { Piece } from './types';
 
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
@@ -21,12 +23,8 @@ export function bindBoard(s: State, boundsUpdated: () => void): void {
   // Cannot be passive, because we prevent touch scrolling and dragging of
   // selected elements.
   const onStart = startDragOrDraw(s);
-  boardEl.addEventListener('touchstart', onStart as EventListener, {
-    passive: false,
-  });
-  boardEl.addEventListener('mousedown', onStart as EventListener, {
-    passive: false,
-  });
+  boardEl.addEventListener('touchstart', onStart as EventListener, { passive: false });
+  boardEl.addEventListener('mousedown', onStart as EventListener, { passive: false });
 
   if (s.disableContextMenu || s.drawable.enabled) {
     boardEl.addEventListener('contextmenu', e => e.preventDefault());
@@ -68,6 +66,7 @@ function unbindable(
   return () => el.removeEventListener(eventName, callback, options);
 }
 
+// slightly misleading name - because it also handles click-moving/dropping of pieces. generally it seems to handle all click events on the board.
 function startDragOrDraw(s: State): MouchBind {
   return e => {
     if (s.draggable.current) drag.cancel(s);
@@ -75,8 +74,22 @@ function startDragOrDraw(s: State): MouchBind {
     else if (e.shiftKey || isRightButton(e)) {
       if (s.drawable.enabled) draw.start(s, e);
     } else if (!s.viewOnly) {
-      if (s.dropmode.active) drop(s, e);
-      else drag.start(s, e);
+      if (s.dropmode.active && undefined === squareOccupied(s, e)) {
+        // this case covers normal drop when it is our turn or pre-drop on empty scare
+        drop(s, e);
+      } else if (
+        s.dropmode.active &&
+        s.movable.color !== s.turnColor /*not our turn*/ &&
+        squareOccupied(s, e)?.color === s.turnColor /*occupied by opp's piece*/
+      ) {
+        // this case is for predrop on opp's piece
+        drop(s, e);
+      } else {
+        // if it is occupied by our piece - cancel drop mode and start dragging that piece instead.
+        // if it is occupied by opp's piece - just cancel drop mode. drag.start() will do nothing
+        cancelDropMode(s);
+        drag.start(s, e);
+      }
     }
   };
 }
@@ -87,4 +100,11 @@ function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind
       if (s.drawable.enabled) withDraw(s, e);
     } else if (!s.viewOnly) withDrag(s, e);
   };
+}
+
+function squareOccupied(s: State, e: cg.MouchEvent): Piece | undefined {
+  const position = eventPosition(e);
+  const dest = position && getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.geometry);
+  if (dest && s.pieces.get(dest)) return s.pieces.get(dest);
+  return undefined;
 }

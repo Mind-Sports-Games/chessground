@@ -9,4 +9,6 @@ jobs:
       - run: |
           npm install
           npm run lint
-          npm run dist
+          npm run compile
+          npm run test
+          npm run dev

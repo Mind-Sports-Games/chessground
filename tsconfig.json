@@ -1,15 +1,24 @@
 {
   "include": ["src/*.ts"],
+  "filesGlob": ["src/*.ts"],
   "exclude": [],
   "compilerOptions": {
+    "outDir": "./",
+    "declaration": true,
+    "removeComments": true,
     "noEmitOnError": false,
-    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitThis": true,
+    "noImplicitAny": true,
     "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "alwaysStrict": true,
     "module": "commonjs",
     "target": "ES2017",
+    "inlineSourceMap": true,
+    "inlineSources": true,
     "lib": ["DOM", "ES2017"]
   }
 }
