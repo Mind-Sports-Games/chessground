@@ -126,7 +126,7 @@ export interface State extends HeadlessState {
 
 export function defaults(): HeadlessState {
   return {
-    pieces: fen.read(fen.initial),
+    pieces: fen.read(fen.initial, { width: 8, height: 8 }),
     orientation: 'white',
     myColor: 'white',
     startColor: 'white',

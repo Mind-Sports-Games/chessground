@@ -12,11 +12,11 @@ function letters(role: cg.Role) {
   return letterPart.length > 1 ? letterPart.replace('p', '+') : letterPart;
 }
 
-export function read(fen: cg.FEN): cg.Pieces {
+export function read(fen: cg.FEN, dimensions: cg.BoardDimensions): cg.Pieces {
   if (fen === 'start') fen = initial;
   if (fen.indexOf('[') !== -1) fen = fen.slice(0, fen.indexOf('['));
   const pieces: cg.Pieces = new Map();
-  let row: number = fen.split('/').length;
+  let row: number = dimensions.height;
   let col = 0;
   let promoted = false;
   let num = 0;
