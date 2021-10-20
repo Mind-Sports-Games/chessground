@@ -11,7 +11,7 @@ import * as util from './util';
 export function Chessground(element: HTMLElement, config?: Config): Api {
   const maybeState: State | HeadlessState = defaults();
   configure(maybeState, config || {});
-
+  console.log("CG state ", maybeState);
   function redrawAll(): State {
     const prevUnbind = 'dom' in maybeState ? maybeState.dom.unbind : undefined;
     // compute bounds from existing board element if possible

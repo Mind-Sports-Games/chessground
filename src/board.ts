@@ -177,7 +177,10 @@ export function userMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): bool
  *       regular chess movements dynamics
  * */
 export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, force?: boolean): void {
+  console.log("dropping new piece")
   const piece = state.pieces.get(orig);
+  console.log("new peice orig is ", orig )
+  console.log("new piece is ", piece)
   if (piece && (canDrop(state, orig, dest) || force)) {
     state.pieces.delete(orig);
     baseNewPiece(state, piece, dest, force);

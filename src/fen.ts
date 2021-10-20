@@ -13,6 +13,7 @@ function letters(role: cg.Role) {
 }
 
 export function read(fen: cg.FEN, dimensions: cg.BoardDimensions): cg.Pieces {
+  console.log("input fen to read", fen)
   if (fen === 'start') fen = initial;
   if (fen.indexOf('[') !== -1) fen = fen.slice(0, fen.indexOf('['));
   const pieces: cg.Pieces = new Map();
@@ -20,6 +21,8 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions): cg.Pieces {
   let col = 0;
   let promoted = false;
   let num = 0;
+
+  console.log("input fen to read - board fen?", fen)
 
   for (const c of fen) {
     switch (c) {
@@ -61,11 +64,29 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions): cg.Pieces {
       }
     }
   }
+  console.log("pieces found in read fen", pieces)
   return pieces;
 }
 
 export function write(pieces: cg.Pieces, geom: cg.Geometry): cg.FEN {
   const bd = cg.dimensions[geom];
+  console.log("fen being written", invNRanks
+  .slice(-bd.height)
+  .map(y =>
+    NRanks.slice(0, bd.width)
+      .map(x => {
+        const piece = pieces.get(pos2key([x, y]));
+        if (piece) {
+          const letter: string =
+            letters(piece.role) + (piece.promoted && letters(piece.role).charAt(0) !== '+' ? '~' : '');
+          return piece.color === 'white' ? letter.toUpperCase() : letter;
+        } else return '1';
+      })
+      .join('')
+  )
+  .join('/')
+  .replace(/1{2,}/g, s => s.length.toString())
+  )
   return invNRanks
     .slice(-bd.height)
     .map(y =>
