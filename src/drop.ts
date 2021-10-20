@@ -9,8 +9,6 @@ export function setDropMode(s: State, piece?: cg.Piece): void {
   s.dropmode.active = true;
   s.dropmode.piece = piece;
 
-  console.log("setDropMode for piece", piece)
-
   cancelDrag(s);
 
   board.unselect(s);
