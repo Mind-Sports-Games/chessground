@@ -105,6 +105,7 @@ export interface Config {
     };
     onChange?: (shapes: DrawShape[]) => void; // called after drawable shapes change
   };
+  dimensions?: cg.BoardDimensions;
   geometry?: cg.Geometry; // dim3x4 | dim5x5 | dim7x7 | dim8x8 | dim9x9 | dim10x8 | dim9x10 | dim10x10
   variant?: cg.Variant;
   chess960?: boolean;
@@ -123,7 +124,7 @@ export function configure(state: HeadlessState, config: Config): void {
 
   // if a fen was provided, replace the pieces
   if (config.fen) {
-    const pieces = fenRead(config.fen);
+    const pieces = fenRead(config.fen, state.dimensions);
     // prevent to cancel() already started piece drag from pocket!
     if (state.pieces.get('a0') !== undefined) pieces.set('a0', state.pieces.get('a0')!);
     state.pieces = pieces;
