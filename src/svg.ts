@@ -372,8 +372,5 @@ function arrowMargin(bounds: ClientRect, shorten: boolean, bd: cg.BoardDimension
 }
 
 function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.NumberPair {
-  const xScale = Math.min(1, bounds.width / bounds.height) * Math.max(1, bd.height / bd.width);
-  const yScale = Math.min(1, bounds.height / bounds.width) * Math.max(1, bd.width / bd.height);
-  return [(pos[0] - (bd.width - 1) / 2) * xScale, ((bd.height - 1) / 2 - pos[1]) * yScale];
-  //return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
+  return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
