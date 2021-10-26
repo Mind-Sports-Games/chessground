@@ -148,8 +148,8 @@ export function computeSquareCenter(
 ): cg.NumberPair {
   const pos = T.mapToWhiteInverse[orientation](key2pos(key), bd);
   return [
-    bounds.left + (bounds.width * pos[0]) / 8 + bounds.width / 16,
-    bounds.top + (bounds.height * (7 - pos[1])) / 8 + bounds.height / 16,
+    bounds.left + (bounds.width * (pos[0] - 1 + 0.5)) / bd.width,
+    bounds.top + (bounds.height * (bd.height - (pos[1] - 1 + 0.5))) / bd.height,
   ];
 }
 

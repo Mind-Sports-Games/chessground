@@ -245,7 +245,7 @@ function renderCircle(
 ): SVGElement {
   const o = pos2px(pos, bounds, bd),
     widths = circleWidth(bounds, bd),
-    radius = (bounds.width + bounds.height) / 2;
+    radius = (bounds.width + bounds.height) / 32;
   return setAttributes(createElement('circle'), {
     stroke: brush.color,
     'stroke-width': widths[current ? 0 : 1],
@@ -338,10 +338,7 @@ export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SV
 }
 
 function orient(pos: cg.Pos, orientation: cg.Orientation, bd: cg.BoardDimensions): cg.Pos {
-  const newpos = T.mapToWhiteInverse[orientation](pos, bd);
-  return orientation === 'white' || orientation === 'left'
-    ? newpos
-    : [bd.width + 1 - newpos[0], bd.height + 1 - newpos[1]];
+  return T.mapToWhiteInverse[orientation](pos, bd);
 }
 
 function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
