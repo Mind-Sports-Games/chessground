@@ -247,6 +247,7 @@ function renderCircle(
     widths = circleWidth(bounds, bd),
     radius = (bounds.width + bounds.height) / 32 ;
   console.log("o: ", o);
+  console.log("pos", pos);
   console.log("widths: ", widths);
   console.log("radius: ", radius);
   return setAttributes(createElement('circle'), {
@@ -341,10 +342,7 @@ export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SV
 }
 
 function orient(pos: cg.Pos, orientation: cg.Orientation, bd: cg.BoardDimensions): cg.Pos {
-  const newpos = T.mapToWhiteInverse[orientation](pos, bd);
-  return orientation === 'white' || orientation === 'left'
-    ? newpos
-    : [bd.width + 1 - newpos[0], bd.height + 1 - newpos[1]];
+  return T.mapToWhiteInverse[orientation](pos, bd)
 }
 
 function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
@@ -374,5 +372,8 @@ function arrowMargin(bounds: ClientRect, shorten: boolean, bd: cg.BoardDimension
 }
 
 function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.NumberPair {
-  return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
+  const xScale = Math.min(1, bounds.width / bounds.height) * Math.max(1, bd.height / bd.width);
+  const yScale = Math.min(1, bounds.height / bounds.width) * Math.max(1, bd.width / bd.height);
+  return [(pos[0] - (bd.width - 1) / 2) * xScale, ((bd.height - 1) / 2 - pos[1]) * yScale];
+  //return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
