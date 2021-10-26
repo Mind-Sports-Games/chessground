@@ -245,7 +245,7 @@ function renderCircle(
 ): SVGElement {
   const o = pos2px(pos, bounds, bd),
     widths = circleWidth(bounds, bd),
-    radius = (bounds.width + bounds.height) / 2;
+    radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
   return setAttributes(createElement('circle'), {
     stroke: brush.color,
     'stroke-width': widths[current ? 0 : 1],

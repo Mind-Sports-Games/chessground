@@ -147,6 +147,10 @@ export function computeSquareCenter(
   bd: cg.BoardDimensions
 ): cg.NumberPair {
   const pos = T.mapToWhiteInverse[orientation](key2pos(key), bd);
+  if (orientation !== "white") {
+    pos[0] = bd.width - 1 - pos[0];
+    pos[1] = bd.height - 1 - pos[1];
+  }
   return [
     bounds.left + (bounds.width * (pos[0] - 1 + 0.5)) / bd.width,
     bounds.top + (bounds.height * (bd.height - (pos[1] - 1 + 0.5))) / bd.height,
