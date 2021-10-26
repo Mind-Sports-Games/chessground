@@ -244,8 +244,11 @@ function renderCircle(
   bd: cg.BoardDimensions
 ): SVGElement {
   const o = pos2px(pos, bounds, bd),
-    widths = circleWidth(),
-    radius = (bounds.width + bounds.height) / (4 * Math.max(bounds.width, bounds.height));
+    widths = circleWidth(bounds, bd),
+    radius = (bounds.width + bounds.height) / 32 ;
+  console.log("o: ", o);
+  console.log("widths: ", widths);
+  console.log("radius: ", radius);
   return setAttributes(createElement('circle'), {
     stroke: brush.color,
     'stroke-width': widths[current ? 0 : 1],
@@ -353,8 +356,8 @@ function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
   };
 }
 
-function circleWidth(): [number, number] {
-  const base = 1 / 64;
+function circleWidth(bounds: ClientRect, bd: cg.BoardDimensions): [number, number] {
+  const base = bounds.width / (bd.width * 64);
   return [3 * base, 4 * base];
 }
 
