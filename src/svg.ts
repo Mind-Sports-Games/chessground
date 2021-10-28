@@ -218,7 +218,7 @@ function renderShape(
   return el;
 }
 
-function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect,  bd: cg.BoardDimensions): SVGElement {
+function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): SVGElement {
   const { width, height } = bounds;
   const w = width / bd.width;
   const h = height / bd.height;
