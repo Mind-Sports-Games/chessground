@@ -188,7 +188,7 @@ function renderShape(
   let el: SVGElement;
   if (shape.customSvg) {
     const orig = orient(key2pos(shape.orig), state.orientation, state.dimensions);
-    el = renderCustomSvg(shape.customSvg, orig, bounds);
+    el = renderCustomSvg(shape.customSvg, orig, bounds, state.dimensions);
   } else if (shape.piece)
     el = renderPiece(
       state.drawable.pieces.baseUrl,
@@ -218,12 +218,12 @@ function renderShape(
   return el;
 }
 
-function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect): SVGElement {
+function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): SVGElement {
   const { width, height } = bounds;
-  const w = width / 8;
-  const h = height / 8;
-  const x = pos[0] * w;
-  const y = (7 - pos[1]) * h;
+  const w = width / bd.width;
+  const h = height / bd.height;
+  const x = (pos[0] - 1) * w;
+  const y = (bd.height - (pos[1] - 1)) * h;
 
   // Translate to top-left of `orig` square
   const g = setAttributes(createElement('g'), { transform: `translate(${x},${y})` });
@@ -245,7 +245,7 @@ function renderCircle(
 ): SVGElement {
   const o = pos2px(pos, bounds, bd),
     widths = circleWidth(bounds, bd),
-    radius = (bounds.width + bounds.height) / 32;
+    radius = (bounds.width + bounds.height) / (2 * (bd.height + bd.width));
   return setAttributes(createElement('circle'), {
     stroke: brush.color,
     'stroke-width': widths[current ? 0 : 1],
