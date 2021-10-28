@@ -223,7 +223,7 @@ function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect, bd:
   const w = width / bd.width;
   const h = height / bd.height;
   const x = (pos[0] - 1) * w;
-  const y = (bd.height - (pos[1] - 1)) * h;
+  const y = (bd.height - pos[1]) * h;
 
   // Translate to top-left of `orig` square
   const g = setAttributes(createElement('g'), { transform: `translate(${x},${y})` });
