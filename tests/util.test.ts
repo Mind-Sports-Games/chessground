@@ -19,8 +19,7 @@ describe('computeSquareCenter() test', () => {
         return 'None';
       },
     };
-    const geom = cg.Geometry.dim8x8;
-    const bd = cg.dimensions[geom];
+    const bd: cg.BoardDimensions = { width: 8, height: 8 };
 
     const expected = [0.5, 7.5];
     const pos = computeSquareCenter(key, orientation, bounds, bd);
@@ -46,8 +45,7 @@ describe('computeSquareCenter() test', () => {
         return 'None';
       },
     };
-    const geom = cg.Geometry.dim8x8;
-    const bd = cg.dimensions[geom];
+    const bd: cg.BoardDimensions = { width: 8, height: 8 };
 
     const expected = [7.5, 0.5];
     const pos = computeSquareCenter(key, orientation, bounds, bd);
@@ -73,8 +71,7 @@ describe('computeSquareCenter() test', () => {
         return 'None';
       },
     };
-    const geom = cg.Geometry.dim8x8;
-    const bd = cg.dimensions[geom];
+    const bd: cg.BoardDimensions = { width: 8, height: 8 };
 
     const expected = [0.5, 0.5];
     const pos = computeSquareCenter(key, orientation, bounds, bd);

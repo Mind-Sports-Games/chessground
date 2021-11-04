@@ -223,7 +223,7 @@ export function setSelected(state: HeadlessState, key: cg.Key): void {
       state.pieces,
       key,
       state.premovable.castle,
-      state.geometry,
+      state.dimensions,
       state.variant,
       state.chess960
     );
@@ -284,7 +284,10 @@ function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   return (
     orig !== dest &&
     isPremovable(state, orig) &&
-    containsX(premove(state.pieces, orig, state.premovable.castle, state.geometry, state.variant, state.chess960), dest)
+    containsX(
+      premove(state.pieces, orig, state.premovable.castle, state.dimensions, state.variant, state.chess960),
+      dest
+    )
   );
 }
 
@@ -297,7 +300,7 @@ function canPredrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   if (!piece) {
     return false;
   }
-  const isValidPredrop = containsX(predrop(state.pieces, piece, state.geometry, state.variant), dest);
+  const isValidPredrop = containsX(predrop(state.pieces, piece, state.dimensions, state.variant), dest);
 
   return (
     (!destPiece || destPiece.color !== state.movable.color) &&
@@ -373,9 +376,8 @@ export function getKeyAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
   bounds: ClientRect,
-  geom: cg.Geometry
+  bd: cg.BoardDimensions
 ): cg.Key | undefined {
-  const bd = cg.dimensions[geom];
   const file = Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
   const rank = Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height));
   pos = [file, rank];
@@ -392,11 +394,10 @@ export function getSnappedKeyAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
   bounds: ClientRect,
-  geom: cg.Geometry
+  bd: cg.BoardDimensions
 ): cg.Key | undefined {
-  const bd = cg.dimensions[geom];
   const origPos = key2pos(orig);
-  const validSnapPos = allPos(geom).filter(pos2 => {
+  const validSnapPos = allPos(bd).filter(pos2 => {
     return queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]);
   });
   const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), orientation, bounds, bd));

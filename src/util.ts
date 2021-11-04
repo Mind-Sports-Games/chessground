@@ -14,8 +14,7 @@ function ranks(n: number) {
   return cg.ranks.slice(0, n);
 }
 
-export function allKeys(geom: cg.Geometry = cg.Geometry.dim8x8) {
-  const bd = cg.dimensions[geom];
+export function allKeys(bd: cg.BoardDimensions = { width: 8, height: 8 }) {
   return Array.prototype.concat(...files(bd.width).map(c => ranks(bd.height).map(r => c + r)));
 }
 
@@ -27,7 +26,7 @@ export function key2pos(k: cg.Key) {
   return [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as cg.Pos;
 }
 
-export const allPos = (geom: cg.Geometry): cg.Pos[] => allKeys(geom).map(key2pos);
+export const allPos = (bd: cg.BoardDimensions): cg.Pos[] => allKeys(bd).map(key2pos);
 
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;

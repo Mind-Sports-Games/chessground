@@ -28,7 +28,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   const bounds = s.dom.bounds(),
     position = util.eventPosition(e)!,
-    orig = board.getKeyAtDomPos(position, s.orientation, bounds, s.geometry);
+    orig = board.getKeyAtDomPos(position, s.orientation, bounds, s.dimensions);
   if (!orig) return;
   const piece = s.pieces.get(orig);
   const previouslySelected = s.selected;
@@ -135,7 +135,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
   };
 
   if (piece && board.isPredroppable(s)) {
-    s.predroppable.dropDests = predrop(s.pieces, piece, s.geometry, s.variant);
+    s.predroppable.dropDests = predrop(s.pieces, piece, s.dimensions, s.variant);
   }
 
   processDrag(s);
@@ -197,7 +197,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   board.unsetPredrop(s);
   // touchend has no position; so use the last touchmove position instead
   const eventPos = util.eventPosition(e) || cur.pos;
-  const dest = board.getKeyAtDomPos(eventPos, s.orientation, s.dom.bounds(), s.geometry);
+  const dest = board.getKeyAtDomPos(eventPos, s.orientation, s.dom.bounds(), s.dimensions);
   if (dest && cur.started && cur.orig !== dest) {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
     else {

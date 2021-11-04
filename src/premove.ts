@@ -185,12 +185,11 @@ const shogiHorse: Mobility = (x1, y1, x2, y2) => {
   return bishop(x1, y1, x2, y2) || wazir(x1, y1, x2, y2);
 };
 
-// Define xiangqi palace based on geometry
+// Define xiangqi palace based on geometry/dimensions
 // The palace is the 3x3 squares in the middle files at each side's end of the board
 type Palace = cg.Pos[];
 
-function palace(geom: cg.Geometry, color: cg.Color): Palace {
-  const bd = cg.dimensions[geom];
+function palace(bd: cg.BoardDimensions, color: cg.Color): Palace {
   const middleFile = Math.floor((bd.width + 1) / 2);
   const startingRank = color === 'white' ? 1 : bd.height - 2;
 
@@ -206,17 +205,6 @@ function palace(geom: cg.Geometry, color: cg.Color): Palace {
     [middleFile + 1, startingRank],
   ];
 }
-
-const palaces: { [geom in cg.Geometry]?: { [color in cg.Color]: Palace } } = {
-  [cg.Geometry.dim9x10]: {
-    white: palace(cg.Geometry.dim9x10, 'white'),
-    black: palace(cg.Geometry.dim9x10, 'black'),
-  },
-  [cg.Geometry.dim7x7]: {
-    white: palace(cg.Geometry.dim7x7, 'white'),
-    black: palace(cg.Geometry.dim7x7, 'black'),
-  },
-};
 
 // xiangqi pawn
 function xiangqiPawn(color: cg.Color): Mobility {
@@ -237,15 +225,15 @@ function xiangqiElephant(color: cg.Color): Mobility {
 }
 
 // xiangqi advisor
-function xiangqiAdvisor(color: cg.Color, geom: cg.Geometry): Mobility {
-  const palace = palaces[geom]![color];
-  return (x1, y1, x2, y2) => ferz(x1, y1, x2, y2) && palace.some(point => point[0] === x2 && point[1] === y2);
+function xiangqiAdvisor(color: cg.Color, bd: cg.BoardDimensions): Mobility {
+  const myPalace = palace(bd, color);
+  return (x1, y1, x2, y2) => ferz(x1, y1, x2, y2) && myPalace.some(point => point[0] === x2 && point[1] === y2);
 }
 
 // xiangqi general (king)
-function xiangqiKing(color: cg.Color, geom: cg.Geometry): Mobility {
-  const palace = palaces[geom]![color];
-  return (x1, y1, x2, y2) => wazir(x1, y1, x2, y2) && palace.some(point => point[0] === x2 && point[1] === y2);
+function xiangqiKing(color: cg.Color, bd: cg.BoardDimensions): Mobility {
+  const myPalace = palace(bd, color);
+  return (x1, y1, x2, y2) => wazir(x1, y1, x2, y2) && myPalace.some(point => point[0] === x2 && point[1] === y2);
 }
 
 // shako elephant
@@ -261,8 +249,8 @@ const janggiElephant: Mobility = (x1, y1, x2, y2) => {
 };
 
 // janggi pawn
-function janggiPawn(color: cg.Color, geom: cg.Geometry): Mobility {
-  const oppPalace = palaces[geom]![util.opposite(color)];
+function janggiPawn(color: cg.Color, bd: cg.BoardDimensions): Mobility {
+  const oppPalace = palace(bd, util.opposite(color));
   return (x1, y1, x2, y2) => {
     const palacePos = oppPalace.findIndex(point => point[0] === x1 && point[1] === y1);
     let additionalMobility: Mobility;
@@ -295,9 +283,9 @@ function janggiPawn(color: cg.Color, geom: cg.Geometry): Mobility {
 }
 
 // janggi rook
-function janggiRook(geom: cg.Geometry): Mobility {
-  const wPalace = palaces[geom]!['white'];
-  const bPalace = palaces[geom]!['black'];
+function janggiRook(bd: cg.BoardDimensions): Mobility {
+  const wPalace = palace(bd, 'white');
+  const bPalace = palace(bd, 'black');
   return (x1, y1, x2, y2) => {
     let additionalMobility: Mobility;
     const wPalacePos = wPalace.findIndex(point => point[0] === x1 && point[1] === y1);
@@ -329,10 +317,10 @@ function janggiRook(geom: cg.Geometry): Mobility {
 }
 
 // janggi general (king)
-function janggiKing(color: cg.Color, geom: cg.Geometry): Mobility {
-  const palace = palaces[geom]![color];
+function janggiKing(color: cg.Color, bd: cg.BoardDimensions): Mobility {
+  const myPalace = palace(bd, color);
   return (x1, y1, x2, y2) => {
-    const palacePos = palace.findIndex(point => point[0] === x1 && point[1] === y1);
+    const palacePos = myPalace.findIndex(point => point[0] === x1 && point[1] === y1);
     let additionalMobility: Mobility;
     switch (palacePos) {
       case 0:
@@ -355,7 +343,7 @@ function janggiKing(color: cg.Color, geom: cg.Geometry): Mobility {
     }
     return (
       (wazir(x1, y1, x2, y2) || additionalMobility(x1, y1, x2, y2)) &&
-      palace.some(point => point[0] === x2 && point[1] === y2)
+      myPalace.some(point => point[0] === x2 && point[1] === y2)
     );
   };
 }
@@ -482,7 +470,7 @@ export function premove(
   pieces: cg.Pieces,
   key: cg.Key,
   canCastle: boolean,
-  geom: cg.Geometry,
+  bd: cg.BoardDimensions,
   variant: cg.Variant,
   chess960: boolean
 ): cg.Key[] {
@@ -511,10 +499,10 @@ export function premove(
           mobility = xiangqiElephant(color);
           break; // elephant
         case 'a-piece':
-          mobility = xiangqiAdvisor(color, geom);
+          mobility = xiangqiAdvisor(color, bd);
           break; // advisor
         case 'k-piece':
-          mobility = xiangqiKing(color, geom);
+          mobility = xiangqiKing(color, bd);
           break; // king
         case 'm-piece':
           mobility = chancellor;
@@ -525,11 +513,11 @@ export function premove(
     case 'janggi':
       switch (piece.role) {
         case 'p-piece':
-          mobility = janggiPawn(color, geom);
+          mobility = janggiPawn(color, bd);
           break; // pawn
         case 'c-piece': // cannon
         case 'r-piece':
-          mobility = janggiRook(geom);
+          mobility = janggiRook(bd);
           break; // rook
         case 'n-piece':
           mobility = knight;
@@ -539,7 +527,7 @@ export function premove(
           break; // elephant
         case 'a-piece': // advisor
         case 'k-piece':
-          mobility = janggiKing(color, geom);
+          mobility = janggiKing(color, bd);
           break; // king
       }
       break;
@@ -558,7 +546,7 @@ export function premove(
             mobility = knight;
             break; // horse
           case 'k-piece':
-            mobility = xiangqiKing(color, geom);
+            mobility = xiangqiKing(color, bd);
             break; // king
         }
       }
@@ -1104,7 +1092,7 @@ export function premove(
   }
 
   return util
-    .allKeys(geom)
+    .allKeys(bd)
     .map(util.key2pos)
     .filter(pos2 => {
       return (pos[0] !== pos2[0] || pos[1] !== pos2[1]) && mobility(pos[0], pos[1], pos2[0], pos2[1]);

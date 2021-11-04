@@ -64,8 +64,7 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions): cg.Pieces {
   return pieces;
 }
 
-export function write(pieces: cg.Pieces, geom: cg.Geometry): cg.FEN {
-  const bd = cg.dimensions[geom];
+export function write(pieces: cg.Pieces, bd: cg.BoardDimensions): cg.FEN {
   return invNRanks
     .slice(-bd.height)
     .map(y =>
