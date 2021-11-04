@@ -106,7 +106,6 @@ export interface Config {
     onChange?: (shapes: DrawShape[]) => void; // called after drawable shapes change
   };
   dimensions?: cg.BoardDimensions;
-  geometry?: cg.Geometry; // dim3x4 | dim5x5 | dim7x7 | dim8x8 | dim9x9 | dim10x8 | dim9x10 | dim10x10
   variant?: cg.Variant;
   chess960?: boolean;
   notation?: cg.Notation;
@@ -120,7 +119,7 @@ export function configure(state: HeadlessState, config: Config): void {
 
   merge(state, config);
 
-  if (config.geometry) state.dimensions = cg.dimensions[config.geometry];
+  if (config.dimensions) state.dimensions = config.dimensions;
 
   // if a fen was provided, replace the pieces
   if (config.fen) {

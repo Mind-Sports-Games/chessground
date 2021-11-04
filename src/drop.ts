@@ -14,7 +14,7 @@ export function setDropMode(s: State, piece?: cg.Piece): void {
   board.unselect(s);
 
   if (piece && board.isPredroppable(s)) {
-    s.predroppable.dropDests = predrop(s.pieces, piece, s.geometry, s.variant);
+    s.predroppable.dropDests = predrop(s.pieces, piece, s.dimensions, s.variant);
   }
 }
 
@@ -34,7 +34,7 @@ export function drop(s: State, e: cg.MouchEvent): void {
   if (piece) {
     s.pieces.set('a0', piece);
     const position = util.eventPosition(e);
-    const dest = position && board.getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.geometry);
+    const dest = position && board.getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions);
     if (dest) board.dropNewPiece(s, 'a0', dest);
   }
   s.dom.redraw();

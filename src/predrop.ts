@@ -10,15 +10,15 @@ const wholeBoard = (_x: number, _y: number) => true;
  * @param from	1-based index from given color's PoV
  * @param to	1-based index from given color's PoV
  * @param color The piece's color
- * @param geom  The board's geometry
+ * @param db  The board's dimensions
  *
  * Returns a function that checks if a position's rank is inside the from-to range, where from and to are indices of rank when counting from
  * current "color"'s point of view (i.e. if from=to=1 and color=black the function will return true only if the position's rank is 8 in case of 8x8 board)
  * from and to can be zero or negative to denote that many ranks counting from the last
  *
  * */
-function rankRange(from: number, to: number, color: cg.Color, geom: cg.Geometry): DropMobility {
-  const height = cg.dimensions[geom].height;
+function rankRange(from: number, to: number, color: cg.Color, bd: cg.BoardDimensions): DropMobility {
+  const height = bd.height;
   if (from < 1) from += height;
   if (to < 1) to += height;
   return (_x, y) => {
@@ -27,7 +27,12 @@ function rankRange(from: number, to: number, color: cg.Color, geom: cg.Geometry)
   };
 }
 
-export default function predrop(pieces: cg.Pieces, piece: cg.Piece, geom: cg.Geometry, variant: cg.Variant): cg.Key[] {
+export default function predrop(
+  pieces: cg.Pieces,
+  piece: cg.Piece,
+  bd: cg.BoardDimensions,
+  variant: cg.Variant
+): cg.Key[] {
   const color = piece.color;
   const role = piece.role;
 
@@ -42,25 +47,25 @@ export default function predrop(pieces: cg.Pieces, piece: cg.Piece, geom: cg.Geo
     case 'gothhouse':
       switch (role) {
         case 'p-piece':
-          mobility = rankRange(2, -1, color, geom);
+          mobility = rankRange(2, -1, color, bd);
           break; // pawns can't be dropped on the first rank or last rank
       }
       break;
 
     case 'placement':
-      mobility = rankRange(1, 1, color, geom); // the "drop" is the placement phase where pieces can only be placed on the first rank
+      mobility = rankRange(1, 1, color, bd); // the "drop" is the placement phase where pieces can only be placed on the first rank
       break;
 
     case 'sittuyin':
       switch (role) {
         case 'r-piece':
-          mobility = rankRange(1, 1, color, geom);
+          mobility = rankRange(1, 1, color, bd);
           break; // rooks can only be placed on the first rank
         default:
           mobility = (x, y) => {
             // the "drop" is the placement phase where pieces can be placed on its player's half of the board
-            const width = cg.dimensions[geom].width;
-            const height = cg.dimensions[geom].height;
+            const width = bd.width;
+            const height = bd.height;
             if (color === 'black') {
               x = width - x + 1;
               y = height - y + 1;
@@ -76,10 +81,10 @@ export default function predrop(pieces: cg.Pieces, piece: cg.Piece, geom: cg.Geo
       switch (role) {
         case 'p-piece': // pawns and lances can't be dropped on the last rank
         case 'l-piece':
-          mobility = rankRange(1, -1, color, geom);
+          mobility = rankRange(1, -1, color, bd);
           break;
         case 'n-piece':
-          mobility = rankRange(1, -2, color, geom);
+          mobility = rankRange(1, -2, color, bd);
           break; // knights can't be dropped on the last two ranks
       }
       break;
@@ -93,7 +98,7 @@ export default function predrop(pieces: cg.Pieces, piece: cg.Piece, geom: cg.Geo
     case 'torishogi':
       switch (role) {
         case 's-piece':
-          mobility = rankRange(1, -1, color, geom);
+          mobility = rankRange(1, -1, color, bd);
           break; // swallows can't be dropped on the last rank
       }
       break;
@@ -101,13 +106,13 @@ export default function predrop(pieces: cg.Pieces, piece: cg.Piece, geom: cg.Geo
     case 'grandhouse':
       switch (role) {
         case 'p-piece':
-          mobility = rankRange(2, 7, color, geom);
+          mobility = rankRange(2, 7, color, bd);
           break; // pawns can't be dropped on the 1st, or 8th to 10th ranks
       }
       break;
 
     case 'shogun':
-      mobility = rankRange(1, 5, color, geom); // shogun only permits drops on ranks 1-5 for all pieces
+      mobility = rankRange(1, 5, color, bd); // shogun only permits drops on ranks 1-5 for all pieces
       break;
 
     case 'synochess':
@@ -123,7 +128,7 @@ export default function predrop(pieces: cg.Pieces, piece: cg.Piece, geom: cg.Geo
   }
 
   return util
-    .allKeys(geom)
+    .allKeys(bd)
     .map(util.key2pos)
     .filter(pos => {
       return pieces.get(util.pos2key(pos))?.color !== color && mobility(pos[0], pos[1]);

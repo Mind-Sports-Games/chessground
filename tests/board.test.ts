@@ -1,6 +1,5 @@
-import { Geometry } from '../src/types';
 import { getKeyAtDomPos, getSnappedKeyAtDomPos } from '../src/board';
-import { NumberPair } from '../src/types';
+import { NumberPair, BoardDimensions } from '../src/types';
 import { expect } from 'chai';
 
 describe('getSnappedKeyAtDomPos() test', () => {
@@ -20,10 +19,10 @@ describe('getSnappedKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'a8';
-    const snappedKey = getSnappedKeyAtDomPos('a8', bpos, orientation, bounds, geom);
+    const snappedKey = getSnappedKeyAtDomPos('a8', bpos, orientation, bounds, bd);
     expect(expected).to.equal(snappedKey);
   });
 });
@@ -45,10 +44,10 @@ describe('getSnappedKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'h1';
-    const snappedKey = getSnappedKeyAtDomPos('h1', bpos, orientation, bounds, geom);
+    const snappedKey = getSnappedKeyAtDomPos('h1', bpos, orientation, bounds, bd);
     expect(expected).to.equal(snappedKey);
   });
 });
@@ -70,10 +69,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'a8';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
@@ -95,10 +94,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'a1';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
@@ -120,10 +119,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'h1';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
@@ -145,10 +144,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'h8';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
@@ -170,10 +169,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'h1';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
@@ -195,10 +194,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'h8';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
@@ -220,10 +219,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'a8';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
@@ -245,10 +244,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'a1';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
@@ -270,10 +269,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'a1';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
@@ -295,10 +294,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'h1';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
@@ -320,10 +319,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'h8';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
@@ -345,10 +344,10 @@ describe('getKeyAtDomPos() test', () => {
         return 'None';
       },
     };
-    const geom = Geometry.dim8x8;
+    const bd: BoardDimensions = { width: 8, height: 8 };
 
     const expected = 'a8';
-    const key = getKeyAtDomPos(bpos, orientation, bounds, geom);
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
     expect(expected).to.equal(key);
   });
 });
