@@ -304,7 +304,7 @@ function renderPiece(
     name = promotionRoleToSvgName(variant, piece);
   // If baseUrl doesn't end with '/' use it as full href
   // This is needed when drop piece suggestion .svg image file names are different than "name" produces
-  const href = baseUrl.endsWith('/') ? baseUrl + name + '.svg' : baseUrl;
+  const href = baseUrl.endsWith('/') ? baseUrl.slice('https://playstrategy.org'.length) + name + '.svg' : baseUrl;
   const side = piece.color === myColor ? 'ally' : 'enemy';
   return setAttributes(createElement('image'), {
     className: `${piece.role} ${piece.color} ${side}`,
