@@ -196,7 +196,8 @@ function renderShape(
       shape.piece,
       bounds,
       state.dimensions,
-      state.myColor
+      state.myColor,
+      state.variant
     );
   else {
     const orig = orient(key2pos(shape.orig), state.orientation, state.dimensions);
@@ -293,12 +294,14 @@ function renderPiece(
   piece: DrawShapePiece,
   bounds: ClientRect,
   bd: cg.BoardDimensions,
-  myColor: cg.Color
+  myColor: cg.Color,
+  variant: cg.Variant
 ): SVGElement {
   const o = pos2px(pos, bounds, bd),
     width = (bounds.width / bd.width) * (piece.scale || 1),
     height = (bounds.height / bd.height) * (piece.scale || 1),
-    name = piece.color[0] + piece.role[0].toUpperCase();
+    //name = piece.color[0] + piece.role[0].toUpperCase();
+    name = promotionRoleToSvgName(variant, piece);
   // If baseUrl doesn't end with '/' use it as full href
   // This is needed when drop piece suggestion .svg image file names are different than "name" produces
   const href = baseUrl.endsWith('/') ? baseUrl + name + '.svg' : baseUrl;
@@ -369,4 +372,22 @@ function arrowMargin(bounds: ClientRect, shorten: boolean, bd: cg.BoardDimension
 
 function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.NumberPair {
   return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
+}
+
+function promotionRoleToSvgName(variant: cg.Variant, piece: DrawShapePiece){
+  switch(variant){
+    case 'shogi':
+      switch (piece.role){
+        case 'pp-piece': return '0' + 'TO';
+        case 'pl-piece': return '0' + 'NY';
+        case 'pn-piece': return '0' + 'NK';
+        case 'ps-piece': return '0' + 'NG';
+        case 'pr-piece': return '0' + 'RY';
+        case 'pb-piece': return '0' + 'UM';
+      }
+    case 'xiangqi':
+      return (piece.color === 'white' ? 'R' : 'B') + piece.role[0].toUpperCase();
+    default: //chess types
+      return piece.color[0] + piece.role[0].toUpperCase();
+  }
 }
