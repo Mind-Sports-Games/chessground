@@ -374,20 +374,28 @@ function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.Num
   return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
 
-function promotionRoleToSvgName(variant: cg.Variant, piece: DrawShapePiece){
-  switch(variant){
+function promotionRoleToSvgName(variant: cg.Variant, piece: DrawShapePiece) {
+  switch (variant) {
     case 'shogi':
-      switch (piece.role){
-        case 'pp-piece': return '0' + 'TO';
-        case 'pl-piece': return '0' + 'NY';
-        case 'pn-piece': return '0' + 'NK';
-        case 'ps-piece': return '0' + 'NG';
-        case 'pr-piece': return '0' + 'RY';
-        case 'pb-piece': return '0' + 'UM';
+      switch (piece.role) {
+        case 'pp-piece':
+          return '0' + 'TO';
+        case 'pl-piece':
+          return '0' + 'NY';
+        case 'pn-piece':
+          return '0' + 'NK';
+        case 'ps-piece':
+          return '0' + 'NG';
+        case 'pr-piece':
+          return '0' + 'RY';
+        case 'pb-piece':
+          return '0' + 'UM';
       }
+      break;
     case 'xiangqi':
       return (piece.color === 'white' ? 'R' : 'B') + piece.role[0].toUpperCase();
-    default: //chess types
+    default:
+      //chess types
       return piece.color[0] + piece.role[0].toUpperCase();
   }
 }

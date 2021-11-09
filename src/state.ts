@@ -207,7 +207,7 @@ export function defaults(): HeadlessState {
         },
       },
       pieces: {
-        baseUrl: 'https://lichess1.org/assets/piece/cburnett/',
+        baseUrl: 'https://playstrategy.org/assets/piece/cburnett/',
       },
       prevSvgHash: '',
     },
