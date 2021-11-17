@@ -63,10 +63,10 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     } else if (xiangqi){
       if (s.orientation == "white"){
         container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width).reverse(), 'files' + ' white'));
-        container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width), 'files' + ' black'));
+        container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width).reverse(), 'files' + ' black'));
       }else{
         container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width), 'files' + ' white'));
-        container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width).reverse(), 'files' + ' black'));
+        container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width), 'files' + ' black'));
       }
     } else {
       container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.height), 'ranks' + orientClass));
