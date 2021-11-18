@@ -60,11 +60,11 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     } else if (s.notation === Notation.JANGGI) {
       container.appendChild(renderCoords(['0'].concat(ranks.slice(0, 9).reverse()), 'ranks' + orientClass));
       container.appendChild(renderCoords(ranks.slice(0, 9), 'files' + orientClass));
-    } else if (xiangqi){
-      if (s.orientation == "white"){
+    } else if (xiangqi) {
+      if (s.orientation === 'white') {
         container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width).reverse(), 'files' + ' white'));
         container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width).reverse(), 'files' + ' black'));
-      }else{
+      } else {
         container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width), 'files' + ' white'));
         container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width), 'files' + ' black'));
       }
