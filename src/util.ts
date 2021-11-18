@@ -18,11 +18,11 @@ export function allKeys(bd: cg.BoardDimensions = { width: 8, height: 8 }) {
   return Array.prototype.concat(...files(bd.width).map(c => ranks(bd.height).map(r => c + r)));
 }
 
-export function pos2key(pos: cg.Pos) {
+export function pos2key(pos: cg.Pos): cg.Key {
   return (cg.files[pos[0] - 1] + cg.ranks[pos[1] - 1]) as cg.Key;
 }
 
-export function key2pos(k: cg.Key) {
+export function key2pos(k: cg.Key): cg.Pos {
   return [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as cg.Pos;
 }
 

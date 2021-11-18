@@ -374,7 +374,7 @@ function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.Num
   return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
 
-function promotionRoleToSvgName(variant: cg.Variant, piece: DrawShapePiece) : string {
+function promotionRoleToSvgName(variant: cg.Variant, piece: DrawShapePiece): string {
   switch (variant) {
     case 'shogi':
       switch (piece.role) {
