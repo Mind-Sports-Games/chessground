@@ -89,3 +89,13 @@ describe('key2pos() test', () => {
     expect(expected[1]).to.equal(pos[1]);
   });
 });
+
+describe('key2pos() test', () => {
+  it('testing a10 gives [1, 10]', () => {
+    const key = 'a10';
+    const pos: cg.Pos = key2pos(key);
+    const expected: cg.Pos = [1, 10];
+    expect(expected[0]).to.equal(pos[0]);
+    expect(expected[1]).to.equal(pos[1]);
+  });
+});

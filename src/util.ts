@@ -2,7 +2,7 @@ import * as cg from './types';
 import * as T from './transformations';
 
 export const colors: cg.Color[] = ['white', 'black'];
-export const invRanks: readonly cg.Rank[] = [...cg.ranks].reverse();
+export const invRanks: readonly cg.Rank[] = [...cg.ranks10].reverse();
 export const NRanks: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 export const invNRanks: number[] = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 
@@ -11,7 +11,7 @@ function files(n: number) {
 }
 
 function ranks(n: number) {
-  return cg.ranks.slice(0, n);
+  return cg.ranks10.slice(0, n);
 }
 
 export function allKeys(bd: cg.BoardDimensions = { width: 8, height: 8 }) {
@@ -19,11 +19,11 @@ export function allKeys(bd: cg.BoardDimensions = { width: 8, height: 8 }) {
 }
 
 export function pos2key(pos: cg.Pos): cg.Key {
-  return (cg.files[pos[0] - 1] + cg.ranks[pos[1] - 1]) as cg.Key;
+  return (cg.files[pos[0] - 1] + cg.ranks10[pos[1] - 1]) as cg.Key;
 }
 
 export function key2pos(k: cg.Key): cg.Pos {
-  return [k.charCodeAt(0) - 96, k.charCodeAt(1) - 48] as cg.Pos;
+  return [k.charCodeAt(0) - 96, parseInt(k.slice(1))] as cg.Pos;
 }
 
 export const allPos = (bd: cg.BoardDimensions): cg.Pos[] => allKeys(bd).map(key2pos);
