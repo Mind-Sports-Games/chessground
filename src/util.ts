@@ -126,15 +126,8 @@ export const setVisible = (el: HTMLElement, v: boolean): void => {
 };
 
 export const eventPosition = (e: cg.MouchEvent): cg.NumberPair | undefined => {
-  if (e.clientX || e.clientX === 0) {
-    console.log("eventPosition (x, y): ", e.clientX, e.clientY)
-    return [e.clientX, e.clientY!];
-  }
-  if (e.targetTouches?.[0]){
-     console.log("targetTouches (x, y): ", e.targetTouches[0], e.targetTouches[0].clientY)
-     return [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
-  }
-  console.log("touchend has no position!")
+  if (e.clientX || e.clientX === 0) return [e.clientX, e.clientY!];
+  if (e.targetTouches?.[0]) return [e.targetTouches[0].clientX, e.targetTouches[0].clientY];
   return; // touchend has no position!
 };
 

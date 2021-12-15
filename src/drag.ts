@@ -93,7 +93,6 @@ export function start(s: State, e: cg.MouchEvent): void {
 }
 
 function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
-  console.log("piece close to", pos);
   const orientation = s.orientation,
     bounds = s.dom.bounds(),
     radiusSq = Math.pow(bounds.width / 8, 2);
@@ -185,9 +184,6 @@ export function move(s: State, e: cg.MouchEvent): void {
 
 export function end(s: State, e: cg.MouchEvent): void {
   const cur = s.draggable.current;
-  console.log("end - cur ", cur);
-  console.log("end - e", e);
-  console.log("end - state", s);
   if (!cur) return;
   // create no corresponding mouse event
   if (e.type === 'touchend' && e.cancelable !== false) e.preventDefault();
@@ -200,12 +196,8 @@ export function end(s: State, e: cg.MouchEvent): void {
   board.unsetPremove(s);
   board.unsetPredrop(s);
   // touchend has no position; so use the last touchmove position instead
-  console.log("util.eventPosition(e)", util.eventPosition(e));
-  console.log("cur poss, pos, epos, rel", cur.pos, cur.epos, cur.rel);
   const eventPos = util.eventPosition(e) || cur.epos;
   const dest = board.getKeyAtDomPos(eventPos, s.orientation, s.dom.bounds(), s.dimensions);
-  console.log("eventPos", eventPos);
-  console.log("dest", dest);
   if (dest && cur.started && cur.orig !== dest) {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
     else {

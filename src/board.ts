@@ -377,16 +377,10 @@ export function getKeyAtDomPos(
   bounds: ClientRect,
   bd: cg.BoardDimensions
 ): cg.Key | undefined {
-  console.log("bounds ", bounds);
-  console.log("pos ", pos);
-  console.log("orientation ", orientation);
-  console.log("bd ", bd);
   const file = Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
   const rank = Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height));
   pos = [file, rank];
-  console.log("getkey at dom pos - pos", pos);
   pos = T.mapToWhite[orientation](pos, bd);
-  console.log("getkey at dom pos - pos after orientation", pos);
   return pos[0] > 0 && pos[0] < bd.width + 1 && pos[1] > 0 && pos[1] < bd.height + 1 ? pos2key(pos) : undefined;
 }
 
