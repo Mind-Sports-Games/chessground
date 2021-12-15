@@ -202,7 +202,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   // touchend has no position; so use the last touchmove position instead
   console.log("util.eventPosition(e)", util.eventPosition(e));
   console.log("cur poss, pos, epos, rel", cur.pos, cur.epos, cur.rel);
-  const eventPos = util.eventPosition(e) || cur.rel;
+  const eventPos = util.eventPosition(e) || cur.epos;
   const dest = board.getKeyAtDomPos(eventPos, s.orientation, s.dom.bounds(), s.dimensions);
   console.log("eventPos", eventPos);
   console.log("dest", dest);
