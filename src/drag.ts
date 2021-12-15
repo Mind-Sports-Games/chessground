@@ -196,7 +196,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   board.unsetPremove(s);
   board.unsetPredrop(s);
   // touchend has no position; so use the last touchmove position instead
-  const eventPos = util.eventPosition(e) || cur.pos;
+  const eventPos = util.eventPosition(e) || cur.epos;
   const dest = board.getKeyAtDomPos(eventPos, s.orientation, s.dom.bounds(), s.dimensions);
   if (dest && cur.started && cur.orig !== dest) {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
