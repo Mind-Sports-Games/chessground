@@ -93,6 +93,7 @@ export function start(s: State, e: cg.MouchEvent): void {
 }
 
 function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
+  console.log("piece close to", pos);
   const orientation = s.orientation,
     bounds = s.dom.bounds(),
     radiusSq = Math.pow(bounds.width / 8, 2);
@@ -184,6 +185,9 @@ export function move(s: State, e: cg.MouchEvent): void {
 
 export function end(s: State, e: cg.MouchEvent): void {
   const cur = s.draggable.current;
+  console.log("end - cur ", cur);
+  console.log("end - e", e);
+  console.log("end - state", s);
   if (!cur) return;
   // create no corresponding mouse event
   if (e.type === 'touchend' && e.cancelable !== false) e.preventDefault();
