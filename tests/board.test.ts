@@ -3,9 +3,9 @@ import { NumberPair, BoardDimensions } from '../src/types';
 import { expect } from 'chai';
 
 describe('getSnappedKeyAtDomPos() test', () => {
-  it('testing a8 squares white', () => {
+  it('testing a8 squares p1', () => {
     const bpos: NumberPair = [0.5, 0.5];
-    const orientation = 'white';
+    const orientation = 'p1';
     const bounds = {
       height: 8,
       width: 8,
@@ -28,9 +28,9 @@ describe('getSnappedKeyAtDomPos() test', () => {
 });
 
 describe('getSnappedKeyAtDomPos() test', () => {
-  it('testing h1 squares black', () => {
+  it('testing h1 squares p2', () => {
     const bpos: NumberPair = [0.5, 0.5];
-    const orientation = 'black';
+    const orientation = 'p2';
     const bounds = {
       height: 8,
       width: 8,
@@ -53,9 +53,9 @@ describe('getSnappedKeyAtDomPos() test', () => {
 });
 
 describe('getKeyAtDomPos() test', () => {
-  it('testing a8 squares white', () => {
+  it('testing a8 squares p1', () => {
     const bpos: NumberPair = [0.5, 0.5];
-    const orientation = 'white';
+    const orientation = 'p1';
     const bounds = {
       height: 8,
       width: 8,
@@ -78,9 +78,9 @@ describe('getKeyAtDomPos() test', () => {
 });
 
 describe('getKeyAtDomPos() test', () => {
-  it('testing a1 squares white', () => {
+  it('testing a1 squares p1', () => {
     const bpos: NumberPair = [0.5, 7.5];
-    const orientation = 'white';
+    const orientation = 'p1';
     const bounds = {
       height: 8,
       width: 8,
@@ -103,9 +103,9 @@ describe('getKeyAtDomPos() test', () => {
 });
 
 describe('getKeyAtDomPos() test', () => {
-  it('testing h1 squares white', () => {
+  it('testing h1 squares p1', () => {
     const bpos: NumberPair = [7.5, 7.5];
-    const orientation = 'white';
+    const orientation = 'p1';
     const bounds = {
       height: 8,
       width: 8,
@@ -128,9 +128,9 @@ describe('getKeyAtDomPos() test', () => {
 });
 
 describe('getKeyAtDomPos() test', () => {
-  it('testing h8 squares white', () => {
+  it('testing h8 squares p1', () => {
     const bpos: NumberPair = [7.5, 0.5];
-    const orientation = 'white';
+    const orientation = 'p1';
     const bounds = {
       height: 8,
       width: 8,
@@ -153,9 +153,9 @@ describe('getKeyAtDomPos() test', () => {
 });
 
 describe('getKeyAtDomPos() test', () => {
-  it('testing a8 squares black', () => {
+  it('testing a8 squares p2', () => {
     const bpos: NumberPair = [0.5, 0.5];
-    const orientation = 'black';
+    const orientation = 'p2';
     const bounds = {
       height: 8,
       width: 8,
@@ -178,9 +178,9 @@ describe('getKeyAtDomPos() test', () => {
 });
 
 describe('getKeyAtDomPos() test', () => {
-  it('testing a1 squares black', () => {
+  it('testing a1 squares p2', () => {
     const bpos: NumberPair = [0.5, 7.5];
-    const orientation = 'black';
+    const orientation = 'p2';
     const bounds = {
       height: 8,
       width: 8,
@@ -203,9 +203,9 @@ describe('getKeyAtDomPos() test', () => {
 });
 
 describe('getKeyAtDomPos() test', () => {
-  it('testing h1 squares black', () => {
+  it('testing h1 squares p2', () => {
     const bpos: NumberPair = [7.5, 7.5];
-    const orientation = 'black';
+    const orientation = 'p2';
     const bounds = {
       height: 8,
       width: 8,
@@ -228,9 +228,9 @@ describe('getKeyAtDomPos() test', () => {
 });
 
 describe('getKeyAtDomPos() test', () => {
-  it('testing h8 squares black', () => {
+  it('testing h8 squares p2', () => {
     const bpos: NumberPair = [7.5, 0.5];
-    const orientation = 'black';
+    const orientation = 'p2';
     const bounds = {
       height: 8,
       width: 8,

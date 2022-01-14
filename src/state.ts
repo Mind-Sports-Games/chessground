@@ -7,10 +7,10 @@ import * as cg from './types';
 
 export interface HeadlessState {
   pieces: cg.Pieces;
-  orientation: cg.Orientation; // board orientation. white | black | left | right
-  myColor: cg.Color; // to determine piece is ally or enemy
-  startColor: cg.Color; //starting color
-  turnColor: cg.Color; // turn to play. white | black
+  orientation: cg.Orientation; // board orientation. p1 | p2 | left | right
+  myPlayerIndex: cg.PlayerIndex; // to determine piece is ally or enemy
+  startPlayerIndex: cg.PlayerIndex; //starting playerIndex
+  turnPlayerIndex: cg.PlayerIndex; // turn to play. p1 | p2
   check?: cg.Key; // square currently in check "a2"
   lastMove?: cg.Key[]; // squares part of the last move ["c3"; "c4"]
   selected?: cg.Key; // square currently selected "a1"
@@ -32,7 +32,7 @@ export interface HeadlessState {
   };
   movable: {
     free: boolean; // all moves are valid - board editor
-    color?: cg.Color | 'both'; // color that can move. white | black | both
+    playerIndex?: cg.PlayerIndex | 'both'; // playerIndex that can move. p1 | p2 | both
     dests?: cg.Dests; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     showDests: boolean; // whether to add the move-dest class on squares
     events: {
@@ -42,7 +42,7 @@ export interface HeadlessState {
     rookCastle: boolean; // castle by moving the king to the rook
   };
   premovable: {
-    enabled: boolean; // allow premoves for color that can not move
+    enabled: boolean; // allow premoves for playerIndex that can not move
     showDests: boolean; // whether to add the premove-dest class on squares
     castle: boolean; // whether to allow king castle premoves
     dests?: cg.Key[]; // premove destinations for the current selection
@@ -53,7 +53,7 @@ export interface HeadlessState {
     };
   };
   predroppable: {
-    enabled: boolean; // allow predrops for color that can not move
+    enabled: boolean; // allow predrops for playerIndex that can not move
     showDropDests: boolean; // whether to add the premove-dest css class on dest squares. Maybe an overkill to have this showDest and showDrop dests in each and every place, but could make sense one day
     dropDests?: cg.Key[]; // premove destinations for the currently "selected" piece for pre-dropping. Both in case of drag-drop or click-drop
     current?: {
@@ -103,7 +103,7 @@ export interface HeadlessState {
   events: {
     change?: () => void; // called after the situation changes on the board
     // called after a piece has been moved.
-    // capturedPiece is undefined or like {color: 'white'; 'role': 'queen'}
+    // capturedPiece is undefined or like {playerIndex: 'p1'; 'role': 'queen'}
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
     select?: (key: cg.Key) => void; // called when a square is selected
@@ -126,10 +126,10 @@ export interface State extends HeadlessState {
 export function defaults(): HeadlessState {
   return {
     pieces: fen.read(fen.initial, { width: 8, height: 8 }),
-    orientation: 'white',
-    myColor: 'white',
-    startColor: 'white',
-    turnColor: 'white',
+    orientation: 'p1',
+    myPlayerIndex: 'p1',
+    startPlayerIndex: 'p1',
+    turnPlayerIndex: 'p1',
     coordinates: true,
     autoCastle: true,
     viewOnly: false,
@@ -147,7 +147,7 @@ export function defaults(): HeadlessState {
     },
     movable: {
       free: true,
-      color: 'both',
+      playerIndex: 'both',
       showDests: true,
       events: {},
       rookCastle: true,

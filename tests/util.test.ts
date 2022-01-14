@@ -3,9 +3,9 @@ import { computeSquareCenter, key2pos } from '../src/util';
 import { expect } from 'chai';
 
 describe('computeSquareCenter() test', () => {
-  it('testing a1 square white', () => {
+  it('testing a1 square p1', () => {
     const key = 'a1';
-    const orientation = 'white';
+    const orientation = 'p1';
     const bounds = {
       height: 8,
       width: 8,
@@ -29,9 +29,9 @@ describe('computeSquareCenter() test', () => {
 });
 
 describe('computeSquareCenter() test', () => {
-  it('testing a1 square black', () => {
+  it('testing a1 square p2', () => {
     const key = 'a1';
-    const orientation = 'black';
+    const orientation = 'p2';
     const bounds = {
       height: 8,
       width: 8,

@@ -42,7 +42,7 @@ export type Variant =
   | 'empire'
   | 'ordamirror'
   | undefined;
-export type Color = typeof colors[number];
+export type PlayerIndex = typeof playerIndexs[number];
 export type Letter = typeof letters[number];
 export type Role = `${Letter}-piece` | `p${Letter}-piece`;
 export type File = typeof files[number];
@@ -52,7 +52,7 @@ export type FEN = string;
 export type Pos = [number, number];
 export interface Piece {
   role: Role;
-  color: Color;
+  playerIndex: PlayerIndex;
   promoted?: boolean;
 }
 export interface Drop {
@@ -69,7 +69,7 @@ export type NumberPair = [number, number];
 export type NumberQuad = [number, number, number, number];
 
 export type Orientation = typeof orientations[number];
-export type TransformToWhite = (_: Pos, bt: BoardDimensions) => Pos;
+export type TransformToP1 = (_: Pos, bt: BoardDimensions) => Pos;
 export type TranslateBase = (pos: Pos, xFactor: number, yFactor: number, bt: BoardDimensions) => NumberPair;
 
 export interface Rect {
@@ -149,8 +149,8 @@ export type Unbind = () => void;
 export type Milliseconds = number;
 export type KHz = number;
 
-export const orientations = ['white', 'black', 'left', 'right'] as const; // where the player is sat on the board with white at the bottom
-export const colors = ['white', 'black'] as const;
+export const orientations = ['p1', 'p2', 'left', 'right'] as const; // where the player is sat on the board with p1 at the bottom
+export const playerIndexs = ['p1', 'p2'] as const;
 export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'] as const;
 export const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', ':'] as const;
 export const ranks10 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] as const;

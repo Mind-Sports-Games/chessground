@@ -1,19 +1,19 @@
 import { State } from './state';
 import { key2pos, createEl, posToTranslateRel, posToTranslateAbs, translateRel, translateAbs } from './util';
-import { whitePov } from './board';
+import { p1Pov } from './board';
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim';
 import { DragCurrent } from './drag';
 import * as cg from './types';
 import * as T from './transformations';
 
-type PieceName = string; // `$color $role`
+type PieceName = string; // `$playerIndex $role`
 type SquareClasses = Map<cg.Key, string>;
 
 // ported from https://github.com/veloce/lichobile/blob/master/src/js/chessground/view.js
 // in case of bugs, blame @veloce
 export function render(s: State): void {
   const orientation = s.orientation,
-    asWhite: boolean = whitePov(s),
+    asP1: boolean = p1Pov(s),
     posToTranslate = s.dom.relative ? posToTranslateRel : posToTranslateAbs(s.dom.bounds(), s.dimensions),
     translate = s.dom.relative ? translateRel : translateAbs,
     boardEl: HTMLElement = s.dom.elements.board,
@@ -63,7 +63,7 @@ export function render(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey, s.myColor)) {
+        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex)) {
           const pos = key2pos(k);
           pos[0] += anim[2];
           pos[1] += anim[3];
@@ -73,15 +73,15 @@ export function render(s: State): void {
           el.cgAnimating = false;
           el.classList.remove('anim');
           translate(el, posToTranslate(key2pos(k), orientation, s.dimensions));
-          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asWhite, s.dimensions);
+          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asP1, s.dimensions);
         }
         // same piece: flag as same
-        if (elPieceName === pieceNameOf(pieceAtKey, s.myColor) && (!fading || !el.cgFading)) {
+        if (elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex) && (!fading || !el.cgFading)) {
           samePieces.add(k);
         }
         // different piece: flag as moved unless it is a fading piece
         else {
-          if (fading && elPieceName === pieceNameOf(fading, s.myColor)) {
+          if (fading && elPieceName === pieceNameOf(fading, s.myPlayerIndex)) {
             el.classList.add('fading');
             el.cgFading = true;
           } else {
@@ -126,7 +126,7 @@ export function render(s: State): void {
   for (const [k, p] of pieces) {
     anim = anims.get(k);
     if (!samePieces.has(k)) {
-      pMvdset = movedPieces.get(pieceNameOf(p, s.myColor));
+      pMvdset = movedPieces.get(pieceNameOf(p, s.myPlayerIndex));
       pMvd = pMvdset && pMvdset.pop();
       // a same piece was moved
       if (pMvd) {
@@ -137,7 +137,7 @@ export function render(s: State): void {
           pMvd.cgFading = false;
         }
         const pos = key2pos(k);
-        if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, orientation, asWhite, s.dimensions);
+        if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, orientation, asP1, s.dimensions);
         if (anim) {
           pMvd.cgAnimating = true;
           pMvd.classList.add('anim');
@@ -149,7 +149,7 @@ export function render(s: State): void {
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
       else {
-        const pieceName = pieceNameOf(p, s.myColor),
+        const pieceName = pieceNameOf(p, s.myPlayerIndex),
           pieceNode = createEl('piece', pieceName) as cg.PieceNode,
           pos = key2pos(k);
 
@@ -162,7 +162,7 @@ export function render(s: State): void {
         }
         translate(pieceNode, posToTranslate(pos, orientation, s.dimensions));
 
-        if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, orientation, asWhite, s.dimensions);
+        if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, orientation, asP1, s.dimensions);
 
         boardEl.appendChild(pieceNode);
       }
@@ -198,17 +198,17 @@ function removeNodes(s: State, nodes: HTMLElement[]): void {
   for (const node of nodes) s.dom.elements.board.removeChild(node);
 }
 
-function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asWhite: boolean, bd: cg.BoardDimensions): string {
-  pos = T.mapToWhite[orientation](pos, bd);
+function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asP1: boolean, bd: cg.BoardDimensions): string {
+  pos = T.mapToP1[orientation](pos, bd);
   let z = 2 + (pos[1] - 1) * bd.height + (bd.width - pos[0]);
-  if (asWhite) z = 67 - z;
+  if (asP1) z = 67 - z;
   return z + '';
 }
 
-function pieceNameOf(piece: cg.Piece, myColor: cg.Color): string {
+function pieceNameOf(piece: cg.Piece, myPlayerIndex: cg.PlayerIndex): string {
   const promoted = piece.promoted ? 'promoted ' : '';
-  const side = piece.color === myColor ? 'ally' : 'enemy';
-  return `${piece.color} ${promoted}${piece.role} ${side}`;
+  const side = piece.playerIndex === myPlayerIndex ? 'ally' : 'enemy';
+  return `${piece.playerIndex} ${promoted}${piece.role} ${side}`;
 }
 
 function computeSquareClasses(s: State): SquareClasses {
@@ -241,7 +241,7 @@ function computeSquareClasses(s: State): SquareClasses {
       // TODO: there was a function called isPredroppable that was used in drag.ts or drop.ts or both.
       //       Maybe use the same here to decide what to render instead of potentially making it possible both
       //       kinds of highlighting to happen if something was not cleared up in the state.
-      //       In other place (pocket.ts) this condition is used ot decide similar question: ctrl.mycolor === ctrl.turnColor
+      //       In other place (pocket.ts) this condition is used ot decide similar question: ctrl.myplayerIndex === ctrl.turnPlayerIndex
       if (s.dropmode.showDropDests) {
         const dests = s.dropmode.dropDests?.get(piece.role);
         if (dests)

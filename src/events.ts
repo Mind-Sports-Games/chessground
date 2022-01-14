@@ -79,8 +79,8 @@ function startDragOrDraw(s: State): MouchBind {
         drop(s, e);
       } else if (
         s.dropmode.active &&
-        s.movable.color !== s.turnColor /*not our turn*/ &&
-        squareOccupied(s, e)?.color === s.turnColor /*occupied by opp's piece*/
+        s.movable.playerIndex !== s.turnPlayerIndex /*not our turn*/ &&
+        squareOccupied(s, e)?.playerIndex === s.turnPlayerIndex /*occupied by opp's piece*/
       ) {
         // this case is for predrop on opp's piece
         drop(s, e);

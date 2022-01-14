@@ -32,15 +32,15 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (!orig) return;
   const piece = s.pieces.get(orig);
   const previouslySelected = s.selected;
-  if (!previouslySelected && s.drawable.enabled && (s.drawable.eraseOnClick || !piece || piece.color !== s.turnColor))
+  if (!previouslySelected && s.drawable.enabled && (s.drawable.eraseOnClick || !piece || piece.playerIndex !== s.turnPlayerIndex))
     drawClear(s);
   // Prevent touch scroll and create no corresponding mouse event, if there
-  // is an intent to interact with the board. If no color is movable
+  // is an intent to interact with the board. If no playerIndex is movable
   // (and the board is not for viewing only), touches are likely intended to
   // select squares.
   if (
     e.cancelable !== false &&
-    (!e.touches || !s.movable.color || piece || previouslySelected || pieceCloseTo(s, position))
+    (!e.touches || !s.movable.playerIndex || piece || previouslySelected || pieceCloseTo(s, position))
   )
     e.preventDefault();
   const hadPremove = !!s.premovable.current;
@@ -79,8 +79,8 @@ export function start(s: State, e: cg.MouchEvent): void {
     const ghost = s.dom.elements.ghost;
     if (ghost) {
       const promoted = piece.promoted ? 'promoted ' : '';
-      const side = piece.color === s.myColor ? 'ally' : 'enemy';
-      ghost.className = `ghost ${piece.color} ${promoted}${piece.role} ${side}`;
+      const side = piece.playerIndex === s.myPlayerIndex ? 'ally' : 'enemy';
+      ghost.className = `ghost ${piece.playerIndex} ${promoted}${piece.role} ${side}`;
       util.translateAbs(ghost, util.posToTranslateAbs(bounds, s.dimensions)(util.key2pos(orig), s.orientation));
       util.setVisible(ghost, true);
     }
@@ -110,13 +110,13 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
   s.dom.redraw();
 
   const position = util.eventPosition(e)!,
-    asWhite = board.whitePov(s),
+    asP1 = board.p1Pov(s),
     bounds = s.dom.bounds(),
     squareBounds = computeSquareBounds(key, bounds, s.dimensions, s.orientation);
 
   const rel: cg.NumberPair = [
-    (asWhite ? 0 : s.dimensions.width - 1) * squareBounds.width + bounds.left,
-    (asWhite ? s.dimensions.height : -1) * squareBounds.height + bounds.top,
+    (asP1 ? 0 : s.dimensions.width - 1) * squareBounds.width + bounds.left,
+    (asP1 ? s.dimensions.height : -1) * squareBounds.height + bounds.top,
   ];
 
   s.draggable.current = {
@@ -236,7 +236,7 @@ function removeDragElements(s: State): void {
 }
 
 function computeSquareBounds(key: cg.Key, bounds: ClientRect, bd: cg.BoardDimensions, orientation: cg.Orientation) {
-  const pos = T.mapToWhiteInverse[orientation](util.key2pos(key), bd);
+  const pos = T.mapToP1Inverse[orientation](util.key2pos(key), bd);
   return {
     left: bounds.left + (bounds.width * (pos[0] - 1)) / bd.width,
     top: bounds.top + (bounds.height * (bd.height - pos[1])) / bd.height,

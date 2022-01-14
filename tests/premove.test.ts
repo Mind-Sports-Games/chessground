@@ -4,7 +4,7 @@ import { premove } from '../src/premove';
 import { expect } from 'chai';
 
 describe('premove() test', () => {
-  it('chess white king', () => {
+  it('chess p1 king', () => {
     const state = defaults() as State;
     configure(state, { dimensions: { width: 8, height: 8 }, variant: 'chess', fen: '8/8/8/8/8/8/8/R3K2R w QK' });
     console.log(state.variant, state.pieces);
@@ -22,7 +22,7 @@ describe('premove() test', () => {
 });
 
 describe('premove() test', () => {
-  it('chess white Rook', () => {
+  it('chess p1 Rook', () => {
     const state = defaults() as State;
     configure(state, { dimensions: { width: 8, height: 8 }, variant: 'chess', fen: '8/8/8/8/8/8/8/R3K2R w QK' });
 
@@ -41,7 +41,7 @@ describe('premove() test', () => {
 });
 
 describe('premove() test', () => {
-  it('chess white Bishop', () => {
+  it('chess p1 Bishop', () => {
     const state = defaults() as State;
     configure(state, { dimensions: { width: 8, height: 8 }, variant: 'chess', fen: '8/8/8/8/8/8/8/2B1K3 w QK' });
 
@@ -60,7 +60,7 @@ describe('premove() test', () => {
 });
 
 describe('premove() test', () => {
-  it('chess white Pawn', () => {
+  it('chess p1 Pawn', () => {
     const state = defaults() as State;
     configure(state, { dimensions: { width: 8, height: 8 }, variant: 'chess', fen: '8/8/8/8/8/8/PPPPPPPP/2B1K3 w QK' });
 
@@ -79,7 +79,7 @@ describe('premove() test', () => {
 });
 
 describe('premove() test', () => {
-  it('chess white Knight', () => {
+  it('chess p1 Knight', () => {
     const state = defaults() as State;
     configure(state, { dimensions: { width: 8, height: 8 }, variant: 'chess', fen: '8/8/8/8/8/8/8/1N2K3 w QK' });
 
@@ -98,7 +98,7 @@ describe('premove() test', () => {
 });
 
 describe('premove() test', () => {
-  it('chess white Queen', () => {
+  it('chess p1 Queen', () => {
     const state = defaults() as State;
     configure(state, { dimensions: { width: 8, height: 8 }, variant: 'chess', fen: '8/8/8/8/8/8/8/2BQK3 w QK' });
 
@@ -139,7 +139,7 @@ describe('premove() test', () => {
 });
 
 describe('premove() test', () => {
-  it('janggi white king', () => {
+  it('janggi p1 king', () => {
     const state = defaults() as State;
     configure(state, { dimensions: { width: 9, height: 10 }, variant: 'janggi', fen: '9/9/9/9/9/9/9/9/4K4/9' });
 
@@ -158,7 +158,7 @@ describe('premove() test', () => {
 });
 
 describe('premove() test', () => {
-  it('janggi black pawn', () => {
+  it('janggi p2 pawn', () => {
     const state = defaults() as State;
     configure(state, { dimensions: { width: 9, height: 10 }, variant: 'janggi', fen: '9/9/9/9/9/9/9/9/4p4/9' });
 
@@ -177,7 +177,7 @@ describe('premove() test', () => {
 });
 
 describe('premove() test', () => {
-  it('janggi black rook', () => {
+  it('janggi p2 rook', () => {
     const state = defaults() as State;
     configure(state, { dimensions: { width: 9, height: 10 }, variant: 'janggi', fen: '9/9/9/9/9/9/9/5r3/9/9' });
 

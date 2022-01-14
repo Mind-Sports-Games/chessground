@@ -162,7 +162,7 @@ function shapeHash(
 }
 
 function pieceHash(piece: DrawShapePiece): Hash {
-  return [piece.color, piece.role, piece.scale].filter(x => x).join(',');
+  return [piece.playerIndex, piece.role, piece.scale].filter(x => x).join(',');
 }
 
 function modifiersHash(m: DrawModifiers): Hash {
@@ -196,7 +196,7 @@ function renderShape(
       shape.piece,
       bounds,
       state.dimensions,
-      state.myColor,
+      state.myPlayerIndex,
       state.variant
     );
   else {
@@ -294,20 +294,20 @@ function renderPiece(
   piece: DrawShapePiece,
   bounds: ClientRect,
   bd: cg.BoardDimensions,
-  myColor: cg.Color,
+  myPlayerIndex: cg.PlayerIndex,
   variant: cg.Variant
 ): SVGElement {
   const o = pos2px(pos, bounds, bd),
     width = (bounds.width / bd.width) * (piece.scale || 1),
     height = (bounds.height / bd.height) * (piece.scale || 1),
-    //name = piece.color[0] + piece.role[0].toUpperCase();
+    //name = piece.playerIndex[0] + piece.role[0].toUpperCase();
     name = promotionRoleToSvgName(variant, piece);
   // If baseUrl doesn't end with '/' use it as full href
   // This is needed when drop piece suggestion .svg image file names are different than "name" produces
   const href = baseUrl.endsWith('/') ? baseUrl.slice('https://playstrategy.org'.length) + name + '.svg' : baseUrl;
-  const side = piece.color === myColor ? 'ally' : 'enemy';
+  const side = piece.playerIndex === myPlayerIndex ? 'ally' : 'enemy';
   return setAttributes(createElement('image'), {
-    className: `${piece.role} ${piece.color} ${side}`,
+    className: `${piece.role} ${piece.playerIndex} ${side}`,
     x: o[0] - width / 2,
     y: o[1] - height / 2,
     width: width,
@@ -341,7 +341,7 @@ export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SV
 }
 
 function orient(pos: cg.Pos, orientation: cg.Orientation, bd: cg.BoardDimensions): cg.Pos {
-  return T.mapToWhiteInverse[orientation](pos, bd);
+  return T.mapToP1Inverse[orientation](pos, bd);
 }
 
 function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
@@ -394,9 +394,9 @@ function promotionRoleToSvgName(variant: cg.Variant, piece: DrawShapePiece): str
           return '';
       }
     case 'xiangqi':
-      return (piece.color === 'white' ? 'R' : 'B') + piece.role[0].toUpperCase();
+      return (piece.playerIndex === 'p1' ? 'R' : 'B') + piece.role[0].toUpperCase();
     default:
       //chess types
-      return piece.color[0] + piece.role[0].toUpperCase();
+      return piece.playerIndex[0] + piece.role[0].toUpperCase();
   }
 }
