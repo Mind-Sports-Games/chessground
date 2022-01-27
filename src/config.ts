@@ -6,10 +6,10 @@ import * as cg from './types';
 
 export interface Config {
   fen?: cg.FEN; // chess position in Forsyth notation
-  orientation?: cg.Orientation; // board orientation. white | black | left | right
-  myColor?: cg.Color; // turn of player white | black
-  turnColor?: cg.Color; // turn to play. white | black
-  check?: cg.Color | boolean; // true for current color, false to unset
+  orientation?: cg.Orientation; // board orientation. p1 | p2 | left | right
+  myPlayerIndex?: cg.PlayerIndex; // turn of player p1 | p2
+  turnPlayerIndex?: cg.PlayerIndex; // turn to play. p1 | p2
+  check?: cg.PlayerIndex | boolean; // true for current playerIndex, false to unset
   lastMove?: cg.Key[]; // squares part of the last move ["c3", "c4"]
   selected?: cg.Key; // square currently selected "a1"
   coordinates?: boolean; // include coords attributes
@@ -29,7 +29,7 @@ export interface Config {
   };
   movable?: {
     free?: boolean; // all moves are valid - board editor
-    color?: cg.Color | 'both'; // color that can move. white | black | both | undefined
+    playerIndex?: cg.PlayerIndex | 'both'; // playerIndex that can move. p1 | p2 | both | undefined
     dests?: cg.Dests; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
     showDests?: boolean; // whether to add the move-dest class on squares
     events?: {
@@ -39,7 +39,7 @@ export interface Config {
     rookCastle?: boolean; // castle by moving the king to the rook
   };
   premovable?: {
-    enabled?: boolean; // allow premoves for color that can not move
+    enabled?: boolean; // allow premoves for playerIndex that can not move
     showDests?: boolean; // whether to add the premove-dest class on squares
     castle?: boolean; // whether to allow king castle premoves
     dests?: cg.Key[]; // premove destinations for the current selection
@@ -49,7 +49,7 @@ export interface Config {
     };
   };
   predroppable?: {
-    enabled?: boolean; // allow predrops for color that can not move
+    enabled?: boolean; // allow predrops for playerIndex that can not move
     showDropDests?: boolean;
     dropDests?: cg.Key[];
     current?: {
@@ -77,7 +77,7 @@ export interface Config {
   events?: {
     change?: () => void; // called after the situation changes on the board
     // called after a piece has been moved.
-    // capturedPiece is undefined or like {color: 'white'; 'role': 'queen'}
+    // capturedPiece is undefined or like {playerIndex: 'p1'; 'role': 'queen'}
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
     select?: (key: cg.Key) => void; // called when a square is selected
@@ -145,7 +145,7 @@ export function configure(state: HeadlessState, config: Config): void {
   if (!state.animation.duration || state.animation.duration < 100) state.animation.enabled = false;
 
   if (!state.movable.rookCastle && state.movable.dests) {
-    const rank = state.movable.color === 'white' ? 1 : 8,
+    const rank = state.movable.playerIndex === 'p1' ? 1 : 8,
       kingStartPos = ('e' + rank) as cg.Key,
       dests = state.movable.dests.get(kingStartPos),
       king = state.pieces.get(kingStartPos);
@@ -161,12 +161,12 @@ export function configure(state: HeadlessState, config: Config): void {
   }
 }
 
-function setCheck(state: HeadlessState, color: cg.Color | boolean): void {
+function setCheck(state: HeadlessState, playerIndex: cg.PlayerIndex | boolean): void {
   state.check = undefined;
-  if (color === true) color = state.turnColor;
-  if (color)
+  if (playerIndex === true) playerIndex = state.turnPlayerIndex;
+  if (playerIndex)
     for (const [k, p] of state.pieces) {
-      if (p.role === 'k-piece' && p.color === color) {
+      if (p.role === 'k-piece' && p.playerIndex === playerIndex) {
         state.check = k;
       }
     }

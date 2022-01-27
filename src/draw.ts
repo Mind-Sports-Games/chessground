@@ -14,7 +14,7 @@ export interface DrawShape {
 
 export interface DrawShapePiece {
   role: cg.Role;
-  color: cg.Color;
+  playerIndex: cg.PlayerIndex;
   scale?: number;
 }
 

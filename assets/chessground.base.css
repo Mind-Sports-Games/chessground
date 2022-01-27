@@ -141,7 +141,7 @@ piece.fading {
   width: 12px;
 }
 
-.cg-wrap coords.ranks.black {
+.cg-wrap coords.ranks.p2 {
   flex-flow: column;
 }
 
@@ -155,7 +155,7 @@ piece.fading {
   text-align: center;
 }
 
-.cg-wrap coords.files.black {
+.cg-wrap coords.files.p2 {
   flex-flow: row-reverse;
 }
 

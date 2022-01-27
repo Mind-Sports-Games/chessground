@@ -49,7 +49,7 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions): cg.Pieces {
           const letter = c.toLowerCase();
           const piece = {
             role: roles(letter),
-            color: (c === letter ? 'black' : 'white') as cg.Color,
+            playerIndex: (c === letter ? 'p2' : 'p1') as cg.PlayerIndex,
           } as cg.Piece;
           if (promoted) {
             piece.role = ('p' + piece.role) as cg.Role;
@@ -74,7 +74,7 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions): cg.FEN {
           if (piece) {
             const letter: string =
               letters(piece.role) + (piece.promoted && letters(piece.role).charAt(0) !== '+' ? '~' : '');
-            return piece.color === 'white' ? letter.toUpperCase() : letter;
+            return piece.playerIndex === 'p1' ? letter.toUpperCase() : letter;
           } else return '1';
         })
         .join('')

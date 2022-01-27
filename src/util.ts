@@ -1,7 +1,7 @@
 import * as cg from './types';
 import * as T from './transformations';
 
-export const colors: cg.Color[] = ['white', 'black'];
+export const playerIndexs: cg.PlayerIndex[] = ['p1', 'p2'];
 export const invRanks: readonly cg.Rank[] = [...cg.ranks10].reverse();
 export const NRanks: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 export const invNRanks: number[] = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
@@ -58,26 +58,26 @@ export const timer = (): cg.Timer => {
   };
 };
 
-export const opposite = (c: cg.Color): cg.Color => (c === 'white' ? 'black' : 'white');
+export const opposite = (c: cg.PlayerIndex): cg.PlayerIndex => (c === 'p1' ? 'p2' : 'p1');
 
 const flipOrientationLookup: Record<cg.Orientation, cg.Orientation> = {
-  white: 'black',
-  black: 'white',
+  p1: 'p2',
+  p2: 'p1',
   left: 'right',
   right: 'left',
 };
 export const oppositeOrientation = (c: cg.Orientation): cg.Orientation => flipOrientationLookup[c];
-const flipOrientationLookupForLOA: Record<cg.Color, cg.Orientation> = {
-  white: 'right',
-  black: 'white',
+const flipOrientationLookupForLOA: Record<cg.PlayerIndex, cg.Orientation> = {
+  p1: 'right',
+  p2: 'p1',
 };
-export const oppositeOrientationForLOA = (c: cg.Color): cg.Orientation => flipOrientationLookupForLOA[c];
-const orientationLookupForLOA: Record<cg.Color, cg.Orientation> = {
-  white: 'white',
-  black: 'right',
+export const oppositeOrientationForLOA = (c: cg.PlayerIndex): cg.Orientation => flipOrientationLookupForLOA[c];
+const orientationLookupForLOA: Record<cg.PlayerIndex, cg.Orientation> = {
+  p1: 'p1',
+  p2: 'right',
 };
-export const orientationForLOA = (c: cg.Color): cg.Orientation => orientationLookupForLOA[c];
-export const isColor = (c: cg.Orientation): c is cg.Color => c === 'white' || c === 'black';
+export const orientationForLOA = (c: cg.PlayerIndex): cg.Orientation => orientationLookupForLOA[c];
+export const isPlayerIndex = (c: cg.Orientation): c is cg.PlayerIndex => c === 'p1' || c === 'p2';
 
 export function containsX<X>(xs: X[] | undefined, x: X): boolean {
   return xs !== undefined && xs.indexOf(x) !== -1;
@@ -89,7 +89,9 @@ export const distanceSq = (pos1: cg.Pos, pos2: cg.Pos): number => {
   return dx * dx + dy * dy;
 };
 
-export const samePiece = (p1: cg.Piece, p2: cg.Piece): boolean => p1.role === p2.role && p1.color === p2.color;
+export const samePiece = (player1: cg.Piece, player2: cg.Piece): boolean => {
+  return player1.role === player2.role && player1.playerIndex === player2.playerIndex;
+};
 
 const posToTranslateBase = (
   pos: cg.Pos,
@@ -145,7 +147,7 @@ export function computeSquareCenter(
   bounds: ClientRect,
   bd: cg.BoardDimensions
 ): cg.NumberPair {
-  const pos = T.mapToWhiteInverse[orientation](key2pos(key), bd);
+  const pos = T.mapToP1Inverse[orientation](key2pos(key), bd);
   return [
     bounds.left + (bounds.width * (pos[0] - 1 + 0.5)) / bd.width,
     bounds.top + (bounds.height * (bd.height - (pos[1] - 1 + 0.5))) / bd.height,
