@@ -27,6 +27,13 @@ function rankRange(from: number, to: number, playerIndex: cg.PlayerIndex, bd: cg
   };
 }
 
+function emptysquares(pieces: cg.Pieces): DropMobility {
+  return (x, y) => {
+    const pos = util.pos2key([x, y]) as cg.Key;
+    return !(pos in pieces)
+  }
+}
+
 export default function predrop(
   pieces: cg.Pieces,
   piece: cg.Piece,
@@ -121,6 +128,10 @@ export default function predrop(
 
     case 'shinobi':
       mobility = (_x, y) => y <= 4; // Only p1 can drop, and only on their own half of the board
+      break;
+
+    case 'flipello':
+      mobility = emptysquares(pieces) // cant drop on current pieces (either side) as they cant move
       break;
 
     default:
