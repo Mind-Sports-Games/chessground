@@ -81,7 +81,8 @@ function startDragOrDraw(s: State): MouchBind {
       } else if (
         s.dropmode.active &&
         s.movable.playerIndex !== s.turnPlayerIndex /*not our turn*/ &&
-        squareOccupied(s, e)?.playerIndex === s.turnPlayerIndex /*occupied by opp's piece*/
+        squareOccupied(s, e)?.playerIndex === s.turnPlayerIndex /*occupied by opp's piece*/ 
+        && !s.onlyDropsVariant /* cant drop on opponents pieces in drop only variants as they cant move */
       ) {
         // this case is for predrop on opp's piece
         drop(s, e);

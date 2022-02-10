@@ -117,6 +117,7 @@ export interface HeadlessState {
   variant: cg.Variant;
   chess960: boolean;
   notation: cg.Notation;
+  onlyDropsVariant: boolean;
 }
 
 export interface State extends HeadlessState {
@@ -216,5 +217,6 @@ export function defaults(): HeadlessState {
     variant: 'chess',
     chess960: false,
     notation: cg.Notation.DEFAULT,
+    onlyDropsVariant: false,
   };
 }
