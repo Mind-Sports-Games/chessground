@@ -31,9 +31,8 @@ function emptysquares(pieces: cg.Pieces): DropMobility {
   console.log(pieces);
   return (x, y) => {
     const pos = util.pos2key([x, y]) as cg.Key;
-    console.log(pos);
-    console.log("is pos in pieces: ", pos in pieces);
-    return !(pos in pieces)
+    console.log("is pos in pieces: ", pos, pieces.has(pos));
+    return !(pieces.has(pos))
   }
 }
 
