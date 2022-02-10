@@ -28,10 +28,8 @@ function rankRange(from: number, to: number, playerIndex: cg.PlayerIndex, bd: cg
 }
 
 function emptysquares(pieces: cg.Pieces): DropMobility {
-  console.log(pieces);
   return (x, y) => {
     const pos = util.pos2key([x, y]) as cg.Key;
-    console.log("is pos in pieces: ", pos, pieces.has(pos));
     return !(pieces.has(pos))
   }
 }

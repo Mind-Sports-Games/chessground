@@ -244,6 +244,7 @@ function isMovable(state: HeadlessState, orig: cg.Key): boolean {
   const piece = state.pieces.get(orig);
   return (
     !!piece &&
+    (!state.onlyDropsVariant || (state.onlyDropsVariant && orig == 'a0' )) &&
     (state.movable.playerIndex === 'both' || (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
   );
 }
@@ -299,9 +300,7 @@ function canPredrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   if (!piece) {
     return false;
   }
-  console.log("dest", dest);
   const isValidPredrop = containsX(predrop(state.pieces, piece, state.dimensions, state.variant), dest);
-  console.log("isvalidPredrop", isValidPredrop);
   return (
     (!destPiece || destPiece.playerIndex !== state.movable.playerIndex) &&
     state.predroppable.enabled &&
