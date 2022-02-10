@@ -299,8 +299,9 @@ function canPredrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   if (!piece) {
     return false;
   }
+  console.log("dest", dest);
   const isValidPredrop = containsX(predrop(state.pieces, piece, state.dimensions, state.variant), dest);
-
+  console.log("isvalidPredrop", isValidPredrop);
   return (
     (!destPiece || destPiece.playerIndex !== state.movable.playerIndex) &&
     state.predroppable.enabled &&
