@@ -30,8 +30,8 @@ function rankRange(from: number, to: number, playerIndex: cg.PlayerIndex, bd: cg
 function emptysquares(pieces: cg.Pieces): DropMobility {
   return (x, y) => {
     const pos = util.pos2key([x, y]) as cg.Key;
-    return !(pieces.has(pos))
-  }
+    return !pieces.has(pos);
+  };
 }
 
 export default function predrop(
@@ -131,7 +131,7 @@ export default function predrop(
       break;
 
     case 'flipello':
-      mobility = emptysquares(pieces) // cant drop on current pieces (either side) as they cant move
+      mobility = emptysquares(pieces); // cant drop on current pieces (either side) as they cant move
       break;
 
     default:
