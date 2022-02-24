@@ -88,7 +88,8 @@ function startDragOrDraw(s: State): MouchBind {
       } else {
         // if it is occupied by our piece - cancel drop mode and start dragging that piece instead.
         // if it is occupied by opp's piece - just cancel drop mode. drag.start() will do nothing
-        cancelDropMode(s);
+        // dont cancel drop mode if only drops variant (e.g. flipello) as that is the only action to take
+        if (!s.onlyDropsVariant) cancelDropMode(s);
         drag.start(s, e);
       }
     }
