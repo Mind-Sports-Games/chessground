@@ -156,7 +156,8 @@ function shogiLance(playerIndex: cg.PlayerIndex): Mobility {
 
 // shogi silver, makruk khon, sittuyin elephant
 function shogiSilver(playerIndex: cg.PlayerIndex): Mobility {
-  return (x1, y1, x2, y2) => ferz(x1, y1, x2, y2) || (x1 === x2 && (playerIndex === 'p1' ? y2 === y1 + 1 : y2 === y1 - 1));
+  return (x1, y1, x2, y2) =>
+    ferz(x1, y1, x2, y2) || (x1 === x2 && (playerIndex === 'p1' ? y2 === y1 + 1 : y2 === y1 - 1));
 }
 
 // shogi gold, promoted pawn/knight/lance/silver

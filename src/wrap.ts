@@ -68,6 +68,9 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width), 'files' + ' p1'));
         container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.width), 'files' + ' p2'));
       }
+    } else if (s.variant === 'flipello') {
+      container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.height).reverse(), 'ranks' + orientClass));
+      container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
     } else {
       container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.height), 'ranks' + orientClass));
       container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));

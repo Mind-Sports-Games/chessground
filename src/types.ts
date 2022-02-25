@@ -41,6 +41,7 @@ export type Variant =
   | 'shinobi'
   | 'empire'
   | 'ordamirror'
+  | 'flipello'
   | undefined;
 export type PlayerIndex = typeof playerIndexs[number];
 export type Letter = typeof letters[number];

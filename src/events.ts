@@ -80,14 +80,16 @@ function startDragOrDraw(s: State): MouchBind {
       } else if (
         s.dropmode.active &&
         s.movable.playerIndex !== s.turnPlayerIndex /*not our turn*/ &&
-        squareOccupied(s, e)?.playerIndex === s.turnPlayerIndex /*occupied by opp's piece*/
+        squareOccupied(s, e)?.playerIndex === s.turnPlayerIndex /*occupied by opp's piece*/ &&
+        !s.onlyDropsVariant /* cant drop on opponents pieces in drop only variants as they cant move */
       ) {
         // this case is for predrop on opp's piece
         drop(s, e);
       } else {
         // if it is occupied by our piece - cancel drop mode and start dragging that piece instead.
         // if it is occupied by opp's piece - just cancel drop mode. drag.start() will do nothing
-        cancelDropMode(s);
+        // dont cancel drop mode if only drops variant (e.g. flipello) as that is the only action to take
+        if (!s.onlyDropsVariant) cancelDropMode(s);
         drag.start(s, e);
       }
     }

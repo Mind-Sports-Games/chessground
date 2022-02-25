@@ -109,6 +109,7 @@ export interface Config {
   variant?: cg.Variant;
   chess960?: boolean;
   notation?: cg.Notation;
+  onlyDropsVariant?: boolean;
 }
 
 export function configure(state: HeadlessState, config: Config): void {

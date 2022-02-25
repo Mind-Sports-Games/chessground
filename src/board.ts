@@ -244,7 +244,9 @@ function isMovable(state: HeadlessState, orig: cg.Key): boolean {
   const piece = state.pieces.get(orig);
   return (
     !!piece &&
-    (state.movable.playerIndex === 'both' || (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
+    (!state.onlyDropsVariant || (state.onlyDropsVariant && orig === 'a0')) &&
+    (state.movable.playerIndex === 'both' ||
+      (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
   );
 }
 
@@ -259,13 +261,19 @@ function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   return (
     !!piece &&
     (orig === dest || !state.pieces.has(dest)) &&
-    (state.movable.playerIndex === 'both' || (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
+    (state.movable.playerIndex === 'both' ||
+      (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
   );
 }
 
 function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
   const piece = state.pieces.get(orig);
-  return !!piece && state.premovable.enabled && state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex !== piece.playerIndex;
+  return (
+    !!piece &&
+    state.premovable.enabled &&
+    state.movable.playerIndex === piece.playerIndex &&
+    state.turnPlayerIndex !== piece.playerIndex
+  );
 }
 
 export function isPredroppable(state: HeadlessState): boolean {
@@ -300,7 +308,6 @@ function canPredrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
     return false;
   }
   const isValidPredrop = containsX(predrop(state.pieces, piece, state.dimensions, state.variant), dest);
-
   return (
     (!destPiece || destPiece.playerIndex !== state.movable.playerIndex) &&
     state.predroppable.enabled &&
@@ -316,7 +323,8 @@ export function isDraggable(state: HeadlessState, orig: cg.Key): boolean {
     !!piece &&
     state.draggable.enabled &&
     (state.movable.playerIndex === 'both' ||
-      (state.movable.playerIndex === piece.playerIndex && (state.turnPlayerIndex === piece.playerIndex || state.premovable.enabled)))
+      (state.movable.playerIndex === piece.playerIndex &&
+        (state.turnPlayerIndex === piece.playerIndex || state.premovable.enabled)))
   );
 }
 
