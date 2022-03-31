@@ -301,7 +301,7 @@ function renderPiece(
     width = (bounds.width / bd.width) * (piece.scale || 1),
     height = (bounds.height / bd.height) * (piece.scale || 1),
     //name = piece.playerIndex[0] + piece.role[0].toUpperCase();
-    name = promotionRoleToSvgName(variant, piece);
+    name = roleToSvgName(variant, piece);
   // If baseUrl doesn't end with '/' use it as full href
   // This is needed when drop piece suggestion .svg image file names are different than "name" produces
   const href = baseUrl.endsWith('/') ? baseUrl.slice('https://playstrategy.org'.length) + name + '.svg' : baseUrl;
@@ -374,10 +374,11 @@ function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.Num
   return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
 
-function promotionRoleToSvgName(variant: cg.Variant, piece: DrawShapePiece): string {
+function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece): string {
   switch (variant) {
     case 'shogi':
       switch (piece.role) {
+        //promoted
         case 'pp-piece':
           return '0' + 'TO';
         case 'pl-piece':
@@ -390,13 +391,34 @@ function promotionRoleToSvgName(variant: cg.Variant, piece: DrawShapePiece): str
           return '0' + 'RY';
         case 'pb-piece':
           return '0' + 'UM';
+        //not promoted - only draw your own pieces therefore always 0 not 1?
+        case 'p-piece':
+          return '0FU';
+        case 'l-piece':
+          return '0KY';
+        case 'n-piece':
+          return '0KE';
+        case 's-piece':
+          return '0GI';
+        case 'r-piece':
+          return '0HI';
+        case 'b-piece':
+          return '0KA';
+        case 'g-piece':
+          return '0KI';
+        case 'k-piece':
+          return piece.playerIndex === 'p1' ? '0GY' : '0OU';
         default:
           return '';
       }
     case 'xiangqi':
       return (piece.playerIndex === 'p1' ? 'R' : 'B') + piece.role[0].toUpperCase();
+    case 'flipello':
+    case 'linesOfAction':
+      return (piece.playerIndex === 'p1' ? 'b' : 'w') + piece.role[0].toUpperCase();
+
     default:
       //chess types
-      return piece.playerIndex[0] + piece.role[0].toUpperCase();
+      return (piece.playerIndex === 'p1' ? 'w' : 'b') + piece.role[0].toUpperCase();
   }
 }
