@@ -42,6 +42,7 @@ export type Variant =
   | 'empire'
   | 'ordamirror'
   | 'flipello'
+  | 'oware'
   | undefined;
 export type PlayerIndex = typeof playerIndexs[number];
 export type Letter = typeof letters[number];
