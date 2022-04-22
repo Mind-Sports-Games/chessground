@@ -124,7 +124,7 @@ export function configure(state: HeadlessState, config: Config): void {
 
   // if a fen was provided, replace the pieces
   if (config.fen) {
-    const pieces = fenRead(config.fen, state.dimensions);
+    const pieces = fenRead(config.fen, state.dimensions, state.variant);
     // prevent to cancel() already started piece drag from pocket!
     if (state.pieces.get('a0') !== undefined) pieces.set('a0', state.pieces.get('a0')!);
     state.pieces = pieces;

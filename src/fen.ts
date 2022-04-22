@@ -12,7 +12,7 @@ function letters(role: cg.Role) {
   return letterPart.length > 1 ? letterPart.replace('p', '+') : letterPart;
 }
 
-export function read(fen: cg.FEN, dimensions: cg.BoardDimensions): cg.Pieces {
+export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Variant): cg.Pieces {
   if (fen === 'start') fen = initial;
   if (fen.indexOf('[') !== -1) fen = fen.slice(0, fen.indexOf('['));
   const pieces: cg.Pieces = new Map();
@@ -46,10 +46,19 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions): cg.Pieces {
         } else {
           col += 1 + num;
           num = 0;
-          const letter = c.toLowerCase();
+          const letter = variant === 'oware' ? c : c.toLowerCase();
+          const playerIndex = (
+            variant === 'oware' && row === 1
+              ? 'p1'
+              : variant === 'oware' && row === 2
+              ? 'p2'
+              : c === letter
+              ? 'p2'
+              : 'p1'
+          ) as cg.PlayerIndex;
           const piece = {
             role: roles(letter),
-            playerIndex: (c === letter ? 'p2' : 'p1') as cg.PlayerIndex,
+            playerIndex: playerIndex,
           } as cg.Piece;
           if (promoted) {
             piece.role = ('p' + piece.role) as cg.Role;
@@ -64,7 +73,7 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions): cg.Pieces {
   return pieces;
 }
 
-export function write(pieces: cg.Pieces, bd: cg.BoardDimensions): cg.FEN {
+export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Variant): cg.FEN {
   return invNRanks
     .slice(-bd.height)
     .map(y =>
@@ -74,7 +83,7 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions): cg.FEN {
           if (piece) {
             const letter: string =
               letters(piece.role) + (piece.promoted && letters(piece.role).charAt(0) !== '+' ? '~' : '');
-            return piece.playerIndex === 'p1' ? letter.toUpperCase() : letter;
+            return piece.playerIndex === 'p1' && variant !== 'oware' ? letter.toUpperCase() : letter;
           } else return '1';
         })
         .join('')
