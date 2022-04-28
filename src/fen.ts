@@ -42,7 +42,7 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
       default: {
         const nb = c.charCodeAt(0);
         if (48 <= nb && nb < 58) {
-          num = 10 * num + nb - 48;
+          num = num + nb - 48; // allow set of numbers (e.g. 1's) for space gaps
         } else {
           col += 1 + num;
           num = 0;
