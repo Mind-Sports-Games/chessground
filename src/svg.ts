@@ -416,7 +416,10 @@ function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece): string {
     case 'flipello':
     case 'linesOfAction':
       return (piece.playerIndex === 'p1' ? 'b' : 'w') + piece.role[0].toUpperCase();
-
+    case 'oware': {
+      const asciiNum = piece.role[0].charCodeAt(0);
+      return asciiNum > 90 ? (asciiNum - 70).toString() : (asciiNum - 64).toString();
+    }
     default:
       //chess types
       return (piece.playerIndex === 'p1' ? 'w' : 'b') + piece.role[0].toUpperCase();

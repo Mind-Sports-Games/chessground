@@ -42,6 +42,7 @@ export type Variant =
   | 'empire'
   | 'ordamirror'
   | 'flipello'
+  | 'oware'
   | undefined;
 export type PlayerIndex = typeof playerIndexs[number];
 export type Letter = typeof letters[number];
@@ -182,6 +183,32 @@ export const letters = [
   'x',
   'y',
   'z',
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z',
 ] as const;
 
 export interface BoardDimensions {

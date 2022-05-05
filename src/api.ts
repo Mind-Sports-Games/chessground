@@ -96,7 +96,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     state,
 
-    getFen: () => fenWrite(state.pieces, state.dimensions),
+    getFen: () => fenWrite(state.pieces, state.dimensions, state.variant),
 
     toggleOrientation,
 

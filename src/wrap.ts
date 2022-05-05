@@ -71,6 +71,27 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     } else if (s.variant === 'flipello') {
       container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.height).reverse(), 'ranks' + orientClass));
       container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
+    } else if (s.variant === 'oware') {
+      if (s.orientation === 'p1') {
+        container.appendChild(
+          renderCoords(
+            files.slice(0, s.dimensions.width).map(x => x.toUpperCase()),
+            'files' + ' p1'
+          )
+        );
+        container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + ' p2'));
+      } else {
+        container.appendChild(
+          renderCoords(
+            files
+              .slice(0, s.dimensions.width)
+              .map(x => x.toUpperCase())
+              .reverse(),
+            'files' + ' p1'
+          )
+        );
+        container.appendChild(renderCoords(files.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
+      }
     } else {
       container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.height), 'ranks' + orientClass));
       container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
