@@ -29,6 +29,9 @@ export interface Api {
   // add and/or remove arbitrary pieces on the board
   setPieces(pieces: cg.PiecesDiff): void;
 
+  // add and/or remove arbitrary pieces on the board - no animation! 
+  setBoardPieces(pieces: cg.PiecesDiff): void;
+
   // click a square programmatically
   selectSquare(key: cg.Key | null, force?: boolean): void;
 
@@ -102,6 +105,11 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     setPieces(pieces): void {
       anim(state => board.setPieces(state, pieces), state);
+    },
+
+    setBoardPieces(pieces): void {
+      board.setPieces(state, pieces);
+      state.dom.redraw();
     },
 
     selectSquare(key, force): void {
