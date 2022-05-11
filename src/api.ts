@@ -32,7 +32,7 @@ export interface Api {
   // add and/or remove arbitrary pieces on the board
   setPieces(pieces: cg.PiecesDiff): void;
 
-  // add and/or remove arbitrary pieces on the board - no animation! 
+  // add and/or remove arbitrary pieces on the board - no animation!
   setPiecesNoAnim(pieces: cg.PiecesDiff): void;
 
   // click a square programmatically
