@@ -110,6 +110,7 @@ export interface Config {
   chess960?: boolean;
   notation?: cg.Notation;
   onlyDropsVariant?: boolean;
+  singleClickMoveVariant?: boolean;
 }
 
 export function configure(state: HeadlessState, config: Config): void {
