@@ -2,7 +2,7 @@ import { State } from './state';
 import * as drag from './drag';
 import * as draw from './draw';
 import { cancelDropMode, drop } from './drop';
-import { eventPosition, isRightButton, pos2key } from './util';
+import { eventPosition, isRightButton } from './util';
 import * as cg from './types';
 import { getKeyAtDomPos, baseMove } from './board';
 import { Piece } from './types';
