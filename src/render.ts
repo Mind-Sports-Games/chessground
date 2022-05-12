@@ -213,12 +213,21 @@ function pieceNameOf(piece: cg.Piece, myPlayerIndex: cg.PlayerIndex): string {
 
 function computeSquareClasses(s: State): SquareClasses {
   const squares: SquareClasses = new Map();
-  if (s.lastMove && s.highlight.lastMove)
+  if (s.lastMove && s.highlight.lastMove) {
+    let first = true;
     for (const k of s.lastMove) {
       if (k !== 'a0') {
-        addSquare(squares, k, 'last-move');
+        if (first) {
+          addSquare(squares, k, 'last-move from');
+          first = false;
+        } else {
+          addSquare(squares, k, 'last-move to');
+        }
+      } else {
+        first = false;
       }
     }
+  }
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');

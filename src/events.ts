@@ -4,7 +4,7 @@ import * as draw from './draw';
 import { cancelDropMode, drop } from './drop';
 import { eventPosition, isRightButton } from './util';
 import * as cg from './types';
-import { getKeyAtDomPos } from './board';
+import { getKeyAtDomPos, userMove } from './board';
 import { Piece } from './types';
 
 type MouchBind = (e: cg.MouchEvent) => void;
@@ -90,7 +90,21 @@ function startDragOrDraw(s: State): MouchBind {
         // if it is occupied by opp's piece - just cancel drop mode. drag.start() will do nothing
         // dont cancel drop mode if only drops variant (e.g. flipello) as that is the only action to take
         if (!s.onlyDropsVariant) cancelDropMode(s);
-        drag.start(s, e);
+        // If variant supports single move clicks (as only 1 position for pieces to move to) then just do move
+        if (s.singleClickMoveVariant) {
+          const bounds = s.dom.bounds(),
+            position = eventPosition(e)!,
+            orig = getKeyAtDomPos(position, s.orientation, bounds, s.dimensions);
+          if (!orig) return;
+          const piece = s.pieces.get(orig);
+          const dest = s.movable.dests?.get(orig)![0];
+          if (piece && piece.playerIndex === s.turnPlayerIndex && dest) {
+            userMove(s, orig, dest);
+            s.dom.redraw();
+          }
+        } else {
+          drag.start(s, e);
+        }
       }
     }
   };

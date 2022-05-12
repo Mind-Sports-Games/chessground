@@ -26,8 +26,14 @@ export interface Api {
   // perform a move programmatically
   move(orig: cg.Key, dest: cg.Key): void;
 
+  // perform a move programmatically but with no animation
+  moveNoAnim(orig: cg.Key, dest: cg.Key): void;
+
   // add and/or remove arbitrary pieces on the board
   setPieces(pieces: cg.PiecesDiff): void;
+
+  // add and/or remove arbitrary pieces on the board - no animation!
+  setPiecesNoAnim(pieces: cg.PiecesDiff): void;
 
   // click a square programmatically
   selectSquare(key: cg.Key | null, force?: boolean): void;
@@ -104,6 +110,11 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
       anim(state => board.setPieces(state, pieces), state);
     },
 
+    setPiecesNoAnim(pieces): void {
+      board.setPieces(state, pieces);
+      state.dom.redraw();
+    },
+
     selectSquare(key, force): void {
       if (key) anim(state => board.selectSquare(state, key, force), state);
       else if (state.selected) {
@@ -114,6 +125,11 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     move(orig, dest): void {
       anim(state => board.baseMove(state, orig, dest), state);
+    },
+
+    moveNoAnim(orig, dest): void {
+      board.baseMove(state, orig, dest);
+      state.dom.redraw();
     },
 
     newPiece(piece, key): void {
