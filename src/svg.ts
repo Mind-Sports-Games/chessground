@@ -413,6 +413,7 @@ function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece): string {
       }
     case 'xiangqi':
       return (piece.playerIndex === 'p1' ? 'R' : 'B') + piece.role[0].toUpperCase();
+    case 'flipello10':
     case 'flipello':
     case 'linesOfAction':
       return (piece.playerIndex === 'p1' ? 'b' : 'w') + piece.role[0].toUpperCase();
