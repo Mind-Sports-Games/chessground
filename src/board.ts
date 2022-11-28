@@ -67,6 +67,7 @@ export function unsetPredrop(state: HeadlessState): void {
 
 function cancelDropMode(s: HeadlessState): void {
   s.dropmode.active = false;
+  s.dropmode.piece = undefined; // not sure this will help?
   callUserFunction(s.dropmode.events?.cancel);
 }
 
@@ -217,6 +218,8 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
 }
 
 export function setSelected(state: HeadlessState, key: cg.Key): void {
+  console.log("set Selected, key: ", key);
+  unselect(state);
   state.selected = key;
   if (isPremovable(state, key)) {
     state.premovable.dests = premove(
