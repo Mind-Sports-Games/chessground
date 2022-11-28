@@ -219,6 +219,9 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
 
 export function setSelected(state: HeadlessState, key: cg.Key): void {
   console.log("set Selected, key: ", key);
+  console.log("dropMode state: ", state.dropmode);
+  cancelDropMode(state);
+  console.log("dropMode state: ", state.dropmode);
   unselect(state);
   state.selected = key;
   if (isPremovable(state, key)) {
