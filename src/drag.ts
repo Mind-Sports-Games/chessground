@@ -143,7 +143,6 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
   }
 
   processDrag(s);
-  s.dom.redraw();
 }
 
 function processDrag(s: State): void {
