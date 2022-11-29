@@ -68,6 +68,7 @@ function unbindable(
 
 // slightly misleading name - because it also handles click-moving/dropping of pieces. generally it seems to handle all click events on the board.
 function startDragOrDraw(s: State): MouchBind {
+  console.log("in StartDragOrDraw");
   return e => {
     if (s.draggable.current) drag.cancel(s);
     else if (s.drawable.current) draw.cancel(s);
@@ -76,6 +77,7 @@ function startDragOrDraw(s: State): MouchBind {
     } else if (!s.viewOnly) {
       if (s.dropmode.active && undefined === squareOccupied(s, e)) {
         // this case covers normal drop when it is our turn or pre-drop on empty scare
+        console.log("normal drop case");
         drop(s, e);
       } else if (
         s.dropmode.active &&
@@ -86,6 +88,7 @@ function startDragOrDraw(s: State): MouchBind {
         // this case is for predrop on opp's piece
         drop(s, e);
       } else {
+        console.log("dropping on a piece ours or theres");
         // if it is occupied by our piece - cancel drop mode and start dragging that piece instead.
         // if it is occupied by opp's piece - just cancel drop mode. drag.start() will do nothing
         // dont cancel drop mode if only drops variant (e.g. flipello) as that is the only action to take
@@ -103,6 +106,7 @@ function startDragOrDraw(s: State): MouchBind {
             s.dom.redraw();
           }
         } else {
+          console.log("doing drag.start");
           drag.start(s, e);
         }
       }
