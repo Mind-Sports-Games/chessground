@@ -76,6 +76,8 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
     for (const r of fen.split(' ')[0].split('/')) {
       for (const f of r.split(',')) {
         if (isNaN(+f)) {
+          col += 1 + num;
+          num = 0;
           const count = f.slice(0, -1);
           //const role = f.substring(f.length-1);
           const letter = (+count <= 26)
@@ -93,8 +95,6 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
             playerIndex: playerIndex,
           } as cg.Piece;
           pieces.set(pos2key([col, row]), piece);
-          col += 1 + num;
-          num = 0;
         } else {
           num = num + +f;
         }
@@ -116,9 +116,15 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
         .map(x => {
           const piece = pieces.get(pos2key([x, y]));
           if (piece) {
-            const letter: string =
-              letters(piece.role) + (piece.promoted && letters(piece.role).charAt(0) !== '+' ? '~' : '');
-            return piece.playerIndex === 'p1' && variant !== 'oware' ? letter.toUpperCase() : letter;
+            if (!commaFenVariants.includes(variant)) {
+              const letter: string =
+                letters(piece.role) + (piece.promoted && letters(piece.role).charAt(0) !== '+' ? '~' : '');
+              return piece.playerIndex === 'p1' ? letter.toUpperCase() : letter;
+            } else {
+              const charCode: number = letters(piece.role).charCodeAt(0);
+              const count: number = (charCode <= 90) ? charCode - 64 : charCode - 70
+              return count.toString() + (x === bd.width) ? '' : ',';
+            }
           } else return '1';
         })
         .join('')
