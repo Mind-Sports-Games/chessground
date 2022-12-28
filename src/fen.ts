@@ -22,7 +22,7 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
   let promoted = false;
   let num = 0;
 
-  if (commaFenVariants.includes(variant)) {
+  if (!commaFenVariants.includes(variant)) {
     for (const c of fen) {
       switch (c) {
         case ' ':
