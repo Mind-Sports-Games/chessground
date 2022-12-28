@@ -2,6 +2,7 @@ import { pos2key, NRanks, invNRanks } from './util';
 import * as cg from './types';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+const commaFenVariants: cg.Variant[] = ['oware'];
 
 function roles(letter: string) {
   return (letter.replace('+', 'p') + '-piece') as cg.Role;
@@ -21,38 +22,69 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
   let promoted = false;
   let num = 0;
 
-  for (const c of fen) {
-    switch (c) {
-      case ' ':
-        return pieces;
-      case '/':
-        --row;
-        if (row === 0) return pieces;
-        col = 0;
-        num = 0;
-        break;
-      case '+':
-        promoted = true;
-        break;
-      case '~': {
-        const piece = pieces.get(pos2key([col, row]));
-        if (piece) piece.promoted = true;
-        break;
-      }
-      default: {
-        const nb = c.charCodeAt(0);
-        if (48 <= nb && nb < 58) {
-          num = num + nb - 48; // allow set of numbers (e.g. 1's) for space gaps
-        } else {
-          col += 1 + num;
+  if (commaFenVariants.includes(variant)) {
+    for (const c of fen) {
+      switch (c) {
+        case ' ':
+          return pieces;
+        case '/':
+          --row;
+          if (row === 0) return pieces;
+          col = 0;
           num = 0;
-          const letter = variant === 'oware' ? c : c.toLowerCase();
-          const playerIndex = (
+          break;
+        case '+':
+          promoted = true;
+          break;
+        case '~': {
+          const piece = pieces.get(pos2key([col, row]));
+          if (piece) piece.promoted = true;
+          break;
+        }
+        default: {
+          const nb = c.charCodeAt(0);
+          if (48 <= nb && nb < 58) {
+            num = num + nb - 48; // allow set of numbers (e.g. 1's) for space gaps
+          } else {
+            col += 1 + num;
+            num = 0;
+            const letter = variant === 'oware' ? c : c.toLowerCase();
+            const playerIndex = (
+              variant === 'oware' && row === 1
+                ? 'p1'
+                : variant === 'oware' && row === 2
+                ? 'p2'
+                : c === letter
+                ? 'p2'
+                : 'p1'
+            ) as cg.PlayerIndex;
+            const piece = {
+              role: roles(letter),
+              playerIndex: playerIndex,
+            } as cg.Piece;
+            if (promoted) {
+              piece.role = ('p' + piece.role) as cg.Role;
+              piece.promoted = true;
+              promoted = false;
+            }
+            pieces.set(pos2key([col, row]), piece);
+          }
+        }
+      }
+    }
+  } else {
+    for (const r of fen.split(' ')[0].split('/')) {
+      for (const f of r.split(',')) {
+        if (isNaN(+f)) {
+          const count = f.slice(0, -1);
+          //const role = f.substring(f.length-1);
+          const letter = (+count <= 26)
+            ? String.fromCharCode(64 + +count)
+            : String.fromCharCode(96-26 + +count);
+          const playerIndex = ( 
             variant === 'oware' && row === 1
               ? 'p1'
               : variant === 'oware' && row === 2
-              ? 'p2'
-              : c === letter
               ? 'p2'
               : 'p1'
           ) as cg.PlayerIndex;
@@ -60,14 +92,17 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
             role: roles(letter),
             playerIndex: playerIndex,
           } as cg.Piece;
-          if (promoted) {
-            piece.role = ('p' + piece.role) as cg.Role;
-            piece.promoted = true;
-            promoted = false;
-          }
           pieces.set(pos2key([col, row]), piece);
+          col += 1 + num;
+          num = 0;
+        } else {
+          num = num + +f;
         }
       }
+      --row;
+      if (row === 0) return pieces;
+      col = 0;
+      num = 0;
     }
   }
   return pieces;
