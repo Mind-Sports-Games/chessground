@@ -108,7 +108,6 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
               //mancala specific code here
               const roleLetter = piece.role.charAt(0);
               const count = piece.role.split('-')[0].substring(1);
-              consol
               return count + roleLetter.toUpperCase() + (x === bd.width ? '' : ',');
             }
           } else return '1' + (!commaFenVariants.includes(variant) ? '' : ',');
