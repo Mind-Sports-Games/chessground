@@ -93,7 +93,7 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
 }
 
 export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Variant): cg.FEN {
-  return invNRanks
+  const fen = invNRanks
     .slice(-bd.height)
     .map(y =>
       NRanks.slice(0, bd.width)
@@ -110,9 +110,12 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
               const count = piece.role.split('-')[0].substring(1);
               return count + roleLetter.toUpperCase() + (x === bd.width) ? '' : ',';
             }
-          } else return '1';
+          } else return '1,';
         })
         .join('')
     )
     .join('/');
+  return (!commaFenVariants.includes(variant))
+    ? fen.replace(/1{2,}/g, s => s.length.toString())
+    : fen.replace(/1,{2,}/g, s => (s.length/2).toString());
 }
