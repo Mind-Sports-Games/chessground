@@ -119,7 +119,7 @@ describe('fen.read() test', () => {
 
 describe('fen.read() test', () => {
   it('testing oware fen has 12 pieces', () => {
-    const fenString = 'DDDDDD/DDDDDD 0 0 S';
+    const fenString = '4S,4S,4S,4S,4S,4S/4S,4S,4S,4S,4S,4S 0 0 S';
     const bd: BoardDimensions = { width: 6, height: 2 };
 
     const expected = 12;
@@ -127,7 +127,7 @@ describe('fen.read() test', () => {
     expect(expected).to.equal(pieces.size);
   });
   it('testing oware player pieces from fen', () => {
-    const fenString = 'DDDDDD/DDDDDD 0 0 S';
+    const fenString = '4S,4S,4S,4S,4S,4S/4S,4S,4S,4S,4S,4S 0 0 S';
     const bd: BoardDimensions = { width: 6, height: 2 };
 
     const expectedP1 = 6;
@@ -139,7 +139,7 @@ describe('fen.read() test', () => {
     expect(expectedP2).to.equal(p2Pieces.length);
   });
   it('testing oware player pieces from fen with gaps (two 1s)', () => {
-    const fenString = '11FAEG/GACHBH 0 0 S';
+    const fenString = '1,6S,1,1S,5S,7S/7S,1S,3S,8S,2S,8S 0 0 S';
     const bd: BoardDimensions = { width: 6, height: 2 };
 
     const expectedP1 = 6;
@@ -150,8 +150,8 @@ describe('fen.read() test', () => {
     expect(expectedP1).to.equal(p1Pieces.length);
     expect(expectedP2).to.equal(p2Pieces.length);
   });
-  it('testing oware player pieces from fen with gaps (two 1s)', () => {
-    const fenString = '2FAEG/GACHBH 0 0 S';
+  it('testing oware player pieces from fen with gaps (one 2)', () => {
+    const fenString = '2,6S,1S,5S,7S/7S,1S,3S,8S,2S,8S 0 0 S';
     const bd: BoardDimensions = { width: 6, height: 2 };
 
     const expectedP1 = 6;
@@ -178,7 +178,7 @@ describe('fen.write() test', () => {
 
 describe('fen.write() test', () => {
   it('testing oware read initial fen and then write match', () => {
-    const fenString = 'DDDDDD/DDDDDD 0 0 S';
+    const fenString = '4S,4S,4S,4S,4S,4S/4S,4S,4S,4S,4S,4S 0 0 S';
     const bd: BoardDimensions = { width: 6, height: 2 };
 
     const expected = fenString.split(' ')[0];
@@ -187,7 +187,7 @@ describe('fen.write() test', () => {
     expect(expected).to.equal(writtenFen);
   });
   it('testing oware read fen and then write match', () => {
-    const fenString = 'bBD1DD/aDDF1D C 0 S';
+    const fenString = '28S,2S,4S,1,4S,4S/27S,4S,4S,6S,1,4S 3 0 S';
     const bd: BoardDimensions = { width: 6, height: 2 };
 
     const expected = fenString.split(' ')[0];
@@ -196,19 +196,19 @@ describe('fen.write() test', () => {
     expect(expected).to.equal(writtenFen);
   });
   it('testing oware read fen and then write match for gaps', () => {
-    const fenString = '11FAEG/GACHBH 0 0 S';
+    const fenString = '1,6S,1,1S,5S,7S/7S,1S,3S,8S,2S,8S 0 0 S';
     const bd: BoardDimensions = { width: 6, height: 2 };
 
-    const expected = '2FAEG/GACHBH';
+    const expected = fenString.split(' ')[0];
     const pieces = read(fenString, bd, 'oware');
     const writtenFen = write(pieces, bd, 'oware');
     expect(expected).to.equal(writtenFen);
   });
   it('testing oware read fen and then write match for gaps', () => {
-    const fenString = '2FAEG/GA111H 0 0 S';
+    const fenString = '2,6S,1S,5S,7S/7S,1S,3S,8S,2S,8S 0 0 S';
     const bd: BoardDimensions = { width: 6, height: 2 };
 
-    const expected = '2FAEG/GA3H';
+    const expected = fenString.split(' ')[0];
     const pieces = read(fenString, bd, 'oware');
     const writtenFen = write(pieces, bd, 'oware');
     expect(expected).to.equal(writtenFen);
