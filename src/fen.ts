@@ -114,6 +114,5 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
         })
         .join('')
     )
-    .join('/')
-    .replace(/1{2,}/g, s => s.length.toString());
+    .join('/');
 }
