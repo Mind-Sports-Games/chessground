@@ -117,5 +117,5 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
     .join('/');
   return (!commaFenVariants.includes(variant))
     ? fen.replace(/1{2,}/g, s => s.length.toString())
-    : fen;
+    : fen.replace(/(1,){2,}/g, s => (s.length/2).toString() + ',').replace(',/', '/').replace(', ', ' ');
 }
