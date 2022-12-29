@@ -48,16 +48,8 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
           } else {
             col += 1 + num;
             num = 0;
-            const letter = variant === 'oware' ? c : c.toLowerCase();
-            const playerIndex = (
-              variant === 'oware' && row === 1
-                ? 'p1'
-                : variant === 'oware' && row === 2
-                ? 'p2'
-                : c === letter
-                ? 'p2'
-                : 'p1'
-            ) as cg.PlayerIndex;
+            const letter = c.toLowerCase();
+            const playerIndex = (c === letter ? 'p2' : 'p1') as cg.PlayerIndex;
             const piece = {
               role: roles(letter),
               playerIndex: playerIndex,
@@ -76,22 +68,14 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
     for (const r of fen.split(' ')[0].split('/')) {
       for (const f of r.split(',')) {
         if (isNaN(+f)) {
+          //some mancala specific code in here
           col += 1 + num;
           num = 0;
           const count = f.slice(0, -1);
-          //const role = f.substring(f.length-1);
-          const letter = (+count <= 26)
-            ? String.fromCharCode(64 + +count)
-            : String.fromCharCode(96-26 + +count);
-          const playerIndex = ( 
-            variant === 'oware' && row === 1
-              ? 'p1'
-              : variant === 'oware' && row === 2
-              ? 'p2'
-              : 'p1'
-          ) as cg.PlayerIndex;
+          const role = f.substring(f.length-1).toLowerCase();
+          const playerIndex = (row === 1 ? 'p1' : 'p2') as cg.PlayerIndex;
           const piece = {
-            role: roles(letter),
+            role: `${role}${count}-piece`,
             playerIndex: playerIndex,
           } as cg.Piece;
           pieces.set(pos2key([col, row]), piece);
@@ -121,9 +105,10 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
                 letters(piece.role) + (piece.promoted && letters(piece.role).charAt(0) !== '+' ? '~' : '');
               return piece.playerIndex === 'p1' ? letter.toUpperCase() : letter;
             } else {
-              const charCode: number = letters(piece.role).charCodeAt(0);
-              const count: number = (charCode <= 90) ? charCode - 64 : charCode - 70
-              return count.toString() + (x === bd.width) ? '' : ',';
+              //mancala specific code here
+              const roleLetter = piece.role.charAt(0);
+              const count = piece.role.split('-')[0].substring(1);
+              return count + roleLetter.toUpperCase() + (x === bd.width) ? '' : ',';
             }
           } else return '1';
         })
