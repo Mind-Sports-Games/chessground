@@ -108,14 +108,15 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
               //mancala specific code here
               const roleLetter = piece.role.charAt(0);
               const count = piece.role.split('-')[0].substring(1);
-              return count + roleLetter.toUpperCase() + (x === bd.width) ? '' : ',';
+              consol
+              return count + roleLetter.toUpperCase() + (x === bd.width ? '' : ',');
             }
-          } else return '1,';
+          } else return '1' + (!commaFenVariants.includes(variant) ? '' : ',');
         })
         .join('')
     )
     .join('/');
   return (!commaFenVariants.includes(variant))
     ? fen.replace(/1{2,}/g, s => s.length.toString())
-    : fen.replace(/1,{2,}/g, s => (s.length/2).toString());
+    : fen;
 }
