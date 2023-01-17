@@ -2,7 +2,7 @@ import { pos2key, NRanks, invNRanks } from './util';
 import * as cg from './types';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
-const commaFenVariants: cg.Variant[] = ['oware'];
+const commaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak'];
 
 function roles(letter: string) {
   return (letter.replace('+', 'p') + '-piece') as cg.Role;
