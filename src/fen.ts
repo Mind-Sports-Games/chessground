@@ -72,7 +72,7 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
           col += 1 + num;
           num = 0;
           const count = f.slice(0, -1);
-          const role = f.substring(f.length-1).toLowerCase();
+          const role = f.substring(f.length - 1).toLowerCase();
           const playerIndex = (row === 1 ? 'p1' : 'p2') as cg.PlayerIndex;
           const piece = {
             role: `${role}${count}-piece`,
@@ -115,7 +115,10 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
         .join('')
     )
     .join('/');
-  return (!commaFenVariants.includes(variant))
+  return !commaFenVariants.includes(variant)
     ? fen.replace(/1{2,}/g, s => s.length.toString())
-    : fen.replace(/(1,){2,}/g, s => (s.length/2).toString() + ',').replace(',/', '/').replace(', ', ' ');
+    : fen
+        .replace(/(1,){2,}/g, s => (s.length / 2).toString() + ',')
+        .replace(',/', '/')
+        .replace(', ', ' ');
 }

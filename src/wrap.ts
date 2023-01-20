@@ -1,5 +1,5 @@
 import { HeadlessState } from './state';
-import { setVisible, createEl } from './util';
+import { setVisible, createEl, pos2key, NRanks, invNRanks } from './util';
 import { orientations, files, ranks, ranks10, shogiVariants, xiangqiVariants, Elements, Notation } from './types';
 import { createElement as createSVG, setAttributes } from './svg';
 
@@ -98,6 +98,32 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     }
   }
 
+  if (s.boardScores) {
+    const orientClass = ' ' + s.orientation;
+    const bd = s.dimensions;
+    if (s.variant === 'togyzkumalak') {
+      const boardScores = invNRanks.slice(-bd.height).map(y =>
+        NRanks.slice(0, bd.width).map(x => {
+          const piece = s.pieces.get(pos2key([x, y]));
+          //todo what about kudiz?
+          if (piece) {
+            return piece.role.split('-')[0].substring(1);
+          } else return '';
+        })
+      );
+
+      if (s.orientation === 'p1') {
+        container.appendChild(renderBoardScores(boardScores[1], 'files' + ' p1'));
+        container.appendChild(renderBoardScores(boardScores[0], 'files' + ' p2'));
+      } else {
+        container.appendChild(renderBoardScores(boardScores[0], 'files' + ' p1'));
+        container.appendChild(renderBoardScores(boardScores[1], 'files' + ' p2'));
+      }
+    } else {
+      container.appendChild(renderBoardScores(files.slice(0, s.dimensions.width), 'files' + orientClass));
+    }
+  }
+
   let ghost: HTMLElement | undefined;
   if (s.draggable.showGhost && !relative) {
     ghost = createEl('piece', 'ghost');
@@ -112,6 +138,17 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     svg,
     customSvg,
   };
+}
+
+function renderBoardScores(elems: readonly string[], className: string): HTMLElement {
+  const el = createEl('board-scores', className);
+  let f: HTMLElement;
+  for (const elem of elems) {
+    f = createEl('position-score');
+    f.textContent = elem;
+    el.appendChild(f);
+  }
+  return el;
 }
 
 function renderCoords(elems: readonly string[], className: string): HTMLElement {
