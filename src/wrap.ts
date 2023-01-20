@@ -99,7 +99,6 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   }
 
   if (s.boardScores) {
-    const orientClass = ' ' + s.orientation;
     const bd = s.dimensions;
     if (s.variant === 'togyzkumalak') {
       const boardScores = invNRanks.slice(-bd.height).map(y =>
@@ -113,14 +112,14 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       );
 
       if (s.orientation === 'p1') {
-        container.appendChild(renderBoardScores(boardScores[1], 'files' + ' p1'));
-        container.appendChild(renderBoardScores(boardScores[0], 'files' + ' p2'));
+        container.appendChild(renderBoardScores(boardScores[1], 'p1'));
+        container.appendChild(renderBoardScores(boardScores[0], 'p2'));
       } else {
-        container.appendChild(renderBoardScores(boardScores[0], 'files' + ' p1'));
-        container.appendChild(renderBoardScores(boardScores[1], 'files' + ' p2'));
+        container.appendChild(renderBoardScores(boardScores[1].reverse(), 'p1'));
+        container.appendChild(renderBoardScores(boardScores[0].reverse(), 'p2'));
       }
     } else {
-      container.appendChild(renderBoardScores(files.slice(0, s.dimensions.width), 'files' + orientClass));
+      container.appendChild(renderBoardScores(files.slice(0, s.dimensions.width), s.orientation));
     }
   }
 
