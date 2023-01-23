@@ -115,7 +115,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
           //todo what about kudiz?
           if (piece) {
             return piece.role.split('-')[0].substring(1);
-          } else return '';
+          } else return '0';
         })
       );
 
@@ -153,9 +153,11 @@ function renderBoardScores(elems: readonly string[], className: string): HTMLEle
   for (const elem of elems) {
     const extraClassNames = (parseInt(elem, 10) % 2 === 1 ? 'odd' : '') + (parseInt(elem, 10) > 20 ? ' abundance' : '');
     f = createEl('position-score');
-    g = createEl('score', extraClassNames);
-    g.textContent = elem;
-    f.appendChild(g);
+    if (elem !== '0') {
+      g = createEl('score', extraClassNames);
+      g.textContent = elem;
+      f.appendChild(g);
+    }
     el.appendChild(f);
   }
   return el;
