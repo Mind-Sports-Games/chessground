@@ -149,11 +149,13 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
 
 function renderBoardScores(elems: readonly string[], className: string): HTMLElement {
   const el = createEl('board-scores', className);
-  let f: HTMLElement;
+  let f, g: HTMLElement;
   for (const elem of elems) {
-    const extraClassNames = (parseInt(elem, 10) % 2 == 1 ? 'odd' : '') + (parseInt(elem, 10) > 20 ? ' abundance' : '');
-    f = createEl('position-score', extraClassNames);
-    f.textContent = elem;
+    const extraClassNames = (parseInt(elem, 10) % 2 === 1 ? 'odd' : '') + (parseInt(elem, 10) > 20 ? ' abundance' : '');
+    f = createEl('position-score');
+    g = createEl('score', extraClassNames);
+    g.textContent = elem;
+    f.appendChild(g);
     el.appendChild(f);
   }
   return el;
