@@ -112,8 +112,12 @@ export const posToTranslateAbs = (
   return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor, bt);
 };
 
-export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation, bt: cg.BoardDimensions): cg.NumberPair =>
-  posToTranslateBase(pos, orientation, 100, 100, bt);
+export const posToTranslateRel = (
+  pos: cg.Pos,
+  orientation: cg.Orientation,
+  bt: cg.BoardDimensions,
+  v: cg.Variant
+): cg.NumberPair => posToTranslateBase(pos, orientation, 100, v === 'togyzkumalak' ? 150 : 100, bt);
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;

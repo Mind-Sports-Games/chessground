@@ -114,7 +114,9 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
           const piece = s.pieces.get(pos2key([x, y]));
           //todo what about kudiz?
           if (piece) {
-            return piece.role.split('-')[0].substring(1);
+            if (piece.role === 't-piece') {
+              return 't';
+            } else return piece.role.split('-')[0].substring(1);
           } else return '0';
         })
       );
@@ -151,12 +153,23 @@ function renderBoardScores(elems: readonly string[], className: string): HTMLEle
   const el = createEl('board-scores', className);
   let f, g: HTMLElement;
   for (const elem of elems) {
-    const extraClassNames = (parseInt(elem, 10) % 2 === 1 ? 'odd' : '') + (parseInt(elem, 10) > 20 ? ' abundance' : '');
     f = createEl('position-score');
-    if (elem !== '0') {
-      g = createEl('score', extraClassNames);
-      g.textContent = elem;
-      f.appendChild(g);
+    switch (elem) {
+      case 't': {
+        g = createEl('score', 'tuzdik');
+        f.appendChild(g);
+      }
+      case '0': {
+        g = createEl('score', 'empty');
+        f.appendChild(g);
+      }
+      default: {
+        const extraClassNames =
+          (parseInt(elem, 10) % 2 === 1 ? 'odd' : '') + (parseInt(elem, 10) > 20 ? ' abundance' : '');
+        g = createEl('score', extraClassNames);
+        g.textContent = elem;
+        f.appendChild(g);
+      }
     }
     el.appendChild(f);
   }
