@@ -158,10 +158,12 @@ function renderBoardScores(elems: readonly string[], className: string): HTMLEle
       case 't': {
         g = createEl('score', 'tuzdik');
         f.appendChild(g);
+        break;
       }
       case '0': {
         g = createEl('score', 'empty');
         f.appendChild(g);
+        break;
       }
       default: {
         const extraClassNames =
