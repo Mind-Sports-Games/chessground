@@ -212,7 +212,6 @@ function pieceNameOf(piece: cg.Piece, myPlayerIndex: cg.PlayerIndex): string {
 }
 
 function computeSquareClasses(s: State): SquareClasses {
-  // togyzkumalakHightlighClass(s.variant, k)
   const squares: SquareClasses = new Map();
   if (s.lastMove && s.highlight.lastMove) {
     let first = true;

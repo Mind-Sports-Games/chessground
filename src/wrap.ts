@@ -112,7 +112,6 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       const boardScores = invNRanks.slice(-bd.height).map(y =>
         NRanks.slice(0, bd.width).map(x => {
           const piece = s.pieces.get(pos2key([x, y]));
-          //todo what about kudiz?
           if (piece) {
             if (piece.role === 't-piece') {
               return 't';
