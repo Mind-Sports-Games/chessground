@@ -1,5 +1,5 @@
 import { HeadlessState } from './state';
-import { setVisible, createEl } from './util';
+import { setVisible, createEl, pos2key, NRanks, invNRanks } from './util';
 import { orientations, files, ranks, ranks10, shogiVariants, xiangqiVariants, Elements, Notation } from './types';
 import { createElement as createSVG, setAttributes } from './svg';
 
@@ -92,9 +92,43 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         );
         container.appendChild(renderCoords(files.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
       }
+    } else if (s.variant === 'togyzkumalak') {
+      if (s.orientation === 'p1') {
+        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width), 'files' + ' p1'));
+        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width), 'files' + ' p2'));
+      } else {
+        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p1'));
+        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
+      }
     } else {
       container.appendChild(renderCoords(ranks10.slice(0, s.dimensions.height), 'ranks' + orientClass));
       container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
+    }
+  }
+
+  if (s.boardScores) {
+    const bd = s.dimensions;
+    if (s.variant === 'togyzkumalak') {
+      const boardScores = invNRanks.slice(-bd.height).map(y =>
+        NRanks.slice(0, bd.width).map(x => {
+          const piece = s.pieces.get(pos2key([x, y]));
+          if (piece) {
+            if (piece.role === 't-piece') {
+              return 't';
+            } else return piece.role.split('-')[0].substring(1);
+          } else return '0';
+        })
+      );
+
+      if (s.orientation === 'p1') {
+        container.appendChild(renderBoardScores(boardScores[1], 'p1'));
+        container.appendChild(renderBoardScores(boardScores[0], 'p2'));
+      } else {
+        container.appendChild(renderBoardScores(boardScores[1].reverse(), 'p1'));
+        container.appendChild(renderBoardScores(boardScores[0].reverse(), 'p2'));
+      }
+    } else {
+      container.appendChild(renderBoardScores(files.slice(0, s.dimensions.width), s.orientation));
     }
   }
 
@@ -112,6 +146,35 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     svg,
     customSvg,
   };
+}
+
+function renderBoardScores(elems: readonly string[], className: string): HTMLElement {
+  const el = createEl('board-scores', className);
+  let f, g: HTMLElement;
+  for (const elem of elems) {
+    f = createEl('position-score');
+    switch (elem) {
+      case 't': {
+        g = createEl('score', 'tuzdik');
+        f.appendChild(g);
+        break;
+      }
+      case '0': {
+        g = createEl('score', 'empty');
+        f.appendChild(g);
+        break;
+      }
+      default: {
+        const extraClassNames =
+          (parseInt(elem, 10) % 2 === 1 ? 'odd' : '') + (parseInt(elem, 10) > 20 ? ' abundance' : '');
+        g = createEl('score', extraClassNames);
+        g.textContent = elem;
+        f.appendChild(g);
+      }
+    }
+    el.appendChild(f);
+  }
+  return el;
 }
 
 function renderCoords(elems: readonly string[], className: string): HTMLElement {

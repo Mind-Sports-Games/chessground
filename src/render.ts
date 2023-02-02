@@ -51,7 +51,7 @@ export function render(s: State): void {
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
-        translate(el, posToTranslate(key2pos(k), orientation, s.dimensions));
+        translate(el, posToTranslate(key2pos(k), orientation, s.dimensions, s.variant));
         el.cgDragging = false;
       }
       // remove fading class if it still remains
@@ -68,11 +68,11 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
           el.classList.add('anim');
-          translate(el, posToTranslate(pos, orientation, s.dimensions));
+          translate(el, posToTranslate(pos, orientation, s.dimensions, s.variant));
         } else if (el.cgAnimating) {
           el.cgAnimating = false;
           el.classList.remove('anim');
-          translate(el, posToTranslate(key2pos(k), orientation, s.dimensions));
+          translate(el, posToTranslate(key2pos(k), orientation, s.dimensions, s.variant));
           if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asP1, s.dimensions);
         }
         // same piece: flag as same
@@ -108,7 +108,7 @@ export function render(s: State): void {
     if (!sameSquares.has(sk)) {
       sMvdset = movedSquares.get(className);
       sMvd = sMvdset && sMvdset.pop();
-      const translation = posToTranslate(key2pos(sk), orientation, s.dimensions);
+      const translation = posToTranslate(key2pos(sk), orientation, s.dimensions, s.variant);
       if (sMvd) {
         sMvd.cgKey = sk;
         translate(sMvd, translation);
@@ -144,7 +144,7 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        translate(pMvd, posToTranslate(pos, orientation, s.dimensions));
+        translate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant));
       }
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
@@ -160,7 +160,7 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        translate(pieceNode, posToTranslate(pos, orientation, s.dimensions));
+        translate(pieceNode, posToTranslate(pos, orientation, s.dimensions, s.variant));
 
         if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, orientation, asP1, s.dimensions);
 
@@ -218,10 +218,10 @@ function computeSquareClasses(s: State): SquareClasses {
     for (const k of s.lastMove) {
       if (k !== 'a0') {
         if (first) {
-          addSquare(squares, k, 'last-move from');
+          addSquare(squares, k, 'last-move from' + togyzkumalakHightlighClass(s.variant, k));
           first = false;
         } else {
-          addSquare(squares, k, 'last-move to');
+          addSquare(squares, k, 'last-move to' + togyzkumalakHightlighClass(s.variant, k));
         }
       } else {
         first = false;
@@ -230,17 +230,25 @@ function computeSquareClasses(s: State): SquareClasses {
   }
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
   if (s.selected) {
-    addSquare(squares, s.selected, 'selected');
+    addSquare(squares, s.selected, 'selected' + togyzkumalakHightlighClass(s.variant, s.selected));
     if (s.movable.showDests) {
       const dests = s.movable.dests?.get(s.selected);
       if (dests)
         for (const k of dests) {
-          addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
+          addSquare(
+            squares,
+            k,
+            'move-dest' + (s.pieces.has(k) ? ' oc' : '') + togyzkumalakHightlighClass(s.variant, k)
+          );
         }
       const pDests = s.premovable.dests;
       if (pDests)
         for (const k of pDests) {
-          addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
+          addSquare(
+            squares,
+            k,
+            'premove-dest' + (s.pieces.has(k) ? ' oc' : '') + togyzkumalakHightlighClass(s.variant, k)
+          );
         }
     }
   } else if (s.dropmode.active || s.draggable.current?.orig === 'a0') {
@@ -287,4 +295,8 @@ function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {
   const arr = map.get(key);
   if (arr) arr.push(value);
   else map.set(key, [value]);
+}
+
+function togyzkumalakHightlighClass(variant: cg.Variant, k: cg.Key): string {
+  return variant === 'togyzkumalak' ? (k[1] === '1' ? ' p1' : ' p2') : '';
 }
