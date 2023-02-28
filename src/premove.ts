@@ -467,6 +467,19 @@ function toriEagle(playerIndex: cg.PlayerIndex): Mobility {
   };
 }
 
+function emptysquares(pieces: cg.Pieces): Mobility {
+  return (_, __, x2, y2) => {
+    const pos = util.pos2key([x2, y2]) as cg.Key;
+    return !pieces.has(pos);
+  };
+}
+
+function amazonsQueen(pieces: cg.Pieces): Mobility {
+  return (x1, y1, x2, y2) => {
+    return queen(x1, y1, x2, y2) && emptysquares(pieces)(x1, y1, x2, y2);
+  };
+}
+
 export function premove(
   pieces: cg.Pieces,
   key: cg.Key,
@@ -732,6 +745,16 @@ export function premove(
         case 'k-piece':
           mobility = kingNoCastling;
           break; // king
+      }
+      break;
+
+    case 'amazons':
+      switch (role) {
+        case 'p-piece':
+          break; //arrows cant move
+        case 'q-piece':
+          mobility = amazonsQueen(pieces);
+          break; // queen
       }
       break;
 
