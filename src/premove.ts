@@ -480,6 +480,10 @@ function amazonsQueen(pieces: cg.Pieces): Mobility {
   };
 }
 
+const noMovement: Mobility = (_, __, ___, ____) => {
+  return false;
+};
+
 export function premove(
   pieces: cg.Pieces,
   key: cg.Key,
@@ -751,6 +755,7 @@ export function premove(
     case 'amazons':
       switch (role) {
         case 'p-piece':
+          mobility = noMovement;
           break; //arrows cant move
         case 'q-piece':
           mobility = amazonsQueen(pieces);
