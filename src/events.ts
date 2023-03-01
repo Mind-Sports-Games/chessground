@@ -89,7 +89,6 @@ function startDragOrDraw(s: State): MouchBind {
         // if it is occupied by our piece - cancel drop mode and start dragging that piece instead.
         // if it is occupied by opp's piece - just cancel drop mode. drag.start() will do nothing
         // dont cancel drop mode if only drops variant (e.g. flipello) as that is the only action to take
-        console.log("should be dropping, onlydropsvariant is", s.onlyDropsVariant);
         if (!s.onlyDropsVariant) cancelDropMode(s);
         // If variant supports single move clicks (as only 1 position for pieces to move to) then just do move
         if (s.singleClickMoveVariant) {
@@ -104,7 +103,6 @@ function startDragOrDraw(s: State): MouchBind {
             s.dom.redraw();
           }
         } else {
-          console.log("starting drag");
           drag.start(s, e);
         }
       }

@@ -178,7 +178,6 @@ export function userMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): bool
  * */
 export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, force?: boolean): void {
   const piece = state.pieces.get(orig);
-  console.log("dropnewPiece- orig:dest", orig, dest);
 
   if (piece && (canDrop(state, orig, dest) || force)) {
     state.pieces.delete(orig);
@@ -190,10 +189,9 @@ export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, f
   } else if (piece && canPredrop(state, orig, dest)) {
     setPredrop(state, piece.role, dest);
   } else {
-    console.log("cant drop piece")
     unsetPremove(state);
     unsetPredrop(state);
-    if (!state.onlyDropsVariant ) cancelDropMode(state);
+    cancelDropMode(state);
   }
   state.pieces.delete(orig);
   unselect(state);
@@ -244,8 +242,6 @@ export function unselect(state: HeadlessState): void {
 }
 
 function isMovable(state: HeadlessState, orig: cg.Key): boolean {
-  console.log("ismovable, orig", orig);
-  console.log("ismovable, onlydropsvariant", state.onlyDropsVariant);
   const piece = state.pieces.get(orig);
   return (
     !!piece &&
