@@ -103,7 +103,7 @@ function startDragOrDraw(s: State): MouchBind {
             s.dom.redraw();
           }
         } else {
-          drag.start(s, e);
+          if (!s.onlyDropsVariant) drag.start(s, e);
         }
       }
     }
