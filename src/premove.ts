@@ -479,49 +479,49 @@ function amazonsQueen(pieces: cg.Pieces): Mobility {
     if (x2 > x1 && y1 === y2) {
       for (let i = 1; x1 + i < x2; i++) {
         const pos = util.pos2key([x1 + i, y2]) as cg.Key;
-        if (!pieces.has(pos)) return false;
+        if (pieces.has(pos)) return false;
       }
     }
     if (x2 < x1 && y1 === y2) {
       for (let i = 1; x1 - i > x2; i++) {
         const pos = util.pos2key([x1 - i, y2]) as cg.Key;
-        if (!pieces.has(pos)) return false;
+        if (pieces.has(pos)) return false;
       }
     }
     if (y2 > y1 && x1 === x2) {
       for (let i = 1; y1 + i < y2; i++) {
         const pos = util.pos2key([x2, y1 + i]) as cg.Key;
-        if (!pieces.has(pos)) return false;
+        if (pieces.has(pos)) return false;
       }
     }
     if (y2 < y1 && x1 === x2) {
       for (let i = 1; y1 - i > y2; i++) {
         const pos = util.pos2key([x2, y1 - i]) as cg.Key;
-        if (!pieces.has(pos)) return false;
+        if (pieces.has(pos)) return false;
       }
     }
     if (x2 > x1 && y2 > y1) {
       for (let i = 1; x1 + i < x2; i++) {
         const pos = util.pos2key([x1 + i, y1 + i]) as cg.Key;
-        if (!pieces.has(pos)) return false;
+        if (pieces.has(pos)) return false;
       }
     }
     if (x2 < x1 && y2 < y1) {
       for (let i = 1; x1 - i > x2; i++) {
         const pos = util.pos2key([x1 - i, y1 - i]) as cg.Key;
-        if (!pieces.has(pos)) return false;
+        if (pieces.has(pos)) return false;
       }
     }
     if (x2 < x1 && y2 > y1) {
       for (let i = 1; x1 - i > x2; i++) {
         const pos = util.pos2key([x1 - i, y1 + i]) as cg.Key;
-        if (!pieces.has(pos)) return false;
+        if (pieces.has(pos)) return false;
       }
     }
     if (x2 > x1 && y2 < y1) {
       for (let i = 1; x1 + i < x2; i++) {
         const pos = util.pos2key([x1 + i, y1 - i]) as cg.Key;
-        if (!pieces.has(pos)) return false;
+        if (pieces.has(pos)) return false;
       }
     }
     return queen(x1, y1, x2, y2) && emptysquares(pieces)(x1, y1, x2, y2);
