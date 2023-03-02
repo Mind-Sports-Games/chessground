@@ -467,6 +467,71 @@ function toriEagle(playerIndex: cg.PlayerIndex): Mobility {
   };
 }
 
+function emptysquares(pieces: cg.Pieces): Mobility {
+  return (_, __, x2, y2) => {
+    const pos = util.pos2key([x2, y2]) as cg.Key;
+    return !pieces.has(pos);
+  };
+}
+
+function amazonsQueen(pieces: cg.Pieces): Mobility {
+  return (x1, y1, x2, y2) => {
+    if (x2 > x1 && y1 === y2) {
+      for (let i = 1; x1 + i < x2; i++) {
+        const pos = util.pos2key([x1 + i, y2]) as cg.Key;
+        if (pieces.has(pos)) return false;
+      }
+    }
+    if (x2 < x1 && y1 === y2) {
+      for (let i = 1; x1 - i > x2; i++) {
+        const pos = util.pos2key([x1 - i, y2]) as cg.Key;
+        if (pieces.has(pos)) return false;
+      }
+    }
+    if (y2 > y1 && x1 === x2) {
+      for (let i = 1; y1 + i < y2; i++) {
+        const pos = util.pos2key([x2, y1 + i]) as cg.Key;
+        if (pieces.has(pos)) return false;
+      }
+    }
+    if (y2 < y1 && x1 === x2) {
+      for (let i = 1; y1 - i > y2; i++) {
+        const pos = util.pos2key([x2, y1 - i]) as cg.Key;
+        if (pieces.has(pos)) return false;
+      }
+    }
+    if (x2 > x1 && y2 > y1) {
+      for (let i = 1; x1 + i < x2; i++) {
+        const pos = util.pos2key([x1 + i, y1 + i]) as cg.Key;
+        if (pieces.has(pos)) return false;
+      }
+    }
+    if (x2 < x1 && y2 < y1) {
+      for (let i = 1; x1 - i > x2; i++) {
+        const pos = util.pos2key([x1 - i, y1 - i]) as cg.Key;
+        if (pieces.has(pos)) return false;
+      }
+    }
+    if (x2 < x1 && y2 > y1) {
+      for (let i = 1; x1 - i > x2; i++) {
+        const pos = util.pos2key([x1 - i, y1 + i]) as cg.Key;
+        if (pieces.has(pos)) return false;
+      }
+    }
+    if (x2 > x1 && y2 < y1) {
+      for (let i = 1; x1 + i < x2; i++) {
+        const pos = util.pos2key([x1 + i, y1 - i]) as cg.Key;
+        if (pieces.has(pos)) return false;
+      }
+    }
+    return queen(x1, y1, x2, y2) && emptysquares(pieces)(x1, y1, x2, y2);
+  };
+}
+
+const noMovement: Mobility = (_, __, ___, ____) => {
+  return false;
+};
+
 export function premove(
   pieces: cg.Pieces,
   key: cg.Key,
@@ -732,6 +797,17 @@ export function premove(
         case 'k-piece':
           mobility = kingNoCastling;
           break; // king
+      }
+      break;
+
+    case 'amazons':
+      switch (role) {
+        case 'p-piece':
+          mobility = noMovement;
+          break; //arrows cant move
+        case 'q-piece':
+          mobility = amazonsQueen(pieces);
+          break; // queen
       }
       break;
 

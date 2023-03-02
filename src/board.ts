@@ -102,7 +102,7 @@ function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolea
 export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   const origPiece = state.pieces.get(orig),
     destPiece = state.pieces.get(dest);
-  if ((orig === dest && state.variant !== "togyzkumalak") || !origPiece) return false;
+  if ((orig === dest && state.variant !== 'togyzkumalak') || !origPiece) return false;
   const captured = destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
   if (dest === state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captured);
@@ -178,6 +178,7 @@ export function userMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): bool
  * */
 export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, force?: boolean): void {
   const piece = state.pieces.get(orig);
+
   if (piece && (canDrop(state, orig, dest) || force)) {
     state.pieces.delete(orig);
     baseNewPiece(state, piece, dest, force);
@@ -252,7 +253,9 @@ function isMovable(state: HeadlessState, orig: cg.Key): boolean {
 
 export function canMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   return (
-    (orig !== dest || state.variant === "togyzkumalak") && isMovable(state, orig) && (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest))
+    (orig !== dest || state.variant === 'togyzkumalak') &&
+    isMovable(state, orig) &&
+    (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest))
   );
 }
 

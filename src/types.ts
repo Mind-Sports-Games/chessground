@@ -43,6 +43,7 @@ export type Variant =
   | 'ordamirror'
   | 'flipello'
   | 'flipello10'
+  | 'amazons'
   | 'oware'
   | 'togyzkumalak'
   | undefined;

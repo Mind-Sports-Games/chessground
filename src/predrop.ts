@@ -99,6 +99,7 @@ export default function predrop(
     // This code is unnecessary but is here anyway to be explicit
     case 'kyotoshogi':
     case 'dobutsu':
+    case 'amazons':
       mobility = wholeBoard;
       break;
 
