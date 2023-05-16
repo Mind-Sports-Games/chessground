@@ -46,13 +46,16 @@ export type Variant =
   | 'amazons'
   | 'oware'
   | 'togyzkumalak'
+  | 'go9x9'
+  | 'go13x13'
+  | 'go19x19'
   | undefined;
 export type PlayerIndex = typeof playerIndexs[number];
 export type Letter = typeof letters[number];
 export type StoneCount = typeof stoneCounts[number];
 export type Role = `${Letter}-piece` | `p${Letter}-piece` | `s${StoneCount}-piece`;
 export type File = typeof files[number];
-export type Rank = typeof ranks10[number];
+export type Rank = typeof ranks19[number];
 export type Key = 'a0' | `${File}${Rank}`;
 export type FEN = string;
 export type Pos = [number, number];
@@ -157,9 +160,50 @@ export type KHz = number;
 
 export const orientations = ['p1', 'p2', 'left', 'right'] as const; // where the player is sat on the board with p1 at the bottom
 export const playerIndexs = ['p1', 'p2'] as const;
-export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'] as const;
+export const files = [
+  'a',
+  'b',
+  'c',
+  'd',
+  'e',
+  'f',
+  'g',
+  'h',
+  'i',
+  'j',
+  'k',
+  'l',
+  'm',
+  'n',
+  'o',
+  'p',
+  'q',
+  'r',
+  's',
+] as const;
 export const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', ':'] as const;
 export const ranks10 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] as const;
+export const ranks19 = [
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '10',
+  '11',
+  '12',
+  '13',
+  '14',
+  '15',
+  '16',
+  '17',
+  '18',
+  '19',
+] as const;
 export const letters = [
   'a',
   'b',
@@ -257,3 +301,4 @@ export const enum Notation {
 
 export const shogiVariants: Variant[] = ['shogi', 'minishogi', 'kyotoshogi', 'dobutsu', 'gorogoro', 'torishogi'];
 export const xiangqiVariants: Variant[] = ['xiangqi', 'minixiangqi', 'manchu', 'janggi'];
+export const goVariants: Variant[] = ['go9x9', 'go13x13', 'go19x19'];

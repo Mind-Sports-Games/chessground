@@ -2,16 +2,16 @@ import * as cg from './types';
 import * as T from './transformations';
 
 export const playerIndexs: cg.PlayerIndex[] = ['p1', 'p2'];
-export const invRanks: readonly cg.Rank[] = [...cg.ranks10].reverse();
-export const NRanks: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-export const invNRanks: number[] = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+export const invRanks: readonly cg.Rank[] = [...cg.ranks19].reverse();
+export const NRanks: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+export const invNRanks: number[] = [19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
 
 function files(n: number) {
   return cg.files.slice(0, n);
 }
 
 function ranks(n: number) {
-  return cg.ranks10.slice(0, n);
+  return cg.ranks19.slice(0, n);
 }
 
 export function allKeys(bd: cg.BoardDimensions = { width: 8, height: 8 }) {
@@ -19,7 +19,7 @@ export function allKeys(bd: cg.BoardDimensions = { width: 8, height: 8 }) {
 }
 
 export function pos2key(pos: cg.Pos): cg.Key {
-  return (cg.files[pos[0] - 1] + cg.ranks10[pos[1] - 1]) as cg.Key;
+  return (cg.files[pos[0] - 1] + cg.ranks19[pos[1] - 1]) as cg.Key;
 }
 
 export function key2pos(k: cg.Key): cg.Pos {

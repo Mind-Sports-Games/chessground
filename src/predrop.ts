@@ -136,6 +136,12 @@ export default function predrop(
       mobility = emptysquares(pieces); // cant drop on current pieces (either side) as they cant move
       break;
 
+    case 'go9x9':
+    case 'go13x13':
+    case 'go19x19':
+      mobility = emptysquares(pieces); // cant drop on current pieces (either side) as they cant move
+      break;
+
     default:
       console.warn('Unknown drop variant', variant);
   }
