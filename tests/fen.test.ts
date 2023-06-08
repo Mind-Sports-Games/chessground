@@ -214,3 +214,28 @@ describe('fen.write() test', () => {
     expect(expected).to.equal(writtenFen);
   });
 });
+
+describe('fen.write() test', () => {
+  it('testing go read fen and then write match for gaps', () => {
+    const fenString =
+      '19/19/19/19/19/19/19/19/19/19/19/19/19/19/19/19/19/19/Ss2S2s11[SSSSSSSSSSssssssssss] b - 2 8 6 3';
+    const bd: BoardDimensions = { width: 19, height: 19 };
+
+    let expected = fenString.split(' ')[0];
+    if (expected.indexOf('[') !== -1) expected = expected.slice(0, expected.indexOf('['));
+    const pieces = read(fenString, bd, 'go19x19');
+    const writtenFen = write(pieces, bd, 'go19x19');
+    expect(expected).to.equal(writtenFen);
+  });
+  it('testing go read fen and then write match for gaps', () => {
+    const fenString =
+      '19/19/19/19/11Ss2S2s/19/19/19/19/14S3s/19/19/19/19/19/19/19/19/19[SSSSSSSSSSssssssssss] b - 3 9 6 4';
+    const bd: BoardDimensions = { width: 19, height: 19 };
+
+    let expected = fenString.split(' ')[0];
+    if (expected.indexOf('[') !== -1) expected = expected.slice(0, expected.indexOf('['));
+    const pieces = read(fenString, bd, 'go19x19');
+    const writtenFen = write(pieces, bd, 'go19x19');
+    expect(expected).to.equal(writtenFen);
+  });
+});
