@@ -23,7 +23,13 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
   let num = 0;
 
   if (!commaFenVariants.includes(variant)) {
-    for (const c of fen) {
+    let skipNext = false;
+    for (let i = 0; i < fen.length; i++) {
+      if (skipNext) {
+        skipNext = false;
+        continue;
+      }
+      const c = fen[i];
       switch (c) {
         case ' ':
           return pieces;
@@ -42,9 +48,21 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
           break;
         }
         default: {
-          const nb = c.charCodeAt(0);
-          if (48 <= nb && nb < 58) {
-            num = num + nb - 48; // allow set of numbers (e.g. 1's) for space gaps
+          // need to deal with double digits, due to large boards, look ahead here
+          const step = parseInt(c, 10);
+          if (step > 0) {
+            let stepped = false;
+            if (dimensions.width > 9 && i < fen.length + 1 && parseInt(fen[i + 1]) >= 0) {
+              const twoCharStep = parseInt(c + fen[i + 1]);
+              if (twoCharStep > 0) {
+                col += twoCharStep;
+                stepped = true;
+                skipNext = true;
+              }
+            }
+            if (!stepped) {
+              num += step;
+            }
           } else {
             col += 1 + num;
             num = 0;
