@@ -14,6 +14,7 @@ export interface HeadlessState {
   check?: cg.Key; // square currently in check "a2"
   lastMove?: cg.Key[]; // squares part of the last move ["c3"; "c4"]
   selected?: cg.Key; // square currently selected "a1"
+  selectedPieces: cg.Pieces; // selected pieces when using selectOnly mode
   coordinates: boolean; // include coords attributes
   boardScores: boolean; //include board-scores attributes
   autoCastle: boolean; // immediately complete the castle by moving the rook after king move
@@ -137,6 +138,7 @@ export function defaults(): HeadlessState {
     coordinates: true,
     boardScores: false,
     autoCastle: true,
+    selectedPieces: new Map<cg.Key, cg.Piece>(),
     viewOnly: false,
     selectOnly: false,
     disableContextMenu: false,

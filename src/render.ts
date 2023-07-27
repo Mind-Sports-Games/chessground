@@ -229,6 +229,11 @@ function computeSquareClasses(s: State): SquareClasses {
     }
   }
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
+  if (s.selectOnly) {
+    for (let key of s.selectedPieces.keys()) {
+      addSquare(squares, key, 'selected');
+    }
+  }
   if (s.selected) {
     addSquare(squares, s.selected, 'selected' + togyzkumalakHightlighClass(s.variant, s.selected));
     if (s.movable.showDests) {
