@@ -230,7 +230,7 @@ function computeSquareClasses(s: State): SquareClasses {
   }
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
   if (s.selectOnly) {
-    for (let key of s.selectedPieces.keys()) {
+    for (const key of s.selectedPieces.keys()) {
       addSquare(squares, key, 'selected');
     }
   }
