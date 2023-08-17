@@ -177,18 +177,13 @@ export function calculatePlayerEmptyAreas(
   bd: cg.BoardDimensions,
   deadStones: cg.Pieces
 ): Map<cg.Key, cg.PlayerIndex> {
-  const emptySquares: cg.Key[] = allKeys(bd).filter(key => !pieces.has(key));
+  const emptySquares: cg.Key[] = allKeys(bd).filter(key => !pieces.has(key) || deadStones.has(key));
   const piecesToConsider = new Map<cg.Key, cg.Piece>();
   pieces.forEach((piece: cg.Piece, key: cg.Key) => {
     piecesToConsider.set(key, piece);
   });
-  deadStones.forEach((piece: cg.Piece, key: cg.Key) => {
-    const otherPlayerPiece = {
-      role: piece.role,
-      playerIndex: piece.playerIndex === 'p1' ? 'p2' : 'p1',
-      promoted: piece.promoted,
-    } as cg.Piece;
-    piecesToConsider.set(key, otherPlayerPiece);
+  deadStones.forEach((_: cg.Piece, key: cg.Key) => {
+    piecesToConsider.delete(key);
   });
   const areas: cg.Key[][] = calculateAreas(emptySquares, bd);
 
@@ -199,7 +194,9 @@ export function calculatePlayerEmptyAreas(
     const surroundingPlayers = new Set(borderKeys.map(k => piecesToConsider.get(k)?.playerIndex));
     if (surroundingPlayers.size === 1) {
       for (const k of area) {
-        playerAreas.set(k, surroundingPlayers.has('p1') ? 'p1' : 'p2');
+        if (!Array.from(deadStones.keys()).includes(k)) {
+          playerAreas.set(k, surroundingPlayers.has('p1') ? 'p1' : 'p2');
+        }
       }
     }
   }

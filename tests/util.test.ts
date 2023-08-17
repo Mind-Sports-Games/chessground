@@ -232,9 +232,9 @@ describe('calculatePlayeremptyAreas() test', () => {
     const bd = { height: 3, width: 3 };
     const areas = calculatePlayerEmptyAreas(pieces, bd, deadStones);
     const expected = new Map<cg.Key, cg.PlayerIndex>();
+    expected.set('a3', 'p1');
     expected.set('c3', 'p1');
     expected.set('c1', 'p1');
-    expected.set('a3', 'p1');
     expected.set('a1', 'p1');
     expect(expected.size).to.equal(areas.size);
     expect(Array.from(expected.keys())[0]).to.equal(Array.from(areas.keys())[0]);
@@ -245,5 +245,28 @@ describe('calculatePlayeremptyAreas() test', () => {
     expect(expected.get('c3')).to.equal('p1');
     expect(expected.get('c1')).to.equal('p1');
     expect(expected.get('a3')).to.equal('p1');
+  });
+});
+
+describe('calculatePlayeremptyAreas() test', () => {
+  it('testing complex grid with dead stones 2', () => {
+    const pieces = new Map<cg.Key, cg.Piece>();
+    const deadStones = new Map<cg.Key, cg.Piece>();
+    const p1Piece = { role: 's-piece', playerIndex: 'p1' } as cg.Piece;
+    const p2Piece = { role: 's-piece', playerIndex: 'p2' } as cg.Piece;
+    pieces.set('a2', p1Piece);
+    pieces.set('b1', p1Piece);
+    pieces.set('a3', p2Piece);
+    pieces.set('b3', p2Piece);
+    pieces.set('c2', p2Piece);
+    deadStones.set('b3', p2Piece);
+    deadStones.set('c2', p2Piece);
+    const bd = { height: 3, width: 3 };
+    const areas = calculatePlayerEmptyAreas(pieces, bd, deadStones);
+    const expected = new Map<cg.Key, cg.PlayerIndex>();
+    expected.set('a1', 'p1');
+    expect(expected.size).to.equal(areas.size);
+    expect(Array.from(expected.keys())[0]).to.equal(Array.from(areas.keys())[0]);
+    expect(expected.get('a1')).to.equal('p1');
   });
 });
