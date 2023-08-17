@@ -28,6 +28,20 @@ export function key2pos(k: cg.Key): cg.Pos {
 
 export const allPos = (bd: cg.BoardDimensions): cg.Pos[] => allKeys(bd).map(key2pos);
 
+export function adjacentKeys(bd: cg.BoardDimensions, key: cg.Key): cg.Key[] {
+  const pos = key2pos(key);
+  const adjacentSquares = [
+    [0, 1],
+    [0, -1],
+    [1, 0],
+    [-1, 0],
+  ];
+  return adjacentSquares
+    .map(offset => [pos[0] + offset[0], pos[1] + offset[1]])
+    .filter(p => p[0] > 0 && p[0] <= bd.width && p[1] > 0 && p[1] <= bd.height)
+    .map(p => pos2key(p as cg.Pos));
+}
+
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
   const ret = (): A => {
@@ -156,6 +170,71 @@ export function computeSquareCenter(
     bounds.left + (bounds.width * (pos[0] - 1 + 0.5)) / bd.width,
     bounds.top + (bounds.height * (bd.height - (pos[1] - 1 + 0.5))) / bd.height,
   ];
+}
+
+export function calculatePlayerEmptyAreas(
+  pieces: cg.Pieces,
+  bd: cg.BoardDimensions,
+  deadStones: cg.Pieces
+): Map<cg.Key, cg.PlayerIndex> {
+  const emptySquares: cg.Key[] = allKeys(bd).filter(key => !pieces.has(key));
+  const piecesToConsider = new Map<cg.Key, cg.Piece>();
+  pieces.forEach((piece: cg.Piece, key: cg.Key) => {
+    piecesToConsider.set(key, piece);
+  });
+  deadStones.forEach((piece: cg.Piece, key: cg.Key) => {
+    const otherPlayerPiece = {
+      role: piece.role,
+      playerIndex: piece.playerIndex === 'p1' ? 'p2' : 'p1',
+      promoted: piece.promoted,
+    } as cg.Piece;
+    piecesToConsider.set(key, otherPlayerPiece);
+  });
+  const areas: cg.Key[][] = calculateAreas(emptySquares, bd);
+
+  const playerAreas = new Map<cg.Key, cg.PlayerIndex>();
+
+  for (const area of areas) {
+    const borderKeys = calculateBorder(area, bd);
+    const surroundingPlayers = new Set(borderKeys.map(k => piecesToConsider.get(k)?.playerIndex));
+    if (surroundingPlayers.size === 1) {
+      for (const k of area) {
+        playerAreas.set(k, surroundingPlayers.has('p1') ? 'p1' : 'p2');
+      }
+    }
+  }
+
+  return playerAreas;
+}
+
+export function calculateBorder(squares: cg.Key[], bd: cg.BoardDimensions): cg.Key[] {
+  return squares.flatMap(k => adjacentKeys(bd, k)).filter(k => !squares.includes(k));
+}
+
+export function calculateAreas(emptySquares: cg.Key[], bd: cg.BoardDimensions): cg.Key[][] {
+  function assignNextWave(squaresToBeAssigned: cg.Key[], emptyAreas: cg.Key[][]): cg.Key[][] {
+    const emptySquaresToAdd = squaresToBeAssigned.filter(stba =>
+      emptyAreas
+        .slice(0, 1)
+        .flat()
+        .flatMap(s => adjacentKeys(bd, s))
+        .includes(stba)
+    );
+    const updatedEmptyAreas =
+      emptySquaresToAdd.length === 0
+        ? [squaresToBeAssigned.slice(0, 1)].concat(emptyAreas)
+        : [emptyAreas.slice(0, 1).flat().concat(emptySquaresToAdd)].concat(emptyAreas.slice(1));
+
+    const updatedSquaresToBeAssigned = squaresToBeAssigned.filter(s => !updatedEmptyAreas.flat().includes(s));
+
+    if (updatedSquaresToBeAssigned.length > 0) {
+      return assignNextWave(updatedSquaresToBeAssigned, updatedEmptyAreas);
+    } else {
+      return updatedEmptyAreas;
+    }
+  }
+
+  return assignNextWave(emptySquares.slice(1), [emptySquares.slice(0, 1)]);
 }
 
 export type Callback = (...args: any[]) => void;
