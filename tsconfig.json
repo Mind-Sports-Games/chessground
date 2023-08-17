@@ -16,7 +16,7 @@
     "strictNullChecks": true,
     "alwaysStrict": true,
     "module": "commonjs",
-    "target": "ES2017",
+    "target": "ES2019",
     "inlineSourceMap": true,
     "inlineSources": true,
     "lib": ["DOM", "ES2017", "ES2019"]
