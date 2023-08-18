@@ -14,10 +14,12 @@ export interface HeadlessState {
   check?: cg.Key; // square currently in check "a2"
   lastMove?: cg.Key[]; // squares part of the last move ["c3"; "c4"]
   selected?: cg.Key; // square currently selected "a1"
+  selectedPieces: cg.Pieces; // selected pieces when using selectOnly mode
   coordinates: boolean; // include coords attributes
   boardScores: boolean; //include board-scores attributes
   autoCastle: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly: boolean; // don't bind events: the user will never be able to move pieces around
+  selectOnly: boolean; // only allow user to select squares/pieces (multiple selection allowed)
   disableContextMenu: boolean; // because who needs a context menu on a chessboard
   resizable: boolean; // listens to chessground.resize on document.body to clear bounds cache
   addPieceZIndex: boolean; // adds z-index values to pieces (for 3D)
@@ -136,7 +138,9 @@ export function defaults(): HeadlessState {
     coordinates: true,
     boardScores: false,
     autoCastle: true,
+    selectedPieces: new Map<cg.Key, cg.Piece>(),
     viewOnly: false,
+    selectOnly: false,
     disableContextMenu: false,
     resizable: true,
     addPieceZIndex: false,

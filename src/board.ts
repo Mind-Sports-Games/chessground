@@ -199,6 +199,19 @@ export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, f
 
 export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean): void {
   callUserFunction(state.events.select, key);
+  if (state.selectOnly) {
+    const piece = state.pieces.get(key);
+    if (piece) {
+      if (state.selectedPieces.has(key)) {
+        state.selectedPieces.delete(key);
+      } else {
+        state.selectedPieces.set(key, piece);
+      }
+    }
+    return;
+  } else {
+    state.selectedPieces.clear();
+  }
   if (state.selected) {
     if (state.selected === key && !state.draggable.enabled) {
       unselect(state);

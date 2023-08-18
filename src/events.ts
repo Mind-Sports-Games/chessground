@@ -74,37 +74,41 @@ function startDragOrDraw(s: State): MouchBind {
     else if (e.shiftKey || isRightButton(e)) {
       if (s.drawable.enabled) draw.start(s, e);
     } else if (!s.viewOnly) {
-      if (s.dropmode.active && undefined === squareOccupied(s, e)) {
-        // this case covers normal drop when it is our turn or pre-drop on empty scare
-        drop(s, e);
-      } else if (
-        s.dropmode.active &&
-        s.movable.playerIndex !== s.turnPlayerIndex /*not our turn*/ &&
-        squareOccupied(s, e)?.playerIndex === s.turnPlayerIndex /*occupied by opp's piece*/ &&
-        !s.onlyDropsVariant /* cant drop on opponents pieces in drop only variants as they cant move */
-      ) {
-        // this case is for predrop on opp's piece
-        drop(s, e);
-      } else {
-        // if it is occupied by our piece - cancel drop mode and start dragging that piece instead.
-        // if it is occupied by opp's piece - just cancel drop mode. drag.start() will do nothing
-        // dont cancel drop mode if only drops variant (e.g. flipello) as that is the only action to take
-        if (!s.onlyDropsVariant) cancelDropMode(s);
-        // If variant supports single move clicks (as only 1 position for pieces to move to) then just do move
-        if (s.singleClickMoveVariant) {
-          const bounds = s.dom.bounds(),
-            position = eventPosition(e)!,
-            orig = getKeyAtDomPos(position, s.orientation, bounds, s.dimensions);
-          if (!orig) return;
-          const piece = s.pieces.get(orig);
-          const dest = s.movable.dests?.get(orig)![0];
-          if (piece && piece.playerIndex === s.turnPlayerIndex && dest) {
-            userMove(s, orig, dest);
-            s.dom.redraw();
-          }
+      if (!s.selectOnly) {
+        if (s.dropmode.active && undefined === squareOccupied(s, e)) {
+          // this case covers normal drop when it is our turn or pre-drop on empty scare
+          drop(s, e);
+        } else if (
+          s.dropmode.active &&
+          s.movable.playerIndex !== s.turnPlayerIndex /*not our turn*/ &&
+          squareOccupied(s, e)?.playerIndex === s.turnPlayerIndex /*occupied by opp's piece*/ &&
+          !s.onlyDropsVariant /* cant drop on opponents pieces in drop only variants as they cant move */
+        ) {
+          // this case is for predrop on opp's piece
+          drop(s, e);
         } else {
-          drag.start(s, e);
+          // if it is occupied by our piece - cancel drop mode and start dragging that piece instead.
+          // if it is occupied by opp's piece - just cancel drop mode. drag.start() will do nothing
+          // dont cancel drop mode if only drops variant (e.g. flipello) as that is the only action to take
+          if (!s.onlyDropsVariant) cancelDropMode(s);
+          // If variant supports single move clicks (as only 1 position for pieces to move to) then just do move
+          if (s.singleClickMoveVariant) {
+            const bounds = s.dom.bounds(),
+              position = eventPosition(e)!,
+              orig = getKeyAtDomPos(position, s.orientation, bounds, s.dimensions);
+            if (!orig) return;
+            const piece = s.pieces.get(orig);
+            const dest = s.movable.dests?.get(orig)![0];
+            if (piece && piece.playerIndex === s.turnPlayerIndex && dest) {
+              userMove(s, orig, dest);
+              s.dom.redraw();
+            }
+          } else {
+            drag.start(s, e);
+          }
         }
+      } else {
+        drag.start(s, e);
       }
     }
   };

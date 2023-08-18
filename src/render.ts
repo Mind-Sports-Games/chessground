@@ -1,5 +1,13 @@
 import { State } from './state';
-import { key2pos, createEl, posToTranslateRel, posToTranslateAbs, translateRel, translateAbs } from './util';
+import {
+  key2pos,
+  createEl,
+  posToTranslateRel,
+  posToTranslateAbs,
+  translateRel,
+  translateAbs,
+  calculatePlayerEmptyAreas,
+} from './util';
 import { p1Pov } from './board';
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim';
 import { DragCurrent } from './drag';
@@ -229,6 +237,18 @@ function computeSquareClasses(s: State): SquareClasses {
     }
   }
   if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
+  if (s.selectOnly) {
+    for (const key of s.selectedPieces.keys()) {
+      addSquare(squares, key, 'selected');
+    }
+    //area highlight for go games
+    if (s.variant && ['go9x9', 'go13x13', 'go19x19'].includes(s.variant)) {
+      const areas = calculatePlayerEmptyAreas(s.pieces, s.dimensions, s.selectedPieces);
+      for (const [s, p] of areas) {
+        addSquare(squares, s, 'area ' + p);
+      }
+    }
+  }
   if (s.selected) {
     addSquare(squares, s.selected, 'selected' + togyzkumalakHightlighClass(s.variant, s.selected));
     if (s.movable.showDests) {

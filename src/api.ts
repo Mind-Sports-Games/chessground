@@ -38,6 +38,9 @@ export interface Api {
   // click a square programmatically
   selectSquare(key: cg.Key | null, force?: boolean): void;
 
+  // unselect any selected pieces (make it empty)
+  resetSelectedPieces(): void;
+
   // put a new piece on the board
   newPiece(piece: cg.Piece, key: cg.Key): void;
 
@@ -121,6 +124,10 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
         board.unselect(state);
         state.dom.redraw();
       }
+    },
+
+    resetSelectedPieces(): void {
+      render(state => (state.selectedPieces = new Map<cg.Key, cg.Piece>()), state);
     },
 
     move(orig, dest): void {

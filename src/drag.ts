@@ -50,14 +50,14 @@ export function start(s: State, e: cg.MouchEvent): void {
   const hadPremove = !!s.premovable.current;
   const hadPredrop = !!s.predroppable.current;
   s.stats.ctrlKey = e.ctrlKey;
-  if (s.selected && board.canMove(s, s.selected, orig)) {
+  if (s.selected && board.canMove(s, s.selected, orig) && !s.selectOnly) {
     anim(state => board.selectSquare(state, orig), s);
   } else {
     board.selectSquare(s, orig);
   }
   const stillSelected = s.selected === orig;
   const element = pieceElementByKey(s, orig);
-  if (piece && element && stillSelected && board.isDraggable(s, orig)) {
+  if (piece && element && stillSelected && board.isDraggable(s, orig) && !s.selectOnly) {
     const squareBounds = computeSquareBounds(orig, bounds, s.dimensions, s.orientation);
     s.draggable.current = {
       orig,
