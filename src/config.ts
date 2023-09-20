@@ -1,5 +1,5 @@
 import { HeadlessState } from './state';
-import { setSelected } from './board';
+import { setSelected, setGoScore } from './board';
 import { read as fenRead } from './fen';
 import { DrawShape, DrawBrush } from './draw';
 import * as cg from './types';
@@ -144,6 +144,9 @@ export function configure(state: HeadlessState, config: Config): void {
 
   // fix move/premove dests
   if (state.selected) setSelected(state, state.selected);
+
+  //fix go scores
+  setGoScore(state);
 
   // no need for such short animations
   if (!state.animation.duration || state.animation.duration < 100) state.animation.enabled = false;

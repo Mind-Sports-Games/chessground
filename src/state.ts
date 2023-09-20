@@ -15,6 +15,7 @@ export interface HeadlessState {
   lastMove?: cg.Key[]; // squares part of the last move ["c3"; "c4"]
   selected?: cg.Key; // square currently selected "a1"
   selectedPieces: cg.Pieces; // selected pieces when using selectOnly mode
+  simpleGoScores?: cg.SimpleGoScores; // score for each player in go game (area + pieces)
   coordinates: boolean; // include coords attributes
   boardScores: boolean; //include board-scores attributes
   autoCastle: boolean; // immediately complete the castle by moving the rook after king move

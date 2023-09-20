@@ -6,6 +6,7 @@ import {
   calculateAreas,
   calculatePlayerEmptyAreas,
   calculatePieceGroup,
+  calculateGoScores,
 } from '../src/util';
 import { expect } from 'chai';
 
@@ -323,5 +324,81 @@ describe('calculatePieceGroup() test', () => {
     expect(Array.from(pieceGroup)[1]).to.equal(Array.from(expected)[1]);
     expect(Array.from(pieceGroup)[2]).to.equal(Array.from(expected)[2]);
     expect(Array.from(pieceGroup)[3]).to.equal(Array.from(expected)[3]);
+  });
+});
+
+describe('calculateGoScores() test', () => {
+  it('testing go score from simple game with dead stones', () => {
+    const pieces = new Map<cg.Key, cg.Piece>();
+    const deadStones = new Map<cg.Key, cg.Piece>();
+    const p1Piece = { role: 's-piece', playerIndex: 'p1' } as cg.Piece;
+    const p2Piece = { role: 's-piece', playerIndex: 'p2' } as cg.Piece;
+    pieces.set('a2', p1Piece);
+    pieces.set('b1', p1Piece);
+    pieces.set('a3', p2Piece);
+    pieces.set('b3', p2Piece);
+    pieces.set('c2', p2Piece);
+    deadStones.set('b3', p2Piece);
+    deadStones.set('c2', p2Piece);
+    deadStones.set('a3', p2Piece);
+    const bd = { height: 3, width: 3 };
+    const goScores = calculateGoScores(deadStones, pieces, bd);
+    const expected = { p1: 9, p2: 0 };
+
+    expect(expected.p1).to.equal(goScores.p1);
+    expect(expected.p2).to.equal(goScores.p2);
+  });
+});
+
+describe('calculateGoScores() test', () => {
+  it('testing go score from simple game with dead stones', () => {
+    const pieces = new Map<cg.Key, cg.Piece>();
+    const deadStones = new Map<cg.Key, cg.Piece>();
+    const p1Piece = { role: 's-piece', playerIndex: 'p1' } as cg.Piece;
+    const p2Piece = { role: 's-piece', playerIndex: 'p2' } as cg.Piece;
+    pieces.set('a2', p1Piece);
+    pieces.set('b1', p1Piece);
+    pieces.set('a3', p2Piece);
+    pieces.set('b3', p2Piece);
+    pieces.set('c2', p2Piece);
+    deadStones.set('b3', p2Piece);
+    deadStones.set('c2', p2Piece);
+
+    const bd = { height: 3, width: 3 };
+    const goScores = calculateGoScores(deadStones, pieces, bd);
+    const expected = { p1: 3, p2: 1 };
+
+    expect(expected.p1).to.equal(goScores.p1);
+    expect(expected.p2).to.equal(goScores.p2);
+  });
+});
+
+describe('calculateGoScores() test', () => {
+  it('testing go score from simple game with dead stones', () => {
+    const pieces = new Map<cg.Key, cg.Piece>();
+    const deadStones = new Map<cg.Key, cg.Piece>();
+    const p1Piece = { role: 's-piece', playerIndex: 'p1' } as cg.Piece;
+    const p2Piece = { role: 's-piece', playerIndex: 'p2' } as cg.Piece;
+    pieces.set('a2', p1Piece);
+    pieces.set('b1', p1Piece);
+    pieces.set('c3', p1Piece);
+    pieces.set('d4', p1Piece);
+    pieces.set('a3', p2Piece);
+    pieces.set('b3', p2Piece);
+    pieces.set('b4', p2Piece);
+    pieces.set('c1', p2Piece);
+    pieces.set('c2', p2Piece);
+    pieces.set('c4', p2Piece);
+    pieces.set('d2', p2Piece);
+    deadStones.set('c3', p2Piece);
+    deadStones.set('d4', p2Piece);
+    deadStones.set('c4', p1Piece);
+
+    const bd = { height: 4, width: 4 };
+    const goScores = calculateGoScores(deadStones, pieces, bd);
+    const expected = { p1: 3, p2: 12 };
+
+    expect(expected.p1).to.equal(goScores.p1);
+    expect(expected.p2).to.equal(goScores.p2);
   });
 });
