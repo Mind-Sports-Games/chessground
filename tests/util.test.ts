@@ -1,5 +1,12 @@
 import * as cg from '../src/types';
-import { computeSquareCenter, key2pos, adjacentKeys, calculateAreas, calculatePlayerEmptyAreas } from '../src/util';
+import {
+  computeSquareCenter,
+  key2pos,
+  adjacentKeys,
+  calculateAreas,
+  calculatePlayerEmptyAreas,
+  calculatePieceGroup,
+} from '../src/util';
 import { expect } from 'chai';
 
 describe('computeSquareCenter() test', () => {
@@ -268,5 +275,53 @@ describe('calculatePlayeremptyAreas() test', () => {
     expect(expected.size).to.equal(areas.size);
     expect(Array.from(expected.keys())[0]).to.equal(Array.from(areas.keys())[0]);
     expect(expected.get('a1')).to.equal('p1');
+  });
+});
+
+describe('calculatePieceGroup() test', () => {
+  it('testing piecegroups for go position', () => {
+    const pieces = new Map<cg.Key, cg.Piece>();
+    const p1Piece = { role: 's-piece', playerIndex: 'p1' } as cg.Piece;
+    const p2Piece = { role: 's-piece', playerIndex: 'p2' } as cg.Piece;
+    pieces.set('a2', p1Piece);
+    pieces.set('b1', p1Piece);
+    pieces.set('a3', p2Piece);
+    pieces.set('b3', p2Piece);
+    pieces.set('c2', p2Piece);
+    const bd = { height: 3, width: 3 };
+    const pieceGroup = calculatePieceGroup('a3', pieces, bd);
+    const expected: cg.Key[] = ['a3', 'b3'];
+
+    expect(expected.length).to.equal(pieceGroup.length);
+    expect(Array.from(pieceGroup)[0]).to.equal(Array.from(expected)[0]);
+    expect(Array.from(pieceGroup)[1]).to.equal(Array.from(expected)[1]);
+  });
+});
+
+describe('calculatePieceGroup() test', () => {
+  it('testing piecegroups for go position', () => {
+    const pieces = new Map<cg.Key, cg.Piece>();
+    const p1Piece = { role: 's-piece', playerIndex: 'p1' } as cg.Piece;
+    const p2Piece = { role: 's-piece', playerIndex: 'p2' } as cg.Piece;
+    pieces.set('a2', p1Piece);
+    pieces.set('b1', p1Piece);
+    pieces.set('c3', p1Piece);
+    pieces.set('d4', p1Piece);
+    pieces.set('a3', p2Piece);
+    pieces.set('b3', p2Piece);
+    pieces.set('b4', p2Piece);
+    pieces.set('c1', p2Piece);
+    pieces.set('c2', p2Piece);
+    pieces.set('c4', p2Piece);
+    pieces.set('d2', p2Piece);
+    const bd = { height: 4, width: 4 };
+    const pieceGroup = calculatePieceGroup('b3', pieces, bd);
+    const expected: cg.Key[] = ['b3', 'b4', 'a3', 'c4'];
+
+    expect(expected.length).to.equal(pieceGroup.length);
+    expect(Array.from(pieceGroup)[0]).to.equal(Array.from(expected)[0]);
+    expect(Array.from(pieceGroup)[1]).to.equal(Array.from(expected)[1]);
+    expect(Array.from(pieceGroup)[2]).to.equal(Array.from(expected)[2]);
+    expect(Array.from(pieceGroup)[3]).to.equal(Array.from(expected)[3]);
   });
 });
