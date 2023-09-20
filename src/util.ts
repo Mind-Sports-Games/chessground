@@ -234,6 +234,22 @@ export function calculateAreas(emptySquares: cg.Key[], bd: cg.BoardDimensions): 
   return assignNextWave(emptySquares.slice(1), [emptySquares.slice(0, 1)]);
 }
 
+export function calculatePieceGroup(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
+  function assignNextWave(pieceGroup: cg.Key[]): cg.Key[] {
+    const borderKeys = calculateBorder(pieceGroup, bd);
+    const newKeys = borderKeys.filter(
+      k => pieces.get(k) && pieces.get(k)?.playerIndex === pieces.get(pieceKey)?.playerIndex
+    );
+    if (newKeys.length > 0) {
+      return assignNextWave(pieceGroup.concat(newKeys));
+    } else {
+      return pieceGroup;
+    }
+  }
+
+  return assignNextWave([pieceKey]);
+}
+
 export type Callback = (...args: any[]) => void;
 
 export function callUserFunction(f: Callback | undefined, ...args: any[]): void {

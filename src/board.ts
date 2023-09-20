@@ -9,6 +9,7 @@ import {
   computeSquareCenter,
   containsX,
   callUserFunction,
+  calculatePieceGroup,
 } from './util';
 import { premove, queen, knight } from './premove';
 import predrop from './predrop';
@@ -202,10 +203,15 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
   if (state.selectOnly) {
     const piece = state.pieces.get(key);
     if (piece) {
+      const pieceGroup = calculatePieceGroup(key, state.pieces, state.dimensions);
       if (state.selectedPieces.has(key)) {
-        state.selectedPieces.delete(key);
+        for (const k of pieceGroup) {
+          state.selectedPieces.delete(k);
+        }
       } else {
-        state.selectedPieces.set(key, piece);
+        for (const k of pieceGroup) {
+          state.selectedPieces.set(k, piece);
+        }
       }
     }
     return;
