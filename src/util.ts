@@ -250,6 +250,30 @@ export function calculatePieceGroup(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.
   return assignNextWave([pieceKey]);
 }
 
+export function calculateGoScores(deadStones: cg.Pieces, pieces: cg.Pieces, bd: cg.BoardDimensions): cg.SimpleGoScores {
+  let p1Score = 0;
+  let p2Score = 0;
+
+  const remainingPieces = new Map<cg.Key, cg.Piece>([...Array.from(pieces.entries())]);
+  for (const [k, _] of deadStones) {
+    remainingPieces.delete(k);
+  }
+  const areas = calculatePlayerEmptyAreas(remainingPieces, bd, new Map<cg.Key, cg.Piece>());
+  for (const [_, p] of areas) {
+    if (p === 'p1') p1Score++;
+    else p2Score++;
+  }
+
+  const remainingPieceKeys: cg.Key[] = allKeys(bd).filter(key => pieces.has(key) && !deadStones.has(key));
+  p1Score = p1Score + remainingPieceKeys.filter(k => pieces.get(k)?.playerIndex === 'p1').length;
+  p2Score = p2Score + remainingPieceKeys.filter(k => pieces.get(k)?.playerIndex === 'p2').length;
+
+  return {
+    p1: p1Score,
+    p2: p2Score,
+  };
+}
+
 export type Callback = (...args: any[]) => void;
 
 export function callUserFunction(f: Callback | undefined, ...args: any[]): void {

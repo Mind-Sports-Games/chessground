@@ -10,6 +10,7 @@ import {
   containsX,
   callUserFunction,
   calculatePieceGroup,
+  calculateGoScores,
 } from './util';
 import { premove, queen, knight } from './premove';
 import predrop from './predrop';
@@ -198,6 +199,14 @@ export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, f
   unselect(state);
 }
 
+export function setGoScore(state: HeadlessState): void {
+  if (state.selectOnly) {
+    state.simpleGoScores = calculateGoScores(state.selectedPieces, state.pieces, state.dimensions);
+  } else {
+    state.simpleGoScores = undefined;
+  }
+}
+
 export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean): void {
   callUserFunction(state.events.select, key);
   if (state.selectOnly) {
@@ -213,10 +222,12 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
           state.selectedPieces.set(k, piece);
         }
       }
+      state.simpleGoScores = calculateGoScores(state.selectedPieces, state.pieces, state.dimensions);
     }
     return;
   } else {
     state.selectedPieces.clear();
+    state.simpleGoScores = undefined;
   }
   if (state.selected) {
     if (state.selected === key && !state.draggable.enabled) {

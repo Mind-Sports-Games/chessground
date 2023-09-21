@@ -299,6 +299,11 @@ export const enum Notation {
   XIANGQI_WXF,
 }
 
+export interface SimpleGoScores {
+  p1: number;
+  p2: number;
+}
+
 export const shogiVariants: Variant[] = ['shogi', 'minishogi', 'kyotoshogi', 'dobutsu', 'gorogoro', 'torishogi'];
 export const xiangqiVariants: Variant[] = ['xiangqi', 'minixiangqi', 'manchu', 'janggi'];
 export const goVariants: Variant[] = ['go9x9', 'go13x13', 'go19x19'];
