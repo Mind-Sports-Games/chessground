@@ -71,7 +71,7 @@ export function render(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex)) {
+        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation)) {
           const pos = key2pos(k);
           pos[0] += anim[2];
           pos[1] += anim[3];
@@ -84,12 +84,12 @@ export function render(s: State): void {
           if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asP1, s.dimensions);
         }
         // same piece: flag as same
-        if (elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex) && (!fading || !el.cgFading)) {
+        if (elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation) && (!fading || !el.cgFading)) {
           samePieces.add(k);
         }
         // different piece: flag as moved unless it is a fading piece
         else {
-          if (fading && elPieceName === pieceNameOf(fading, s.myPlayerIndex)) {
+          if (fading && elPieceName === pieceNameOf(fading, s.myPlayerIndex, s.orientation)) {
             el.classList.add('fading');
             el.cgFading = true;
           } else {
@@ -134,7 +134,7 @@ export function render(s: State): void {
   for (const [k, p] of pieces) {
     anim = anims.get(k);
     if (!samePieces.has(k)) {
-      pMvdset = movedPieces.get(pieceNameOf(p, s.myPlayerIndex));
+      pMvdset = movedPieces.get(pieceNameOf(p, s.myPlayerIndex, s.orientation));
       pMvd = pMvdset && pMvdset.pop();
       // a same piece was moved
       if (pMvd) {
@@ -157,7 +157,7 @@ export function render(s: State): void {
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
       else {
-        const pieceName = pieceNameOf(p, s.myPlayerIndex),
+        const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation),
           pieceNode = createEl('piece', pieceName) as cg.PieceNode,
           pos = key2pos(k);
 
@@ -213,9 +213,14 @@ function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asP1: boolean, bd: 
   return z + '';
 }
 
-function pieceNameOf(piece: cg.Piece, myPlayerIndex: cg.PlayerIndex): string {
+function pieceNameOf(piece: cg.Piece, myPlayerIndex: cg.PlayerIndex, orientation: cg.Orientation): string {
   const promoted = piece.promoted ? 'promoted ' : '';
-  const side = piece.playerIndex === myPlayerIndex ? 'ally' : 'enemy';
+  const side =
+    (piece.playerIndex === myPlayerIndex && orientation === myPlayerIndex) ||
+    (piece.playerIndex !== myPlayerIndex && orientation !== myPlayerIndex)
+      ? 'ally'
+      : 'enemy';
+
   return `${piece.playerIndex} ${promoted}${piece.role} ${side}`;
 }
 
