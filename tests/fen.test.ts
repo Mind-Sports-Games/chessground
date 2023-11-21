@@ -239,3 +239,26 @@ describe('fen.write() test', () => {
     expect(expected).to.equal(writtenFen);
   });
 });
+//todo Confirm structure of Backgammon fen...
+describe('fen.read() test', () => {
+  it('testing backgammon fen has 8 pieces', () => {
+    const fenString = '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[] w - - 1';
+    const bd: BoardDimensions = { width: 12, height: 2 };
+
+    const expected = 8;
+    const pieces = read(fenString, bd, 'backgammon');
+    expect(expected).to.equal(pieces.size);
+  });
+});
+describe('fen.write() test', () => {
+  it('testing backgammon read initial fen and then write match', () => {
+    const fenString = '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[] w - - 1';
+    const bd: BoardDimensions = { width: 12, height: 2 };
+
+    let expected = fenString.split(' ')[0];
+    if (expected.indexOf('[') !== -1) expected = expected.slice(0, expected.indexOf('['));
+    const pieces = read(fenString, bd, 'backgammon');
+    const writtenFen = write(pieces, bd, 'backgammon');
+    expect(expected).to.equal(writtenFen);
+  });
+});
