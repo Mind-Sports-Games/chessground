@@ -102,15 +102,22 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       }
     } else if (s.variant === 'backgammon') {
       if (s.orientation === 'p1') {
-        container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
-        container.appendChild(
-          renderCoords(['13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'], 'files' + ' p1')
-        );
-      } else {
-        container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width), 'files' + ' p1'));
         container.appendChild(
           renderCoords(
-            ['13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'].reverse(),
+            [' 1', ' 2', ' 3', ' 4', ' 5', ' 6', '  ', ' 7', ' 8', ' 9', '10', '11', '12'].reverse(),
+            'files' + ' p2'
+          )
+        );
+        container.appendChild(
+          renderCoords(['13', '14', '15', '16', '17', '18', '  ', '19', '20', '21', '22', '23', '24'], 'files' + ' p1')
+        );
+      } else {
+        container.appendChild(
+          renderCoords([' 1', ' 2', ' 3', ' 4', ' 5', ' 6', '  ', ' 7', ' 8', ' 9', '10', '11', '12'], 'files' + ' p1')
+        );
+        container.appendChild(
+          renderCoords(
+            ['13', '14', '15', '16', '17', '18', '  ', '19', '20', '21', '22', '23', '24'].reverse(),
             'files' + ' p2'
           )
         );
