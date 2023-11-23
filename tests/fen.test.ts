@@ -248,6 +248,10 @@ describe('fen.read() test', () => {
     const expected = 8;
     const pieces = read(fenString, bd, 'backgammon');
     expect(expected).to.equal(pieces.size);
+    const p1Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p1');
+    const p2Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p2');
+    expect(4).to.equal(p1Pieces.length);
+    expect(4).to.equal(p2Pieces.length);
   });
 });
 describe('fen.write() test', () => {
