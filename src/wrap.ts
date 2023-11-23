@@ -100,6 +100,21 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p1'));
         container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
       }
+    } else if (s.variant === 'backgammon') {
+      if (s.orientation === 'p1') {
+        container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
+        container.appendChild(
+          renderCoords(['13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'], 'files' + ' p1')
+        );
+      } else {
+        container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width), 'files' + ' p1'));
+        container.appendChild(
+          renderCoords(
+            ['13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24'].reverse(),
+            'files' + ' p2'
+          )
+        );
+      }
     } else {
       container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
       container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
