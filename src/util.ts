@@ -119,9 +119,10 @@ const posToTranslateBase = (
 
 export const posToTranslateAbs = (
   bounds: ClientRect,
-  bt: cg.BoardDimensions
+  bt: cg.BoardDimensions,
+  variant: cg.Variant
 ): ((pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair) => {
-  const xFactor = bounds.width / bt.width,
+  const xFactor = (bounds.width / bt.width) * (variant === 'backgammon' ? 0.8 : 1),
     yFactor = bounds.height / bt.height;
   return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor, bt);
 };

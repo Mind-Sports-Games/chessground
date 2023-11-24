@@ -22,7 +22,7 @@ type SquareClasses = Map<cg.Key, string>;
 export function render(s: State): void {
   const orientation = s.orientation,
     asP1: boolean = p1Pov(s),
-    posToTranslate = s.dom.relative ? posToTranslateRel : posToTranslateAbs(s.dom.bounds(), s.dimensions),
+    posToTranslate = s.dom.relative ? posToTranslateRel : posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant),
     translate = s.dom.relative ? translateRel : translateAbs,
     boardEl: HTMLElement = s.dom.elements.board,
     pieces: cg.Pieces = s.pieces,
@@ -192,7 +192,7 @@ export function render(s: State): void {
 export function updateBounds(s: State): void {
   if (s.dom.relative) return;
   const orientation = s.orientation,
-    posToTranslate = posToTranslateAbs(s.dom.bounds(), s.dimensions);
+    posToTranslate = posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant);
   let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;
   while (el) {
     if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el)) {
