@@ -131,7 +131,8 @@ export const posToTranslateRel = (
   orientation: cg.Orientation,
   bt: cg.BoardDimensions,
   v: cg.Variant
-): cg.NumberPair => posToTranslateBase(pos, orientation, 100, v === 'togyzkumalak' ? 150 : 100, bt);
+): cg.NumberPair =>
+  posToTranslateBase(pos, orientation, v === 'backgammon' ? 80 : 100, v === 'togyzkumalak' ? 150 : 100, bt);
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
