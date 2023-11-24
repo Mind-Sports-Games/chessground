@@ -416,10 +416,27 @@ export function getKeyAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
   bounds: ClientRect,
-  bd: cg.BoardDimensions
+  bd: cg.BoardDimensions,
+  variant: cg.Variant = 'chess'
 ): cg.Key | undefined {
-  const file = Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
-  const rank = Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height));
+  const bgBorder = 1 / 15;
+  const file =
+    variant === 'backgammon'
+      ? (pos[0] - bounds.left) / bounds.width < 1 / 15 ||
+        (pos[0] - bounds.left) / bounds.width >= 14 / 15 ||
+        ((pos[0] - bounds.left) / bounds.width >= 7 / 15 && (pos[0] - bounds.left) / bounds.width <= 8 / 15)
+        ? undefined
+        : (pos[0] - bounds.left) / bounds.width <= 7 / 15
+        ? Math.ceil(bd.width * ((pos[0] - bounds.left - bounds.width * bgBorder) / (bounds.width * 12 * bgBorder)))
+        : Math.ceil(bd.width * ((pos[0] - bounds.left - bounds.width * 2 * bgBorder) / (bounds.width * 12 * bgBorder)))
+      : Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
+  const rank =
+    variant === 'backgammon'
+      ? (pos[1] - bounds.top) / bounds.height <= 1 / 15 || (pos[1] - bounds.top) / bounds.height >= 14 / 15
+        ? undefined
+        : Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height))
+      : Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height));
+  if (rank === undefined || file === undefined) return undefined;
   pos = [file, rank];
   pos = T.mapToP1[orientation](pos, bd);
   return pos[0] > 0 && pos[0] < bd.width + 1 && pos[1] > 0 && pos[1] < bd.height + 1 ? pos2key(pos) : undefined;

@@ -95,7 +95,7 @@ function startDragOrDraw(s: State): MouchBind {
           if (s.singleClickMoveVariant) {
             const bounds = s.dom.bounds(),
               position = eventPosition(e)!,
-              orig = getKeyAtDomPos(position, s.orientation, bounds, s.dimensions);
+              orig = getKeyAtDomPos(position, s.orientation, bounds, s.dimensions, s.variant);
             if (!orig) return;
             const piece = s.pieces.get(orig);
             const dest = s.movable.dests?.get(orig)![0];
@@ -124,7 +124,7 @@ function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind
 
 function squareOccupied(s: State, e: cg.MouchEvent): Piece | undefined {
   const position = eventPosition(e);
-  const dest = position && getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions);
+  const dest = position && getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
   if (dest && s.pieces.get(dest)) return s.pieces.get(dest);
   return undefined;
 }
