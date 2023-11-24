@@ -240,7 +240,7 @@ function pieceNameOf(
 function backgammonPieceClass(k: cg.Key, orientation: cg.Orientation): string {
   const pos = key2pos(k);
   const leftOrRight = orientation === 'p1' ? (pos[0] <= 6 ? 'left' : 'right') : pos[0] <= 6 ? 'right' : 'left';
-  const topOrBottom = orientation === 'p1' ? (pos[1] <= 1 ? 'top' : 'bottom') : pos[1] <= 1 ? 'botttom' : 'top';
+  const topOrBottom = orientation === 'p1' ? (pos[1] <= 1 ? 'bottom' : 'top') : pos[1] <= 1 ? 'top' : 'bottom';
   return `${topOrBottom}-${leftOrRight}`;
 }
 
