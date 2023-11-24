@@ -71,7 +71,11 @@ export function render(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation)) {
+        if (
+          anim &&
+          el.cgAnimating &&
+          elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation, s.variant, k)
+        ) {
           const pos = key2pos(k);
           pos[0] += anim[2];
           pos[1] += anim[3];
@@ -84,12 +88,15 @@ export function render(s: State): void {
           if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asP1, s.dimensions);
         }
         // same piece: flag as same
-        if (elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation) && (!fading || !el.cgFading)) {
+        if (
+          elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation, s.variant, k) &&
+          (!fading || !el.cgFading)
+        ) {
           samePieces.add(k);
         }
         // different piece: flag as moved unless it is a fading piece
         else {
-          if (fading && elPieceName === pieceNameOf(fading, s.myPlayerIndex, s.orientation)) {
+          if (fading && elPieceName === pieceNameOf(fading, s.myPlayerIndex, s.orientation, s.variant, k)) {
             el.classList.add('fading');
             el.cgFading = true;
           } else {
@@ -134,7 +141,7 @@ export function render(s: State): void {
   for (const [k, p] of pieces) {
     anim = anims.get(k);
     if (!samePieces.has(k)) {
-      pMvdset = movedPieces.get(pieceNameOf(p, s.myPlayerIndex, s.orientation));
+      pMvdset = movedPieces.get(pieceNameOf(p, s.myPlayerIndex, s.orientation, s.variant, k));
       pMvd = pMvdset && pMvdset.pop();
       // a same piece was moved
       if (pMvd) {
@@ -157,7 +164,7 @@ export function render(s: State): void {
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
       else {
-        const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation),
+        const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation, s.variant, k),
           pieceNode = createEl('piece', pieceName) as cg.PieceNode,
           pos = key2pos(k);
 
@@ -213,15 +220,28 @@ function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asP1: boolean, bd: 
   return z + '';
 }
 
-function pieceNameOf(piece: cg.Piece, myPlayerIndex: cg.PlayerIndex, orientation: cg.Orientation): string {
+function pieceNameOf(
+  piece: cg.Piece,
+  myPlayerIndex: cg.PlayerIndex,
+  orientation: cg.Orientation,
+  variant: cg.Variant,
+  k: cg.Key
+): string {
   const promoted = piece.promoted ? 'promoted ' : '';
   const side =
     (piece.playerIndex === myPlayerIndex && orientation === myPlayerIndex) ||
     (piece.playerIndex !== myPlayerIndex && orientation !== myPlayerIndex)
       ? 'ally'
       : 'enemy';
+  const posClass = variant === 'backgammon' ? backgammonPieceClass(k, orientation) : '';
+  return `${piece.playerIndex} ${promoted}${piece.role} ${side} ${posClass}`;
+}
 
-  return `${piece.playerIndex} ${promoted}${piece.role} ${side}`;
+function backgammonPieceClass(k: cg.Key, orientation: cg.Orientation): string {
+  const pos = key2pos(k);
+  const leftOrRight = orientation === 'p1' ? (pos[0] <= 6 ? 'left' : 'right') : pos[0] <= 6 ? 'right' : 'left';
+  const topOrBottom = orientation === 'p1' ? (pos[1] <= 1 ? 'top' : 'bottom') : pos[1] <= 1 ? 'botttom' : 'top';
+  return `${topOrBottom}-${leftOrRight}`;
 }
 
 function computeSquareClasses(s: State): SquareClasses {
