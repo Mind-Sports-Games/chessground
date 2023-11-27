@@ -233,15 +233,15 @@ function pieceNameOf(
     (piece.playerIndex !== myPlayerIndex && orientation !== myPlayerIndex)
       ? 'ally'
       : 'enemy';
-  const posClass = variant === 'backgammon' ? backgammonPieceClass(k, orientation) : '';
-  return `${piece.playerIndex} ${promoted}${piece.role} ${side} ${posClass}`;
+  const posClass = variant === 'backgammon' ? backgammonPosClass(k, orientation) : '';
+  return `${piece.playerIndex} ${promoted}${piece.role} ${side}${posClass}`;
 }
 
-function backgammonPieceClass(k: cg.Key, orientation: cg.Orientation): string {
+function backgammonPosClass(k: cg.Key, orientation: cg.Orientation): string {
   const pos = key2pos(k);
   const leftOrRight = orientation === 'p1' ? (pos[0] <= 6 ? 'left' : 'right') : pos[0] <= 6 ? 'right' : 'left';
   const topOrBottom = orientation === 'p1' ? (pos[1] <= 1 ? 'bottom' : 'top') : pos[1] <= 1 ? 'top' : 'bottom';
-  return `${topOrBottom}-${leftOrRight}`;
+  return ` ${topOrBottom}-${leftOrRight}`;
 }
 
 function computeSquareClasses(s: State): SquareClasses {
@@ -251,10 +251,10 @@ function computeSquareClasses(s: State): SquareClasses {
     for (const k of s.lastMove) {
       if (k !== 'a0') {
         if (first) {
-          addSquare(squares, k, 'last-move from' + togyzkumalakHightlighClass(s.variant, k));
+          addSquare(squares, k, 'last-move from' + variantSpecificHighlightClass(s.variant, k, s.orientation));
           first = false;
         } else {
-          addSquare(squares, k, 'last-move to' + togyzkumalakHightlighClass(s.variant, k));
+          addSquare(squares, k, 'last-move to' + variantSpecificHighlightClass(s.variant, k, s.orientation));
         }
       } else {
         first = false;
@@ -275,7 +275,7 @@ function computeSquareClasses(s: State): SquareClasses {
     }
   }
   if (s.selected) {
-    addSquare(squares, s.selected, 'selected' + togyzkumalakHightlighClass(s.variant, s.selected));
+    addSquare(squares, s.selected, 'selected' + variantSpecificHighlightClass(s.variant, s.selected, s.orientation));
     if (s.movable.showDests) {
       const dests = s.movable.dests?.get(s.selected);
       if (dests)
@@ -283,7 +283,7 @@ function computeSquareClasses(s: State): SquareClasses {
           addSquare(
             squares,
             k,
-            'move-dest' + (s.pieces.has(k) ? ' oc' : '') + togyzkumalakHightlighClass(s.variant, k)
+            'move-dest' + (s.pieces.has(k) ? ' oc' : '') + variantSpecificHighlightClass(s.variant, k, s.orientation)
           );
         }
       const pDests = s.premovable.dests;
@@ -292,7 +292,7 @@ function computeSquareClasses(s: State): SquareClasses {
           addSquare(
             squares,
             k,
-            'premove-dest' + (s.pieces.has(k) ? ' oc' : '') + togyzkumalakHightlighClass(s.variant, k)
+            'premove-dest' + (s.pieces.has(k) ? ' oc' : '') + variantSpecificHighlightClass(s.variant, k, s.orientation)
           );
         }
     }
@@ -342,6 +342,13 @@ function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {
   else map.set(key, [value]);
 }
 
-function togyzkumalakHightlighClass(variant: cg.Variant, k: cg.Key): string {
-  return variant === 'togyzkumalak' ? (k[1] === '1' ? ' p1' : ' p2') : '';
+function variantSpecificHighlightClass(variant: cg.Variant, k: cg.Key, orientation: cg.Orientation): string {
+  switch (variant) {
+    case 'togyzkumalak':
+      return k[1] === '1' ? ' p1' : ' p2';
+    case 'backgammon':
+      return backgammonPosClass(k, orientation);
+    default:
+      return '';
+  }
 }
