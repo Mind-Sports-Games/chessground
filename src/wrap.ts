@@ -200,9 +200,10 @@ function renderBoardScores(elems: readonly string[], className: string): HTMLEle
 
 function renderDice(elems: readonly number[], className: string): HTMLElement {
   const el = createEl('cg-dice', className);
+  const diceClass = ['one', 'two', 'three', 'four', 'five', 'six'];
   let d: HTMLElement;
   for (const elem of elems) {
-    d = createEl('dice', elem.toString());
+    d = createEl('dice', diceClass[elem - 1]);
     el.appendChild(d);
   }
   return el;
