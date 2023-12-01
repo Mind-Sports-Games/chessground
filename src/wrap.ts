@@ -151,6 +151,8 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     }
   }
 
+  if (s.dice.length > 0) renderDice(s.dice, s.turnPlayerIndex);
+
   let ghost: HTMLElement | undefined;
   if (s.draggable.showGhost && !relative) {
     ghost = createEl('piece', 'ghost');
@@ -192,6 +194,16 @@ function renderBoardScores(elems: readonly string[], className: string): HTMLEle
       }
     }
     el.appendChild(f);
+  }
+  return el;
+}
+
+function renderDice(elems: readonly number[], className: string): HTMLElement {
+  const el = createEl('cg-dice', className);
+  let d: HTMLElement;
+  for (const elem of elems) {
+    d = createEl('dice', elem.toString());
+    el.appendChild(d);
   }
   return el;
 }

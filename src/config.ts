@@ -14,6 +14,7 @@ export interface Config {
   selected?: cg.Key; // square currently selected "a1"
   coordinates?: boolean; // include coords attributes
   boardScores?: boolean; //include board-scores attributes
+  dice?: []; // dice to display on the board
   autoCastle?: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly?: boolean; // don't bind events: the user will never be able to move pieces around
   selectOnly?: boolean; // only allow user to select squares/pieces (multiple selection allowed)
