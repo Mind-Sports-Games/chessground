@@ -151,7 +151,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     }
   }
 
-  if (s.dice.length > 0) renderDice(s.dice, s.turnPlayerIndex);
+  if (s.dice.length > 0) container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
 
   let ghost: HTMLElement | undefined;
   if (s.draggable.showGhost && !relative) {
