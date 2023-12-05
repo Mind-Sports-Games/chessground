@@ -274,5 +274,9 @@ describe('fen.readPocket() test', () => {
     const pocketPieces = readPocket(fenString, 'backgammon');
 
     expect(expected).to.equal(pocketPieces.length);
+    expect('s2-piece').to.equal(pocketPieces[0].role);
+    expect('p2').to.equal(pocketPieces[0].playerIndex);
+    expect('s3-piece').to.equal(pocketPieces[1].role);
+    expect('p1').to.equal(pocketPieces[1].playerIndex);
   });
 });

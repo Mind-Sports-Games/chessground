@@ -122,7 +122,7 @@ export function readPocket(fen: cg.FEN, variant: cg.Variant): cg.Piece[] {
   if (variant === 'backgammon' && fen.indexOf('[') !== -1 && fen.indexOf(']') !== -1) {
     const start = fen.indexOf('[', 0);
     const end = fen.indexOf(']', start);
-    const pocket = fen.substring(start, end);
+    const pocket = fen.substring(start + 1, end);
     if (pocket === '') return [];
     const pocketPieces: cg.Piece[] = [];
     for (const p of pocket.split(',')) {
