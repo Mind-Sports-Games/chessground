@@ -1,6 +1,6 @@
 import { HeadlessState } from './state';
 import { setSelected, setGoScore } from './board';
-import { read as fenRead } from './fen';
+import { read as fenRead, readPocket as fenReadPocket } from './fen';
 import { DrawShape, DrawBrush } from './draw';
 import * as cg from './types';
 
@@ -129,9 +129,11 @@ export function configure(state: HeadlessState, config: Config): void {
   // if a fen was provided, replace the pieces
   if (config.fen) {
     const pieces = fenRead(config.fen, state.dimensions, state.variant);
+    const pocketPieces = fenReadPocket(config.fen, state.variant);
     // prevent to cancel() already started piece drag from pocket!
     if (state.pieces.get('a0') !== undefined) pieces.set('a0', state.pieces.get('a0')!);
     state.pieces = pieces;
+    state.pocketPieces = pocketPieces;
     state.drawable.shapes = [];
   }
 

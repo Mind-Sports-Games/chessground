@@ -118,6 +118,27 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
   return pieces;
 }
 
+export function readPocket(fen: cg.FEN, variant: cg.Variant): cg.Piece[] {
+  if (variant === 'backgammon' && fen.indexOf('[') !== -1 && fen.indexOf(']') !== -1) {
+    const start = fen.indexOf('[', 0);
+    const end = fen.indexOf(']', start);
+    const pocket = fen.substring(start, end);
+    if (pocket === '') return [];
+    const pocketPieces: cg.Piece[] = [];
+    for (const p of pocket.split(',')) {
+      const count = p.slice(0, -1);
+      const role = p.substring(p.length - 1).toLowerCase();
+      const playerIndex = p.substring(p.length - 1) === role ? 'p2' : 'p1';
+      const piece = {
+        role: `${role}${count}-piece`,
+        playerIndex: playerIndex,
+      } as cg.Piece;
+      pocketPieces.push(piece);
+    }
+    return pocketPieces;
+  } else return [];
+}
+
 export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Variant): cg.FEN {
   const fen = invNRanks
     .slice(-bd.height)

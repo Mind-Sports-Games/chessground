@@ -1,5 +1,5 @@
 import { BoardDimensions } from '../src/types';
-import { read, write } from '../src/fen';
+import { read, readPocket, write } from '../src/fen';
 import * as cg from '../src/types';
 import { expect } from 'chai';
 
@@ -264,5 +264,15 @@ describe('fen.write() test', () => {
     const pieces = read(fenString, bd, 'backgammon');
     const writtenFen = write(pieces, bd, 'backgammon');
     expect(expected).to.equal(writtenFen);
+  });
+});
+describe('fen.readPocket() test', () => {
+  it('testing backgammon read a fen pocket', () => {
+    const fenString = '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[2s,3S] w - - 1';
+
+    let expected = 2;
+    const pocketPieces = readPocket(fenString, 'backgammon');
+
+    expect(expected).to.equal(pocketPieces.length);
   });
 });

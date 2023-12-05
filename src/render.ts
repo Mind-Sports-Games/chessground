@@ -26,6 +26,7 @@ export function render(s: State): void {
     translate = s.dom.relative ? translateRel : translateAbs,
     boardEl: HTMLElement = s.dom.elements.board,
     pieces: cg.Pieces = s.pieces,
+    pocketPieces: cg.Piece[] = s.pocketPieces,
     curAnim: AnimCurrent | undefined = s.animation.current,
     anims: AnimVectors = curAnim ? curAnim.plan.anims : new Map(),
     fadings: AnimFadings = curAnim ? curAnim.plan.fadings : new Map(),
@@ -182,6 +183,16 @@ export function render(s: State): void {
         boardEl.appendChild(pieceNode);
       }
     }
+  }
+
+  // walk over all pocketPieces and set nodes
+  for (const p of pocketPieces) {
+    const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation, s.variant, 'a1' as cg.Key),
+      pieceNode = createEl('piece', 'pocket ' + pieceName) as cg.PieceNode;
+
+    pieceNode.cgPiece = pieceName;
+
+    boardEl.appendChild(pieceNode);
   }
 
   // remove any element that remains in the moved sets

@@ -7,6 +7,7 @@ import * as cg from './types';
 
 export interface HeadlessState {
   pieces: cg.Pieces;
+  pocketPieces: cg.Piece[]; // only currently used for backgammon as pockets are displayed on the board
   orientation: cg.Orientation; // board orientation. p1 | p2 | left | right
   myPlayerIndex: cg.PlayerIndex; // to determine piece is ally or enemy
   startPlayerIndex: cg.PlayerIndex; //starting playerIndex
@@ -133,6 +134,7 @@ export interface State extends HeadlessState {
 export function defaults(): HeadlessState {
   return {
     pieces: fen.read(fen.initial, { width: 8, height: 8 }, 'chess'),
+    pocketPieces: fen.readPocket(fen.initial, 'chess'),
     orientation: 'p1',
     myPlayerIndex: 'p1',
     startPlayerIndex: 'p1',
