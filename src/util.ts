@@ -276,6 +276,41 @@ export function calculateGoScores(deadStones: cg.Pieces, pieces: cg.Pieces, bd: 
   };
 }
 
+export function calculateBackgammonScores(
+  pieces: cg.Pieces,
+  pocketPieces: cg.Piece[],
+  bd: cg.BoardDimensions
+): cg.BackgammonScores {
+  let p1Score = 0;
+  let p2Score = 0;
+  //pieces on board
+  for (const [k, p] of pieces) {
+    const pos = key2pos(k);
+    const boardPosNumber = pos[1] === 1 ? pos[0] + bd.width : bd.width + 1 - pos[0];
+    const count = p.role.split('-')[0].slice(1);
+    if (p.playerIndex === 'p1') {
+      const distanceOff = bd.height * bd.width + 1 - boardPosNumber;
+      p1Score += parseInt(count, 10) * distanceOff;
+    } else {
+      const distanceOff = boardPosNumber;
+      p2Score += parseInt(count, 10) * distanceOff;
+    }
+  }
+  //captured pieces
+  for (const pp of pocketPieces) {
+    const count = pp.role.split('-')[0].slice(1);
+    if (pp.playerIndex === 'p1') {
+      p1Score += parseInt(count, 10) * (bd.height * bd.width + 1);
+    } else {
+      p2Score += parseInt(count, 10) * (bd.height * bd.width + 1);
+    }
+  }
+  return {
+    p1: p1Score,
+    p2: p2Score,
+  };
+}
+
 export type Callback = (...args: any[]) => void;
 
 export function callUserFunction(f: Callback | undefined, ...args: any[]): void {

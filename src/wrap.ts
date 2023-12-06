@@ -1,5 +1,5 @@
 import { HeadlessState } from './state';
-import { setVisible, createEl, pos2key, NRanks, invNRanks } from './util';
+import { calculateBackgammonScores, setVisible, createEl, pos2key, NRanks, invNRanks } from './util';
 import { orientations, files, ranks, ranks19, shogiVariants, xiangqiVariants, Elements, Notation } from './types';
 import { createElement as createSVG, setAttributes } from './svg';
 
@@ -140,14 +140,18 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       );
 
       if (s.orientation === 'p1') {
-        container.appendChild(renderBoardScores(boardScores[1], 'p1'));
-        container.appendChild(renderBoardScores(boardScores[0], 'p2'));
+        container.appendChild(renderTogyBoardScores(boardScores[1], 'p1'));
+        container.appendChild(renderTogyBoardScores(boardScores[0], 'p2'));
       } else {
-        container.appendChild(renderBoardScores(boardScores[1].reverse(), 'p1'));
-        container.appendChild(renderBoardScores(boardScores[0].reverse(), 'p2'));
+        container.appendChild(renderTogyBoardScores(boardScores[1].reverse(), 'p1'));
+        container.appendChild(renderTogyBoardScores(boardScores[0].reverse(), 'p2'));
       }
+    } else if (s.variant === 'backgammon') {
+      const boardScores = calculateBackgammonScores(s.pieces, s.pocketPieces, s.dimensions);
+      container.appendChild(renderBoardScores(boardScores.p1.toString(), 'p1'));
+      container.appendChild(renderBoardScores(boardScores.p2.toString(), 'p2'));
     } else {
-      container.appendChild(renderBoardScores(files.slice(0, s.dimensions.width), s.orientation));
+      container.appendChild(renderBoardScores('0', s.orientation));
     }
   }
 
@@ -169,7 +173,15 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   };
 }
 
-function renderBoardScores(elems: readonly string[], className: string): HTMLElement {
+function renderBoardScores(score: string, className: string): HTMLElement {
+  const el = createEl('board-scores', className);
+  const f: HTMLElement = createEl('board-score');
+  f.textContent = score;
+  el.appendChild(f);
+  return el;
+}
+
+function renderTogyBoardScores(elems: readonly string[], className: string): HTMLElement {
   const el = createEl('board-scores', className);
   let f, g: HTMLElement;
   for (const elem of elems) {
