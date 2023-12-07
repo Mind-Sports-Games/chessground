@@ -19,7 +19,7 @@ export interface HeadlessState {
   simpleGoScores?: cg.SimpleGoScores; // score for each player in go game (area + pieces)
   coordinates: boolean; // include coords attributes
   boardScores: boolean; //include board-scores attributes
-  dice: number[]; // dice to display on the board
+  dice: cg.Dice; // dice to display on the board
   autoCastle: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly: boolean; // don't bind events: the user will never be able to move pieces around
   selectOnly: boolean; // only allow user to select squares/pieces (multiple selection allowed)
@@ -141,7 +141,7 @@ export function defaults(): HeadlessState {
     turnPlayerIndex: 'p1',
     coordinates: true,
     boardScores: false,
-    dice: [],
+    dice: { available: [], unavailable: [] },
     autoCastle: true,
     selectedPieces: new Map<cg.Key, cg.Piece>(),
     viewOnly: false,

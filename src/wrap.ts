@@ -1,6 +1,6 @@
 import { HeadlessState } from './state';
 import { calculateBackgammonScores, setVisible, createEl, pos2key, NRanks, invNRanks } from './util';
-import { orientations, files, ranks, ranks19, shogiVariants, xiangqiVariants, Elements, Notation } from './types';
+import { orientations, files, ranks, ranks19, shogiVariants, xiangqiVariants, Elements, Notation, Dice } from './types';
 import { createElement as createSVG, setAttributes } from './svg';
 
 export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boolean): Elements {
@@ -155,7 +155,8 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     }
   }
 
-  if (s.dice.length > 0) container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
+  if (s.dice.available.length > 0 || s.dice.unavailable.length > 0)
+    container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
 
   let ghost: HTMLElement | undefined;
   if (s.draggable.showGhost && !relative) {
@@ -210,12 +211,16 @@ function renderTogyBoardScores(elems: readonly string[], className: string): HTM
   return el;
 }
 
-function renderDice(elems: readonly number[], className: string): HTMLElement {
+function renderDice(dice: Dice, className: string): HTMLElement {
   const el = createEl('cg-dice', className);
   const diceClass = ['one', 'two', 'three', 'four', 'five', 'six'];
   let d: HTMLElement;
-  for (const elem of elems) {
-    d = createEl('dice', diceClass[elem - 1]);
+  for (const elem of dice.unavailable) {
+    d = createEl('dice', diceClass[elem - 1] + ' unavailable');
+    el.appendChild(d);
+  }
+  for (const elem of dice.available) {
+    d = createEl('dice', diceClass[elem - 1] + ' available');
     el.appendChild(d);
   }
   return el;

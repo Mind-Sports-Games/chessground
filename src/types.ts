@@ -307,6 +307,11 @@ export interface SimpleGoScores {
   p2: number;
 }
 
+export interface Dice {
+  available: number[];
+  unavailable: number[];
+}
+
 export interface BackgammonScores {
   p1: number;
   p2: number;
