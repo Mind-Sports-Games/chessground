@@ -155,8 +155,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     }
   }
 
-  if (s.dice.available.length > 0 || s.dice.unavailable.length > 0)
-    container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
+  if (s.dice.length > 0) container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
 
   let ghost: HTMLElement | undefined;
   if (s.draggable.showGhost && !relative) {
@@ -211,16 +210,12 @@ function renderTogyBoardScores(elems: readonly string[], className: string): HTM
   return el;
 }
 
-function renderDice(dice: Dice, className: string): HTMLElement {
+function renderDice(dice: Dice[], className: string): HTMLElement {
   const el = createEl('cg-dice', className);
   const diceClass = ['one', 'two', 'three', 'four', 'five', 'six'];
   let d: HTMLElement;
-  for (const elem of dice.unavailable) {
-    d = createEl('dice', diceClass[elem - 1] + ' unavailable');
-    el.appendChild(d);
-  }
-  for (const elem of dice.available) {
-    d = createEl('dice', diceClass[elem - 1] + ' available');
+  for (const elem of dice) {
+    d = createEl('dice', diceClass[elem.value - 1] + (elem.isAvailable ? ' available' : ' unavailable'));
     el.appendChild(d);
   }
   return el;

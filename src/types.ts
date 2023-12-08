@@ -310,8 +310,8 @@ export interface SimpleGoScores {
 }
 
 export interface Dice {
-  available: number[];
-  unavailable: number[];
+  value: number;
+  isAvailable: boolean;
 }
 
 export interface BackgammonScores {
