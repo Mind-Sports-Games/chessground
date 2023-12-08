@@ -163,7 +163,10 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        if (s.variant === 'backgammon' && pos[1] === 1) {
+        if (
+          s.variant === 'backgammon' &&
+          ((pos[1] === 1 && s.orientation === 'p1') || (s.orientation === 'p2' && pos[1] === 2))
+        ) {
           translateAndRotate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant), 180);
         } else {
           translate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant));
@@ -183,7 +186,10 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        if (s.variant === 'backgammon' && pos[1] === 1) {
+        if (
+          s.variant === 'backgammon' &&
+          ((pos[1] === 1 && s.orientation === 'p1') || (s.orientation === 'p2' && pos[1] === 2))
+        ) {
           translateAndRotate(pieceNode, posToTranslate(pos, orientation, s.dimensions, s.variant), 180);
         } else {
           translate(pieceNode, posToTranslate(pos, orientation, s.dimensions, s.variant));
@@ -203,8 +209,9 @@ export function render(s: State): void {
 
     pieceNode.cgPiece = pieceName;
     const isTop = s.orientation === p.playerIndex;
-    pieceNode.cgKey = isTop ? 'a1' : 'a0'; // making rank1 so we can rotate with other pieces during updateBounds
+    pieceNode.cgKey = 'a1';
     pieceNode.cgPocket = true;
+    pieceNode.rotate = isTop;
     if (s.variant === 'backgammon' && isTop) translateAndRotate(pieceNode, [0, 0], 180);
 
     boardEl.appendChild(pieceNode);
@@ -222,8 +229,18 @@ export function updateBounds(s: State): void {
   let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;
   while (el) {
     if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el)) {
-      if (s.variant === 'backgammon' && isPieceNode(el) && key2pos(el.cgKey)[1] === 1) {
-        translateAbsAndRotate(el, el.cgPocket ? [0, 0] : posToTranslate(key2pos(el.cgKey), orientation), 180);
+      if (
+        s.variant === 'backgammon' &&
+        isPieceNode(el) &&
+        ((key2pos(el.cgKey)[1] === 1 && s.orientation === 'p1') ||
+          (s.orientation === 'p2' && key2pos(el.cgKey)[1] === 2) ||
+          el.cgPocket)
+      ) {
+        translateAbsAndRotate(
+          el,
+          el.cgPocket ? [0, 0] : posToTranslate(key2pos(el.cgKey), orientation),
+          el.cgPocket && !el.rotate ? 0 : 180
+        );
       } else {
         translateAbs(el, posToTranslate(key2pos(el.cgKey), orientation));
       }
