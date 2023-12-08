@@ -139,8 +139,16 @@ export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
 };
 
+export const translateAbsAndRotate = (el: HTMLElement, pos: cg.NumberPair, deg: number): void => {
+  el.style.transform = `translate(${pos[0]}px,${pos[1]}px) rotate(${deg}deg)`;
+};
+
 export const translateRel = (el: HTMLElement, percents: cg.NumberPair): void => {
   el.style.transform = `translate(${percents[0]}%,${percents[1]}%)`;
+};
+
+export const translateRelAndRotate = (el: HTMLElement, percents: cg.NumberPair, deg: number): void => {
+  el.style.transform = `translate(${percents[0]}%,${percents[1]}%) rotate(${deg}deg)`;
 };
 
 export const setVisible = (el: HTMLElement, v: boolean): void => {

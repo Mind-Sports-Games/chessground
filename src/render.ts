@@ -7,6 +7,8 @@ import {
   translateRel,
   translateAbs,
   calculatePlayerEmptyAreas,
+  translateRelAndRotate,
+  translateAbsAndRotate,
 } from './util';
 import { p1Pov } from './board';
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim';
@@ -24,6 +26,7 @@ export function render(s: State): void {
     asP1: boolean = p1Pov(s),
     posToTranslate = s.dom.relative ? posToTranslateRel : posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant),
     translate = s.dom.relative ? translateRel : translateAbs,
+    translateAndRotate = s.dom.relative ? translateRelAndRotate : translateAbsAndRotate,
     boardEl: HTMLElement = s.dom.elements.board,
     pieces: cg.Pieces = s.pieces,
     pocketPieces: cg.Piece[] = s.pocketPieces,
@@ -160,7 +163,11 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        translate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant));
+        if (s.variant === 'backgammon' && pos[1] === 1) {
+          translateAndRotate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant), 180);
+        } else {
+          translate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant));
+        }
       }
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
@@ -176,7 +183,11 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        translate(pieceNode, posToTranslate(pos, orientation, s.dimensions, s.variant));
+        if (s.variant === 'backgammon' && pos[1] === 1) {
+          translateAndRotate(pieceNode, posToTranslate(pos, orientation, s.dimensions, s.variant), 180);
+        } else {
+          translate(pieceNode, posToTranslate(pos, orientation, s.dimensions, s.variant));
+        }
 
         if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, orientation, asP1, s.dimensions);
 
@@ -191,6 +202,8 @@ export function render(s: State): void {
       pieceNode = createEl('piece', 'pocket ' + pieceName) as cg.PieceNode;
 
     pieceNode.cgPiece = pieceName;
+    const isTop = s.orientation === p.playerIndex;
+    if (s.variant === 'backgammon' && isTop) translateAndRotate(pieceNode, [0, 0], 180);
 
     boardEl.appendChild(pieceNode);
   }
