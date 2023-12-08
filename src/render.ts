@@ -203,6 +203,8 @@ export function render(s: State): void {
 
     pieceNode.cgPiece = pieceName;
     const isTop = s.orientation === p.playerIndex;
+    pieceNode.cgKey = isTop ? 'a1' : 'a0'; // making rank1 so we can rotate with other pieces during updateBounds
+    pieceNode.cgPocket = true;
     if (s.variant === 'backgammon' && isTop) translateAndRotate(pieceNode, [0, 0], 180);
 
     boardEl.appendChild(pieceNode);
@@ -220,7 +222,11 @@ export function updateBounds(s: State): void {
   let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;
   while (el) {
     if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el)) {
-      translateAbs(el, posToTranslate(key2pos(el.cgKey), orientation));
+      if (s.variant === 'backgammon' && isPieceNode(el) && key2pos(el.cgKey)[1] === 1) {
+        translateAbsAndRotate(el, el.cgPocket ? [0, 0] : posToTranslate(key2pos(el.cgKey), orientation), 180);
+      } else {
+        translateAbs(el, posToTranslate(key2pos(el.cgKey), orientation));
+      }
     }
     el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }
