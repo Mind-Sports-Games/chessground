@@ -140,8 +140,6 @@ export interface PieceNode extends KeyedNode {
   cgAnimating?: boolean;
   cgFading?: boolean;
   cgDragging?: boolean;
-  cgPocket?: boolean;
-  rotate?: boolean;
 }
 export interface SquareNode extends KeyedNode {
   tagName: 'SQUARE';

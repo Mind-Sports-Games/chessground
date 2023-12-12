@@ -7,8 +7,6 @@ import {
   translateRel,
   translateAbs,
   calculatePlayerEmptyAreas,
-  translateRelAndRotate,
-  translateAbsAndRotate,
 } from './util';
 import { p1Pov } from './board';
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim';
@@ -26,7 +24,6 @@ export function render(s: State): void {
     asP1: boolean = p1Pov(s),
     posToTranslate = s.dom.relative ? posToTranslateRel : posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant),
     translate = s.dom.relative ? translateRel : translateAbs,
-    translateAndRotate = s.dom.relative ? translateRelAndRotate : translateAbsAndRotate,
     boardEl: HTMLElement = s.dom.elements.board,
     pieces: cg.Pieces = s.pieces,
     pocketPieces: cg.Piece[] = s.pocketPieces,
@@ -163,14 +160,7 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        if (
-          s.variant === 'backgammon' &&
-          ((pos[1] === 1 && s.orientation === 'p1') || (s.orientation === 'p2' && pos[1] === 2))
-        ) {
-          translateAndRotate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant), 180);
-        } else {
-          translate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant));
-        }
+        translate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant));
       }
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
@@ -186,14 +176,7 @@ export function render(s: State): void {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        if (
-          s.variant === 'backgammon' &&
-          ((pos[1] === 1 && s.orientation === 'p1') || (s.orientation === 'p2' && pos[1] === 2))
-        ) {
-          translateAndRotate(pieceNode, posToTranslate(pos, orientation, s.dimensions, s.variant), 180);
-        } else {
-          translate(pieceNode, posToTranslate(pos, orientation, s.dimensions, s.variant));
-        }
+        translate(pieceNode, posToTranslate(pos, orientation, s.dimensions, s.variant));
 
         if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, orientation, asP1, s.dimensions);
 
@@ -208,11 +191,7 @@ export function render(s: State): void {
       pieceNode = createEl('piece', 'pocket ' + pieceName) as cg.PieceNode;
 
     pieceNode.cgPiece = pieceName;
-    const isTop = s.orientation === p.playerIndex;
     pieceNode.cgKey = 'a1';
-    pieceNode.cgPocket = true;
-    pieceNode.rotate = isTop;
-    if (s.variant === 'backgammon' && isTop) translateAndRotate(pieceNode, [0, 0], 180);
 
     boardEl.appendChild(pieceNode);
   }
@@ -229,21 +208,7 @@ export function updateBounds(s: State): void {
   let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;
   while (el) {
     if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el)) {
-      if (
-        s.variant === 'backgammon' &&
-        isPieceNode(el) &&
-        ((key2pos(el.cgKey)[1] === 1 && s.orientation === 'p1') ||
-          (s.orientation === 'p2' && key2pos(el.cgKey)[1] === 2) ||
-          el.cgPocket)
-      ) {
-        translateAbsAndRotate(
-          el,
-          el.cgPocket ? [0, 0] : posToTranslate(key2pos(el.cgKey), orientation),
-          el.cgPocket && !el.rotate ? 0 : 180
-        );
-      } else {
-        translateAbs(el, posToTranslate(key2pos(el.cgKey), orientation));
-      }
+      translateAbs(el, posToTranslate(key2pos(el.cgKey), orientation));
     }
     el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }
@@ -288,7 +253,7 @@ function backgammonPosClass(k: cg.Key, orientation: cg.Orientation): string {
   const pos = key2pos(k);
   const leftOrRight = orientation === 'p1' ? (pos[0] <= 6 ? 'left' : 'right') : pos[0] <= 6 ? 'right' : 'left';
   const topOrBottom = orientation === 'p1' ? (pos[1] <= 1 ? 'bottom' : 'top') : pos[1] <= 1 ? 'top' : 'bottom';
-  return ` ${topOrBottom}-${leftOrRight}`;
+  return ` ${topOrBottom} ${leftOrRight}`;
 }
 
 function computeSquareClasses(s: State): SquareClasses {
