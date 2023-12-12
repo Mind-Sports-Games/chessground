@@ -187,9 +187,7 @@ export function render(s: State): void {
 
   // walk over all pocketPieces and set nodes
   for (const p of pocketPieces) {
-    const isTop = p.playerIndex === s.orientation;
-    const isDisplayedAsTopClass = !isTop;
-    const classSpecificKey = isDisplayedAsTopClass ? 'a2' : 'a1';
+    const classSpecificKey = p.playerIndex === 'p1' ? 'a1' : 'a2';
     const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation, s.variant, classSpecificKey as cg.Key),
       pieceNode = createEl('piece', 'pocket ' + pieceName) as cg.PieceNode;
 
