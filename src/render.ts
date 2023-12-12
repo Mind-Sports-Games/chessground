@@ -187,11 +187,14 @@ export function render(s: State): void {
 
   // walk over all pocketPieces and set nodes
   for (const p of pocketPieces) {
-    const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation, s.variant, 'a1' as cg.Key),
+    const isTop = p.playerIndex === s.orientation;
+    const isDisplayedAsTopClass = !isTop;
+    const classSpecificKey = isDisplayedAsTopClass ? 'a2' : 'a1';
+    const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation, s.variant, classSpecificKey as cg.Key),
       pieceNode = createEl('piece', 'pocket ' + pieceName) as cg.PieceNode;
 
     pieceNode.cgPiece = pieceName;
-    pieceNode.cgKey = 'a1';
+    pieceNode.cgKey = s.orientation === 'p1' ? 'a2' : 'l1'; // always have 0 transform (top left corner)
 
     boardEl.appendChild(pieceNode);
   }
