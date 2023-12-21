@@ -4,7 +4,7 @@ import * as draw from './draw';
 import { cancelDropMode, drop } from './drop';
 import { eventPosition, isRightButton } from './util';
 import * as cg from './types';
-import { getKeyAtDomPos, userMove } from './board';
+import { areDiceAtDomPos, getKeyAtDomPos, userMove, reorderDice } from './board';
 import { Piece } from './types';
 
 type MouchBind = (e: cg.MouchEvent) => void;
@@ -96,6 +96,10 @@ function startDragOrDraw(s: State): MouchBind {
             const bounds = s.dom.bounds(),
               position = eventPosition(e)!,
               orig = getKeyAtDomPos(position, s.orientation, bounds, s.dimensions, s.variant);
+            if (areDiceAtDomPos(position, s.orientation, bounds, s.variant) && reorderDice(s)) {
+              s.dom.redraw();
+              return;
+            }
             if (!orig) return;
             const piece = s.pieces.get(orig);
             const dest = s.movable.dests?.get(orig)![0];
