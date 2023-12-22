@@ -454,16 +454,15 @@ export function areDiceAtDomPos(
       ? (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15
       : (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15;
   const correctHeight =
-    (pos[1] - bounds.top) / bounds.height > 6.5 / 15 || (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
+    (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
   return variant === 'backgammon' && correctWidth && correctHeight;
 }
 
-export function reorderDice(state: HeadlessState): boolean {
+export function reorderDice(state: HeadlessState): void {
   if (state.dice.length === 2 && state.dice[0].isAvailable && state.dice[1].isAvailable) {
     state.dice = [state.dice[1], state.dice[0]];
     callUserFunction(state.events.selectDice, state.dice);
-    return true;
-  } else return false;
+  }
 }
 
 export function p1Pov(s: HeadlessState): boolean {
