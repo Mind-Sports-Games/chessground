@@ -461,6 +461,7 @@ export function areDiceAtDomPos(
 export function reorderDice(state: HeadlessState): boolean {
   if (state.dice.length === 2 && state.dice[0].isAvailable && state.dice[1].isAvailable) {
     state.dice = [state.dice[1], state.dice[0]];
+    callUserFunction(state.events.selectDice, state.dice);
     return true;
   } else return false;
 }

@@ -114,6 +114,7 @@ export interface HeadlessState {
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
     select?: (key: cg.Key) => void; // called when a square is selected
     insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
+    selectDice?: (dice: cg.Dice) => void; //when the dice have been selected (to swap order)
   };
   drawable: Drawable;
   exploding?: cg.Exploding;
