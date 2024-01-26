@@ -122,6 +122,7 @@ export function configure(state: HeadlessState, config: Config): void {
   if (config.movable && config.movable.dests) state.movable.dests = undefined;
   if (config.dropmode?.dropDests) state.dropmode.dropDests = undefined;
   if (config.drawable?.autoShapes) state.drawable.autoShapes = [];
+  if (config.dice) state.dice = [];
 
   merge(state, config);
 
