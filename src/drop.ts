@@ -35,7 +35,7 @@ export function drop(s: State, e: cg.MouchEvent): void {
     s.pieces.set('a0', piece);
     const position = util.eventPosition(e);
     const dest = position && board.getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions);
-    if (dest) board.dropNewPiece(s, 'a0', dest);
+    if (dest) board.dropNewPiece(s, 'a0', dest, s.variant === 'backgammon');
   }
   //stop processing event clicks, as click drops will trigger a screen click and select a piece.
   e.stopPropagation();

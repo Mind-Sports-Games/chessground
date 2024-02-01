@@ -75,7 +75,7 @@ function startDragOrDraw(s: State): MouchBind {
       if (s.drawable.enabled) draw.start(s, e);
     } else if (!s.viewOnly) {
       if (!s.selectOnly) {
-        if (s.dropmode.active && undefined === squareOccupied(s, e)) {
+        if (s.dropmode.active && (undefined === squareOccupied(s, e) || s.variant === 'backgammon')) {
           // this case covers normal drop when it is our turn or pre-drop on empty scare
           drop(s, e);
         } else if (
