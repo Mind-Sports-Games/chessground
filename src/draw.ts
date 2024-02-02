@@ -68,7 +68,7 @@ export function start(state: State, e: cg.MouchEvent): void {
   e.preventDefault();
   e.ctrlKey ? unselect(state) : cancelMove(state);
   const pos = eventPosition(e)!,
-    orig = getKeyAtDomPos(pos, state.orientation, state.dom.bounds(), state.dimensions);
+    orig = getKeyAtDomPos(pos, state.orientation, state.dom.bounds(), state.dimensions, state.variant);
   if (!orig) return;
   state.drawable.current = {
     orig,
@@ -84,7 +84,13 @@ export function processDraw(state: State): void {
   requestAnimationFrame(() => {
     const cur = state.drawable.current;
     if (cur) {
-      const keyAtDomPos = getKeyAtDomPos(cur.pos, state.orientation, state.dom.bounds(), state.dimensions);
+      const keyAtDomPos = getKeyAtDomPos(
+        cur.pos,
+        state.orientation,
+        state.dom.bounds(),
+        state.dimensions,
+        state.variant
+      );
       if (!keyAtDomPos) {
         cur.snapToValidMove = false;
       }

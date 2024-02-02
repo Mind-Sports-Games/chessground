@@ -35,6 +35,9 @@ export interface Api {
   // add and/or remove arbitrary pieces on the board - no animation!
   setPiecesNoAnim(pieces: cg.PiecesDiff): void;
 
+  // replace arbitrary pieces in the pocket with input
+  setPocketPieces(pocketPieces: cg.Piece[]): void;
+
   // click a square programmatically
   selectSquare(key: cg.Key | null, force?: boolean): void;
 
@@ -116,6 +119,10 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     setPiecesNoAnim(pieces): void {
       board.setPieces(state, pieces);
       state.dom.redraw();
+    },
+
+    setPocketPieces(pocketPieces): void {
+      render(state => (state.pocketPieces = pocketPieces), state);
     },
 
     selectSquare(key, force): void {
