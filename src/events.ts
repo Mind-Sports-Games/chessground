@@ -104,9 +104,10 @@ function startDragOrDraw(s: State): MouchBind {
             const piece = s.pieces.get(orig);
             const isLiftDest =
               s.liftable.liftDests && s.liftable.liftDests?.length > 0 && s.liftable.liftDests.includes(orig);
-            const dest = s.movable.dests?.get(orig)![0];
+            const hasMovableDest = s.movable.dests && s.movable.dests.has(orig);
             //assumption that a piece cant both lift and move otherwise what do we do on a single click?
-            if (piece && piece.playerIndex === s.turnPlayerIndex && dest) {
+            if (piece && piece.playerIndex === s.turnPlayerIndex && hasMovableDest) {
+              const dest = s.movable.dests!.get(orig)![0];
               userMove(s, orig, dest);
               s.dom.redraw();
             } else if (piece && piece.playerIndex === s.turnPlayerIndex && isLiftDest) {
