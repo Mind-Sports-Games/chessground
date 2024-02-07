@@ -41,6 +41,12 @@ export interface Config {
     };
     rookCastle?: boolean; // castle by moving the king to the rook
   };
+  liftable?: {
+    liftDests?: cg.Key[]; // squares to remove a role/stone from
+    events?: {
+      after?: (dest: cg.Key) => void; //called after a lift have been played
+    };
+  };
   premovable?: {
     enabled?: boolean; // allow premoves for playerIndex that can not move
     showDests?: boolean; // whether to add the premove-dest class on squares

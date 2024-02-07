@@ -4,7 +4,7 @@ import * as draw from './draw';
 import { cancelDropMode, drop } from './drop';
 import { eventPosition, isRightButton } from './util';
 import * as cg from './types';
-import { areDiceAtDomPos, getKeyAtDomPos, userMove, reorderDice } from './board';
+import { areDiceAtDomPos, getKeyAtDomPos, userMove, userLift, reorderDice } from './board';
 import { Piece } from './types';
 
 type MouchBind = (e: cg.MouchEvent) => void;
@@ -102,9 +102,15 @@ function startDragOrDraw(s: State): MouchBind {
             }
             if (!orig) return;
             const piece = s.pieces.get(orig);
+            const isLiftDest =
+              s.liftable.liftDests && s.liftable.liftDests?.length > 0 && s.liftable.liftDests.includes(orig);
             const dest = s.movable.dests?.get(orig)![0];
+            //assumption that a piece cant both lift and move otherwise what do we do on a single click?
             if (piece && piece.playerIndex === s.turnPlayerIndex && dest) {
               userMove(s, orig, dest);
+              s.dom.redraw();
+            } else if (piece && piece.playerIndex === s.turnPlayerIndex && isLiftDest) {
+              userLift(s, orig);
               s.dom.redraw();
             }
           } else {

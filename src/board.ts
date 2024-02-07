@@ -171,6 +171,42 @@ export function userMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): bool
   return false;
 }
 
+export function userLift(state: HeadlessState, dest: cg.Key): boolean {
+  const piece = state.pieces.get(dest);
+
+  if (
+    piece &&
+    state.liftable.liftDests &&
+    state.liftable.liftDests.length > 0 &&
+    state.liftable.liftDests?.includes(dest) &&
+    state.turnPlayerIndex === piece.playerIndex
+  ) {
+    if (state.variant === 'backgammon') {
+      const count = piece.role.split('-')[0].substring(1);
+      const letter = piece.role.charAt(0);
+      if (count === '1') {
+        state.pieces.delete(dest);
+      } else {
+        state.pieces.set(dest, {
+          role: `${letter}${+count - 1}-piece` as cg.Role,
+          playerIndex: piece.playerIndex,
+        });
+      }
+    } else {
+      state.pieces.delete(dest);
+    }
+
+    callUserFunction(state.liftable.events.after, dest);
+    return true;
+  } else {
+    unsetPremove(state);
+    unsetPredrop(state);
+    cancelDropMode(state);
+  }
+  unselect(state);
+  return false;
+}
+
 /**
  * TODO: I believe this function is always called with orig=='a0'. Maybe consider changing that parameter to piece/role instead.
  *       I think we currently artificially assign state.pieces[a0] to the current pocket piece being dragged/selected, but it is imho hackish
