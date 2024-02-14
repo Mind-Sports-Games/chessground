@@ -246,7 +246,7 @@ function pieceNameOf(
     (piece.playerIndex !== myPlayerIndex && orientation !== myPlayerIndex)
       ? 'ally'
       : 'enemy';
-  const posClass = variant === 'backgammon' ? backgammonPosClass(k, orientation) : '';
+  const posClass = variant === 'backgammon' || variant === 'nackgammon' ? backgammonPosClass(k, orientation) : '';
   return `${piece.playerIndex} ${promoted}${piece.role} ${side}${posClass}`;
 }
 
@@ -359,6 +359,7 @@ function variantSpecificHighlightClass(variant: cg.Variant, k: cg.Key, orientati
   switch (variant) {
     case 'togyzkumalak':
       return k[1] === '1' ? ' p1' : ' p2';
+    case 'nackgammon':
     case 'backgammon':
       return backgammonPosClass(k, orientation);
     default:

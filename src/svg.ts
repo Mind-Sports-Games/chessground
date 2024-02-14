@@ -423,6 +423,7 @@ function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece): string {
     case 'oware':
     case 'togyzkumalak':
       return piece.role[0].split('-')[0].substring(1);
+    case 'nackgammon':
     case 'backgammon':
       return (piece.playerIndex === 'p1' ? 'w' : 'b') + piece.role[0].split('-')[0].substring(1);
     default:

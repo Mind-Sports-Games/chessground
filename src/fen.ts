@@ -2,7 +2,7 @@ import { pos2key, NRanks, invNRanks } from './util';
 import * as cg from './types';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
-const commaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak', 'backgammon'];
+const commaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak', 'backgammon', 'nackgammon'];
 const mancalaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak'];
 
 function roles(letter: string) {
@@ -119,7 +119,7 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
 }
 
 export function readPocket(fen: cg.FEN, variant: cg.Variant): cg.Piece[] {
-  if (variant === 'backgammon' && fen.indexOf('[') !== -1 && fen.indexOf(']') !== -1) {
+  if ((variant === 'backgammon' || variant === 'nackgammon') && fen.indexOf('[') !== -1 && fen.indexOf(']') !== -1) {
     const start = fen.indexOf('[', 0);
     const end = fen.indexOf(']', start);
     const pocket = fen.substring(start + 1, end);

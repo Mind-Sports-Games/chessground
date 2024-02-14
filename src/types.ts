@@ -52,6 +52,7 @@ export type Variant =
   | 'go13x13'
   | 'go19x19'
   | 'backgammon'
+  | 'nackgammon'
   | undefined;
 export type PlayerIndex = typeof playerIndexs[number];
 export type Letter = typeof letters[number];

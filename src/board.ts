@@ -181,7 +181,7 @@ export function userLift(state: HeadlessState, dest: cg.Key): boolean {
     state.liftable.liftDests?.includes(dest) &&
     state.turnPlayerIndex === piece.playerIndex
   ) {
-    if (state.variant === 'backgammon') {
+    if (state.variant === 'backgammon' || state.variant === 'nackgammon') {
       const count = piece.role.split('-')[0].substring(1);
       const letter = piece.role.charAt(0);
       if (count === '1') {
@@ -457,7 +457,7 @@ export function getKeyAtDomPos(
 ): cg.Key | undefined {
   const bgBorder = 1 / 15;
   const file =
-    variant === 'backgammon'
+    variant === 'backgammon' || variant === 'nackgammon'
       ? (pos[0] - bounds.left) / bounds.width < 1 / 15 ||
         (pos[0] - bounds.left) / bounds.width >= 14 / 15 ||
         ((pos[0] - bounds.left) / bounds.width >= 7 / 15 && (pos[0] - bounds.left) / bounds.width <= 8 / 15)
@@ -467,7 +467,7 @@ export function getKeyAtDomPos(
         : Math.ceil(bd.width * ((pos[0] - bounds.left - bounds.width * 2 * bgBorder) / (bounds.width * 12 * bgBorder)))
       : Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
   const rank =
-    variant === 'backgammon'
+    variant === 'backgammon' || variant === 'nackgammon'
       ? (pos[1] - bounds.top) / bounds.height <= 1 / 15 || (pos[1] - bounds.top) / bounds.height >= 14 / 15
         ? undefined
         : Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height))
@@ -491,7 +491,7 @@ export function areDiceAtDomPos(
       : (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15;
   const correctHeight =
     (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
-  return variant === 'backgammon' && correctWidth && correctHeight;
+  return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
 }
 
 export function reorderDice(state: HeadlessState): void {

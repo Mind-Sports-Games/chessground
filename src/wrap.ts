@@ -100,7 +100,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p1'));
         container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
       }
-    } else if (s.variant === 'backgammon') {
+    } else if (s.variant === 'backgammon' || s.variant === 'nackgammon') {
       if (s.orientation === 'p1') {
         if (s.turnPlayerIndex === 'p1') {
           container.appendChild(
@@ -167,7 +167,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         container.appendChild(renderTogyBoardScores(boardScores[1].reverse(), 'p1'));
         container.appendChild(renderTogyBoardScores(boardScores[0].reverse(), 'p2'));
       }
-    } else if (s.variant === 'backgammon') {
+    } else if (s.variant === 'backgammon' || s.variant === 'nackgammon') {
       const boardScores = calculateBackgammonScores(s.pieces, s.pocketPieces, s.dimensions);
       container.appendChild(renderBoardScores(boardScores.p1.toString(), 'p1'));
       container.appendChild(renderBoardScores(boardScores.p2.toString(), 'p2'));
