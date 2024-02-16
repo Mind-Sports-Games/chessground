@@ -28,7 +28,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   const bounds = s.dom.bounds(),
     position = util.eventPosition(e)!,
-    orig = board.getKeyAtDomPos(position, s.orientation, bounds, s.dimensions);
+    orig = board.getKeyAtDomPos(position, s.orientation, bounds, s.dimensions, s.variant);
   if (!orig) return;
   const piece = s.pieces.get(orig);
   const previouslySelected = s.selected;
@@ -85,7 +85,10 @@ export function start(s: State, e: cg.MouchEvent): void {
       const promoted = piece.promoted ? 'promoted ' : '';
       const side = piece.playerIndex === s.myPlayerIndex ? 'ally' : 'enemy';
       ghost.className = `ghost ${piece.playerIndex} ${promoted}${piece.role} ${side}`;
-      util.translateAbs(ghost, util.posToTranslateAbs(bounds, s.dimensions)(util.key2pos(orig), s.orientation));
+      util.translateAbs(
+        ghost,
+        util.posToTranslateAbs(bounds, s.dimensions, s.variant)(util.key2pos(orig), s.orientation)
+      );
       util.setVisible(ghost, true);
     }
     processDrag(s);
@@ -169,7 +172,7 @@ function processDrag(s: State): void {
         cur.pos = [cur.epos[0] - cur.rel[0], cur.epos[1] - cur.rel[1]];
 
         // move piece
-        const translation = util.posToTranslateAbs(s.dom.bounds(), s.dimensions)(cur.origPos, s.orientation);
+        const translation = util.posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant)(cur.origPos, s.orientation);
         translation[0] += cur.pos[0] + cur.dec[0];
         translation[1] += cur.pos[1] + cur.dec[1];
         util.translateAbs(cur.element, translation);
@@ -201,7 +204,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   board.unsetPredrop(s);
   // touchend has no position; so use the last touchmove position instead
   const eventPos = util.eventPosition(e) || cur.epos;
-  const dest = board.getKeyAtDomPos(eventPos, s.orientation, s.dom.bounds(), s.dimensions);
+  const dest = board.getKeyAtDomPos(eventPos, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
   if (dest && cur.started && cur.orig !== dest) {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
     else {

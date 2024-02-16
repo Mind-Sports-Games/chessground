@@ -1,6 +1,6 @@
 import { HeadlessState } from './state';
-import { setVisible, createEl, pos2key, NRanks, invNRanks } from './util';
-import { orientations, files, ranks, ranks19, shogiVariants, xiangqiVariants, Elements, Notation } from './types';
+import { calculateBackgammonScores, setVisible, createEl, pos2key, NRanks, invNRanks } from './util';
+import { orientations, files, ranks, ranks19, shogiVariants, xiangqiVariants, Elements, Notation, Dice } from './types';
 import { createElement as createSVG, setAttributes } from './svg';
 
 export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boolean): Elements {
@@ -100,6 +100,46 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p1'));
         container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
       }
+    } else if (s.variant === 'backgammon' || s.variant === 'nackgammon') {
+      if (s.orientation === 'p1') {
+        if (s.turnPlayerIndex === 'p1') {
+          container.appendChild(
+            renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p2')
+          );
+          container.appendChild(
+            renderCoords(['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(), 'files' + ' p1')
+          );
+        } else {
+          container.appendChild(
+            renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p1')
+          );
+          container.appendChild(
+            renderCoords(['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(), 'files' + ' p2')
+          );
+        }
+      } else {
+        if (s.turnPlayerIndex === 'p1') {
+          container.appendChild(
+            renderCoords(['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'], 'files' + ' p1')
+          );
+          container.appendChild(
+            renderCoords(
+              ['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'].reverse(),
+              'files' + ' p2'
+            )
+          );
+        } else {
+          container.appendChild(
+            renderCoords(['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'], 'files' + ' p2')
+          );
+          container.appendChild(
+            renderCoords(
+              ['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'].reverse(),
+              'files' + ' p1'
+            )
+          );
+        }
+      }
     } else {
       container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
       container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
@@ -121,16 +161,22 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       );
 
       if (s.orientation === 'p1') {
-        container.appendChild(renderBoardScores(boardScores[1], 'p1'));
-        container.appendChild(renderBoardScores(boardScores[0], 'p2'));
+        container.appendChild(renderTogyBoardScores(boardScores[1], 'p1'));
+        container.appendChild(renderTogyBoardScores(boardScores[0], 'p2'));
       } else {
-        container.appendChild(renderBoardScores(boardScores[1].reverse(), 'p1'));
-        container.appendChild(renderBoardScores(boardScores[0].reverse(), 'p2'));
+        container.appendChild(renderTogyBoardScores(boardScores[1].reverse(), 'p1'));
+        container.appendChild(renderTogyBoardScores(boardScores[0].reverse(), 'p2'));
       }
+    } else if (s.variant === 'backgammon' || s.variant === 'nackgammon') {
+      const boardScores = calculateBackgammonScores(s.pieces, s.pocketPieces, s.dimensions);
+      container.appendChild(renderBoardScores(boardScores.p1.toString(), 'p1'));
+      container.appendChild(renderBoardScores(boardScores.p2.toString(), 'p2'));
     } else {
-      container.appendChild(renderBoardScores(files.slice(0, s.dimensions.width), s.orientation));
+      container.appendChild(renderBoardScores('0', s.orientation));
     }
   }
+
+  if (s.dice.length > 0) container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
 
   let ghost: HTMLElement | undefined;
   if (s.draggable.showGhost && !relative) {
@@ -148,7 +194,15 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   };
 }
 
-function renderBoardScores(elems: readonly string[], className: string): HTMLElement {
+function renderBoardScores(score: string, className: string): HTMLElement {
+  const el = createEl('board-scores', className);
+  const f: HTMLElement = createEl('board-score');
+  f.textContent = score;
+  el.appendChild(f);
+  return el;
+}
+
+function renderTogyBoardScores(elems: readonly string[], className: string): HTMLElement {
   const el = createEl('board-scores', className);
   let f, g: HTMLElement;
   for (const elem of elems) {
@@ -173,6 +227,17 @@ function renderBoardScores(elems: readonly string[], className: string): HTMLEle
       }
     }
     el.appendChild(f);
+  }
+  return el;
+}
+
+function renderDice(dice: Dice[], className: string): HTMLElement {
+  const el = createEl('cg-dice', className);
+  const diceClass = ['one', 'two', 'three', 'four', 'five', 'six'];
+  let d: HTMLElement;
+  for (const elem of dice) {
+    d = createEl('dice', diceClass[elem.value - 1] + (elem.isAvailable ? ' available' : ' unavailable'));
+    el.appendChild(d);
   }
   return el;
 }

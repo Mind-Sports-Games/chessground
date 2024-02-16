@@ -119,9 +119,10 @@ const posToTranslateBase = (
 
 export const posToTranslateAbs = (
   bounds: ClientRect,
-  bt: cg.BoardDimensions
+  bt: cg.BoardDimensions,
+  variant: cg.Variant
 ): ((pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair) => {
-  const xFactor = bounds.width / bt.width,
+  const xFactor = (bounds.width / bt.width) * (variant === 'backgammon' || variant === 'nackgammon' ? 0.8 : 1),
     yFactor = bounds.height / bt.height;
   return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor, bt);
 };
@@ -131,14 +132,29 @@ export const posToTranslateRel = (
   orientation: cg.Orientation,
   bt: cg.BoardDimensions,
   v: cg.Variant
-): cg.NumberPair => posToTranslateBase(pos, orientation, 100, v === 'togyzkumalak' ? 150 : 100, bt);
+): cg.NumberPair =>
+  posToTranslateBase(
+    pos,
+    orientation,
+    100,
+    v === 'togyzkumalak' ? 150 : v === 'backgammon' || v === 'nackgammon' ? 116 : 100,
+    bt
+  );
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
 };
 
+export const translateAbsAndRotate = (el: HTMLElement, pos: cg.NumberPair, deg: number): void => {
+  el.style.transform = `translate(${pos[0]}px,${pos[1]}px) rotate(${deg}deg)`;
+};
+
 export const translateRel = (el: HTMLElement, percents: cg.NumberPair): void => {
   el.style.transform = `translate(${percents[0]}%,${percents[1]}%)`;
+};
+
+export const translateRelAndRotate = (el: HTMLElement, percents: cg.NumberPair, deg: number): void => {
+  el.style.transform = `translate(${percents[0]}%,${percents[1]}%) rotate(${deg}deg)`;
 };
 
 export const setVisible = (el: HTMLElement, v: boolean): void => {
@@ -268,6 +284,41 @@ export function calculateGoScores(deadStones: cg.Pieces, pieces: cg.Pieces, bd: 
   p1Score = p1Score + remainingPieceKeys.filter(k => pieces.get(k)?.playerIndex === 'p1').length;
   p2Score = p2Score + remainingPieceKeys.filter(k => pieces.get(k)?.playerIndex === 'p2').length;
 
+  return {
+    p1: p1Score,
+    p2: p2Score,
+  };
+}
+
+export function calculateBackgammonScores(
+  pieces: cg.Pieces,
+  pocketPieces: cg.Piece[],
+  bd: cg.BoardDimensions
+): cg.BackgammonScores {
+  let p1Score = 0;
+  let p2Score = 0;
+  //pieces on board
+  for (const [k, p] of pieces) {
+    const pos = key2pos(k);
+    const boardPosNumber = pos[1] === 1 ? pos[0] + bd.width : bd.width + 1 - pos[0];
+    const count = p.role.split('-')[0].slice(1);
+    if (p.playerIndex === 'p1') {
+      const distanceOff = bd.height * bd.width + 1 - boardPosNumber;
+      p1Score += parseInt(count, 10) * distanceOff;
+    } else {
+      const distanceOff = boardPosNumber;
+      p2Score += parseInt(count, 10) * distanceOff;
+    }
+  }
+  //captured pieces
+  for (const pp of pocketPieces) {
+    const count = pp.role.split('-')[0].slice(1);
+    if (pp.playerIndex === 'p1') {
+      p1Score += parseInt(count, 10) * (bd.height * bd.width + 1);
+    } else {
+      p2Score += parseInt(count, 10) * (bd.height * bd.width + 1);
+    }
+  }
   return {
     p1: p1Score,
     p2: p2Score,

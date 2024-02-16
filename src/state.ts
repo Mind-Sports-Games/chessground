@@ -7,6 +7,7 @@ import * as cg from './types';
 
 export interface HeadlessState {
   pieces: cg.Pieces;
+  pocketPieces: cg.Piece[]; // only currently used for backgammon as pockets are displayed on the board
   orientation: cg.Orientation; // board orientation. p1 | p2 | left | right
   myPlayerIndex: cg.PlayerIndex; // to determine piece is ally or enemy
   startPlayerIndex: cg.PlayerIndex; //starting playerIndex
@@ -18,6 +19,7 @@ export interface HeadlessState {
   simpleGoScores?: cg.SimpleGoScores; // score for each player in go game (area + pieces)
   coordinates: boolean; // include coords attributes
   boardScores: boolean; //include board-scores attributes
+  dice: cg.Dice[]; // dice to display on the board
   autoCastle: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly: boolean; // don't bind events: the user will never be able to move pieces around
   selectOnly: boolean; // only allow user to select squares/pieces (multiple selection allowed)
@@ -44,6 +46,12 @@ export interface HeadlessState {
       afterNewPiece?: (role: cg.Role, key: cg.Key, metadata: cg.MoveMetadata) => void; // called after a new piece is dropped on the board
     };
     rookCastle: boolean; // castle by moving the king to the rook
+  };
+  liftable: {
+    liftDests?: cg.Key[]; // squares to remove a role/stone from
+    events: {
+      after?: (dest: cg.Key) => void; //called after a lift have been played
+    };
   };
   premovable: {
     enabled: boolean; // allow premoves for playerIndex that can not move
@@ -112,6 +120,7 @@ export interface HeadlessState {
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
     select?: (key: cg.Key) => void; // called when a square is selected
     insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
+    selectDice?: (dice: cg.Dice[]) => void; //when the dice have been selected (to swap order)
   };
   drawable: Drawable;
   exploding?: cg.Exploding;
@@ -132,12 +141,14 @@ export interface State extends HeadlessState {
 export function defaults(): HeadlessState {
   return {
     pieces: fen.read(fen.initial, { width: 8, height: 8 }, 'chess'),
+    pocketPieces: fen.readPocket(fen.initial, 'chess'),
     orientation: 'p1',
     myPlayerIndex: 'p1',
     startPlayerIndex: 'p1',
     turnPlayerIndex: 'p1',
     coordinates: true,
     boardScores: false,
+    dice: [],
     autoCastle: true,
     selectedPieces: new Map<cg.Key, cg.Piece>(),
     viewOnly: false,
@@ -160,6 +171,9 @@ export function defaults(): HeadlessState {
       showDests: true,
       events: {},
       rookCastle: true,
+    },
+    liftable: {
+      events: {},
     },
     premovable: {
       enabled: true,

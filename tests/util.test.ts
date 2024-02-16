@@ -7,6 +7,7 @@ import {
   calculatePlayerEmptyAreas,
   calculatePieceGroup,
   calculateGoScores,
+  calculateBackgammonScores,
 } from '../src/util';
 import { expect } from 'chai';
 
@@ -400,5 +401,66 @@ describe('calculateGoScores() test', () => {
 
     expect(expected.p1).to.equal(goScores.p1);
     expect(expected.p2).to.equal(goScores.p2);
+  });
+});
+
+describe('calculateBackgammonScores() test', () => {
+  it('testing backgammon score from starting fen', () => {
+    const pieces = new Map<cg.Key, cg.Piece>();
+    const pocketPieces: cg.Piece[] = [];
+
+    const p1_5Piece = { role: 's5-piece', playerIndex: 'p1' } as cg.Piece;
+    const p1_2Piece = { role: 's2-piece', playerIndex: 'p1' } as cg.Piece;
+    const p1_3Piece = { role: 's3-piece', playerIndex: 'p1' } as cg.Piece;
+    const p2_5Piece = { role: 's5-piece', playerIndex: 'p2' } as cg.Piece;
+    const p2_2Piece = { role: 's2-piece', playerIndex: 'p2' } as cg.Piece;
+    const p2_3Piece = { role: 's3-piece', playerIndex: 'p2' } as cg.Piece;
+    pieces.set('a2', p1_5Piece);
+    pieces.set('l2', p1_2Piece);
+    pieces.set('e1', p1_3Piece);
+    pieces.set('g1', p1_5Piece);
+    pieces.set('e2', p2_3Piece);
+    pieces.set('g2', p2_5Piece);
+    pieces.set('a1', p2_5Piece);
+    pieces.set('l1', p2_2Piece);
+
+    const bd = { height: 2, width: 12 };
+    const backgammonScores = calculateBackgammonScores(pieces, pocketPieces, bd);
+    const expected = { p1: 167, p2: 167 };
+
+    expect(expected.p1).to.equal(backgammonScores.p1);
+    expect(expected.p2).to.equal(backgammonScores.p2);
+  });
+});
+
+describe('calculateBackgammonScores() test', () => {
+  it('testing backgammon score with captured pieces', () => {
+    const pieces = new Map<cg.Key, cg.Piece>();
+    const pocketPieces: cg.Piece[] = [];
+
+    const p1_5Piece = { role: 's5-piece', playerIndex: 'p1' } as cg.Piece;
+    const p1_2Piece = { role: 's2-piece', playerIndex: 'p1' } as cg.Piece;
+    const p1_3Piece = { role: 's3-piece', playerIndex: 'p1' } as cg.Piece;
+    const p2_5Piece = { role: 's5-piece', playerIndex: 'p2' } as cg.Piece;
+    const p2_2Piece = { role: 's2-piece', playerIndex: 'p2' } as cg.Piece;
+    const p2_3Piece = { role: 's3-piece', playerIndex: 'p2' } as cg.Piece;
+    //pieces.set('a2', p1_5Piece);
+    pieces.set('l2', p1_2Piece);
+    pieces.set('e1', p1_3Piece);
+    pieces.set('g1', p1_5Piece);
+    pieces.set('e2', p2_3Piece);
+    pieces.set('g2', p2_5Piece);
+    pieces.set('a1', p2_5Piece);
+    //pieces.set('l1', p2_2Piece);
+
+    pocketPieces.push(p2_2Piece);
+    pocketPieces.push(p1_5Piece);
+
+    const bd = { height: 2, width: 12 };
+    const backgammonScores = calculateBackgammonScores(pieces, pocketPieces, bd);
+    const expected = { p1: 227, p2: 169 };
+
+    expect(expected.p1).to.equal(backgammonScores.p1);
+    expect(expected.p2).to.equal(backgammonScores.p2);
   });
 });

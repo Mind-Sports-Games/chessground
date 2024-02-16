@@ -51,6 +51,8 @@ export type Variant =
   | 'go9x9'
   | 'go13x13'
   | 'go19x19'
+  | 'backgammon'
+  | 'nackgammon'
   | undefined;
 export type PlayerIndex = typeof playerIndexs[number];
 export type Letter = typeof letters[number];
@@ -302,6 +304,16 @@ export const enum Notation {
 }
 
 export interface SimpleGoScores {
+  p1: number;
+  p2: number;
+}
+
+export interface Dice {
+  value: number;
+  isAvailable: boolean;
+}
+
+export interface BackgammonScores {
   p1: number;
   p2: number;
 }

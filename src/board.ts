@@ -171,6 +171,42 @@ export function userMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): bool
   return false;
 }
 
+export function userLift(state: HeadlessState, dest: cg.Key): boolean {
+  const piece = state.pieces.get(dest);
+
+  if (
+    piece &&
+    state.liftable.liftDests &&
+    state.liftable.liftDests.length > 0 &&
+    state.liftable.liftDests?.includes(dest) &&
+    state.turnPlayerIndex === piece.playerIndex
+  ) {
+    if (state.variant === 'backgammon' || state.variant === 'nackgammon') {
+      const count = piece.role.split('-')[0].substring(1);
+      const letter = piece.role.charAt(0);
+      if (count === '1') {
+        state.pieces.delete(dest);
+      } else {
+        state.pieces.set(dest, {
+          role: `${letter}${+count - 1}-piece` as cg.Role,
+          playerIndex: piece.playerIndex,
+        });
+      }
+    } else {
+      state.pieces.delete(dest);
+    }
+
+    callUserFunction(state.liftable.events.after, dest);
+    return true;
+  } else {
+    unsetPremove(state);
+    unsetPredrop(state);
+    cancelDropMode(state);
+  }
+  unselect(state);
+  return false;
+}
+
 /**
  * TODO: I believe this function is always called with orig=='a0'. Maybe consider changing that parameter to piece/role instead.
  *       I think we currently artificially assign state.pieces[a0] to the current pocket piece being dragged/selected, but it is imho hackish
@@ -416,13 +452,53 @@ export function getKeyAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
   bounds: ClientRect,
-  bd: cg.BoardDimensions
+  bd: cg.BoardDimensions,
+  variant: cg.Variant = 'chess'
 ): cg.Key | undefined {
-  const file = Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
-  const rank = Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height));
+  const bgBorder = 1 / 15;
+  const file =
+    variant === 'backgammon' || variant === 'nackgammon'
+      ? (pos[0] - bounds.left) / bounds.width < 1 / 15 ||
+        (pos[0] - bounds.left) / bounds.width >= 14 / 15 ||
+        ((pos[0] - bounds.left) / bounds.width >= 7 / 15 && (pos[0] - bounds.left) / bounds.width <= 8 / 15)
+        ? undefined
+        : (pos[0] - bounds.left) / bounds.width <= 7 / 15
+        ? Math.ceil(bd.width * ((pos[0] - bounds.left - bounds.width * bgBorder) / (bounds.width * 12 * bgBorder)))
+        : Math.ceil(bd.width * ((pos[0] - bounds.left - bounds.width * 2 * bgBorder) / (bounds.width * 12 * bgBorder)))
+      : Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
+  const rank =
+    variant === 'backgammon' || variant === 'nackgammon'
+      ? (pos[1] - bounds.top) / bounds.height <= 1 / 15 || (pos[1] - bounds.top) / bounds.height >= 14 / 15
+        ? undefined
+        : Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height))
+      : Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height));
+  if (rank === undefined || file === undefined) return undefined;
   pos = [file, rank];
   pos = T.mapToP1[orientation](pos, bd);
   return pos[0] > 0 && pos[0] < bd.width + 1 && pos[1] > 0 && pos[1] < bd.height + 1 ? pos2key(pos) : undefined;
+}
+
+export function areDiceAtDomPos(
+  pos: cg.NumberPair,
+  orientation: cg.Orientation,
+  bounds: ClientRect,
+  variant: cg.Variant = 'chess'
+): boolean {
+  //TODO deicde which side player's dice are on and if they flip during orientation
+  const correctWidth =
+    orientation === 'p2'
+      ? (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15
+      : (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15;
+  const correctHeight =
+    (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
+  return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
+}
+
+export function reorderDice(state: HeadlessState): void {
+  if (state.dice.length === 2 && state.dice[0].isAvailable && state.dice[1].isAvailable) {
+    state.dice = [state.dice[1], state.dice[0]];
+    callUserFunction(state.events.selectDice, state.dice);
+  }
 }
 
 export function p1Pov(s: HeadlessState): boolean {

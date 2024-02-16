@@ -4,7 +4,7 @@ import * as draw from './draw';
 import { cancelDropMode, drop } from './drop';
 import { eventPosition, isRightButton } from './util';
 import * as cg from './types';
-import { getKeyAtDomPos, userMove } from './board';
+import { areDiceAtDomPos, getKeyAtDomPos, userMove, userLift, reorderDice } from './board';
 import { Piece } from './types';
 
 type MouchBind = (e: cg.MouchEvent) => void;
@@ -75,7 +75,10 @@ function startDragOrDraw(s: State): MouchBind {
       if (s.drawable.enabled) draw.start(s, e);
     } else if (!s.viewOnly) {
       if (!s.selectOnly) {
-        if (s.dropmode.active && undefined === squareOccupied(s, e)) {
+        if (
+          s.dropmode.active &&
+          (undefined === squareOccupied(s, e) || s.variant === 'backgammon' || s.variant === 'nackgammon')
+        ) {
           // this case covers normal drop when it is our turn or pre-drop on empty scare
           drop(s, e);
         } else if (
@@ -95,12 +98,23 @@ function startDragOrDraw(s: State): MouchBind {
           if (s.singleClickMoveVariant) {
             const bounds = s.dom.bounds(),
               position = eventPosition(e)!,
-              orig = getKeyAtDomPos(position, s.orientation, bounds, s.dimensions);
+              orig = getKeyAtDomPos(position, s.orientation, bounds, s.dimensions, s.variant);
+            if (areDiceAtDomPos(position, s.orientation, bounds, s.variant)) {
+              reorderDice(s);
+              return;
+            }
             if (!orig) return;
             const piece = s.pieces.get(orig);
-            const dest = s.movable.dests?.get(orig)![0];
-            if (piece && piece.playerIndex === s.turnPlayerIndex && dest) {
+            const isLiftDest =
+              s.liftable.liftDests && s.liftable.liftDests?.length > 0 && s.liftable.liftDests.includes(orig);
+            const hasMovableDest = s.movable.dests && s.movable.dests.has(orig);
+            //assumption that a piece cant both lift and move otherwise what do we do on a single click?
+            if (piece && piece.playerIndex === s.turnPlayerIndex && hasMovableDest) {
+              const dest = s.movable.dests!.get(orig)![0];
               userMove(s, orig, dest);
+              s.dom.redraw();
+            } else if (piece && piece.playerIndex === s.turnPlayerIndex && isLiftDest) {
+              userLift(s, orig);
               s.dom.redraw();
             }
           } else {
@@ -124,7 +138,7 @@ function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind
 
 function squareOccupied(s: State, e: cg.MouchEvent): Piece | undefined {
   const position = eventPosition(e);
-  const dest = position && getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions);
+  const dest = position && getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
   if (dest && s.pieces.get(dest)) return s.pieces.get(dest);
   return undefined;
 }

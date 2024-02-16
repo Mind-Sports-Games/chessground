@@ -2,7 +2,8 @@ import { pos2key, NRanks, invNRanks } from './util';
 import * as cg from './types';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
-const commaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak'];
+const commaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak', 'backgammon', 'nackgammon'];
+const mancalaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak'];
 
 function roles(letter: string) {
   return (letter.replace('+', 'p') + '-piece') as cg.Role;
@@ -86,12 +87,19 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
     for (const r of fen.split(' ')[0].split('/')) {
       for (const f of r.split(',')) {
         if (isNaN(+f)) {
-          //some mancala specific code in here
           col += 1 + num;
           num = 0;
           const count = f.slice(0, -1);
           const role = f.substring(f.length - 1).toLowerCase();
-          const playerIndex = (row === 1 ? 'p1' : 'p2') as cg.PlayerIndex;
+          const playerIndex = (
+            mancalaFenVariants.includes(variant)
+              ? row === 1
+                ? 'p1'
+                : 'p2'
+              : f.substring(f.length - 1) === role
+              ? 'p2'
+              : 'p1'
+          ) as cg.PlayerIndex;
           const piece = {
             role: `${role}${count}-piece`,
             playerIndex: playerIndex,
@@ -110,6 +118,27 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
   return pieces;
 }
 
+export function readPocket(fen: cg.FEN, variant: cg.Variant): cg.Piece[] {
+  if ((variant === 'backgammon' || variant === 'nackgammon') && fen.indexOf('[') !== -1 && fen.indexOf(']') !== -1) {
+    const start = fen.indexOf('[', 0);
+    const end = fen.indexOf(']', start);
+    const pocket = fen.substring(start + 1, end);
+    if (pocket === '') return [];
+    const pocketPieces: cg.Piece[] = [];
+    for (const p of pocket.split(',')) {
+      const count = p.slice(0, -1);
+      const role = p.substring(p.length - 1).toLowerCase();
+      const playerIndex = p.substring(p.length - 1) === role ? 'p2' : 'p1';
+      const piece = {
+        role: `${role}${count}-piece`,
+        playerIndex: playerIndex,
+      } as cg.Piece;
+      pocketPieces.push(piece);
+    }
+    return pocketPieces;
+  } else return [];
+}
+
 export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Variant): cg.FEN {
   const fen = invNRanks
     .slice(-bd.height)
@@ -123,10 +152,14 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
                 letters(piece.role) + (piece.promoted && letters(piece.role).charAt(0) !== '+' ? '~' : '');
               return piece.playerIndex === 'p1' ? letter.toUpperCase() : letter;
             } else {
-              //mancala specific code here
-              const roleLetter = piece.role.charAt(0);
+              const letter = piece.role.charAt(0);
+              const roleLetter = mancalaFenVariants.includes(variant)
+                ? letter.toUpperCase()
+                : piece.playerIndex === 'p1'
+                ? letter.toUpperCase()
+                : letter;
               const count = piece.role.split('-')[0].substring(1);
-              return count + roleLetter.toUpperCase() + (x === bd.width ? '' : ',');
+              return count + roleLetter + (x === bd.width ? '' : ',');
             }
           } else return '1' + (!commaFenVariants.includes(variant) ? '' : ',');
         })

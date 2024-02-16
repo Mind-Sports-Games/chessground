@@ -1,6 +1,6 @@
 import { HeadlessState } from './state';
 import { setSelected, setGoScore } from './board';
-import { read as fenRead } from './fen';
+import { read as fenRead, readPocket as fenReadPocket } from './fen';
 import { DrawShape, DrawBrush } from './draw';
 import * as cg from './types';
 
@@ -14,6 +14,7 @@ export interface Config {
   selected?: cg.Key; // square currently selected "a1"
   coordinates?: boolean; // include coords attributes
   boardScores?: boolean; //include board-scores attributes
+  dice?: cg.Dice[]; // dice to display on the board
   autoCastle?: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly?: boolean; // don't bind events: the user will never be able to move pieces around
   selectOnly?: boolean; // only allow user to select squares/pieces (multiple selection allowed)
@@ -39,6 +40,12 @@ export interface Config {
       afterNewPiece?: (role: cg.Role, key: cg.Key, metadata: cg.MoveMetadata) => void; // called after a new piece is dropped on the board
     };
     rookCastle?: boolean; // castle by moving the king to the rook
+  };
+  liftable?: {
+    liftDests?: cg.Key[]; // squares to remove a role/stone from
+    events?: {
+      after?: (dest: cg.Key) => void; //called after a lift have been played
+    };
   };
   premovable?: {
     enabled?: boolean; // allow premoves for playerIndex that can not move
@@ -84,6 +91,7 @@ export interface Config {
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
     select?: (key: cg.Key) => void; // called when a square is selected
     insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
+    selectDice?: (dice: cg.Dice[]) => void; //when the dice have been selected (to swap order)
   };
   dropmode?: {
     active?: boolean;
@@ -120,6 +128,7 @@ export function configure(state: HeadlessState, config: Config): void {
   if (config.movable && config.movable.dests) state.movable.dests = undefined;
   if (config.dropmode?.dropDests) state.dropmode.dropDests = undefined;
   if (config.drawable?.autoShapes) state.drawable.autoShapes = [];
+  if (config.dice) state.dice = [];
 
   merge(state, config);
 
@@ -128,9 +137,11 @@ export function configure(state: HeadlessState, config: Config): void {
   // if a fen was provided, replace the pieces
   if (config.fen) {
     const pieces = fenRead(config.fen, state.dimensions, state.variant);
+    const pocketPieces = fenReadPocket(config.fen, state.variant);
     // prevent to cancel() already started piece drag from pocket!
     if (state.pieces.get('a0') !== undefined) pieces.set('a0', state.pieces.get('a0')!);
     state.pieces = pieces;
+    state.pocketPieces = pocketPieces;
     state.drawable.shapes = [];
   }
 

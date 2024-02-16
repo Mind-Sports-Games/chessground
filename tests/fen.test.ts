@@ -1,5 +1,5 @@
 import { BoardDimensions } from '../src/types';
-import { read, write } from '../src/fen';
+import { read, readPocket, write } from '../src/fen';
 import * as cg from '../src/types';
 import { expect } from 'chai';
 
@@ -237,5 +237,46 @@ describe('fen.write() test', () => {
     const pieces = read(fenString, bd, 'go19x19');
     const writtenFen = write(pieces, bd, 'go19x19');
     expect(expected).to.equal(writtenFen);
+  });
+});
+//todo Confirm structure of Backgammon fen...
+describe('fen.read() test', () => {
+  it('testing backgammon fen has 8 pieces', () => {
+    const fenString = '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[] w - - 1';
+    const bd: BoardDimensions = { width: 12, height: 2 };
+
+    const expected = 8;
+    const pieces = read(fenString, bd, 'backgammon');
+    expect(expected).to.equal(pieces.size);
+    const p1Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p1');
+    const p2Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p2');
+    expect(4).to.equal(p1Pieces.length);
+    expect(4).to.equal(p2Pieces.length);
+  });
+});
+describe('fen.write() test', () => {
+  it('testing backgammon read initial fen and then write match', () => {
+    const fenString = '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[] w - - 1';
+    const bd: BoardDimensions = { width: 12, height: 2 };
+
+    let expected = fenString.split(' ')[0];
+    if (expected.indexOf('[') !== -1) expected = expected.slice(0, expected.indexOf('['));
+    const pieces = read(fenString, bd, 'backgammon');
+    const writtenFen = write(pieces, bd, 'backgammon');
+    expect(expected).to.equal(writtenFen);
+  });
+});
+describe('fen.readPocket() test', () => {
+  it('testing backgammon read a fen pocket', () => {
+    const fenString = '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[2s,3S] w - - 1';
+
+    let expected = 2;
+    const pocketPieces = readPocket(fenString, 'backgammon');
+
+    expect(expected).to.equal(pocketPieces.length);
+    expect('s2-piece').to.equal(pocketPieces[0].role);
+    expect('p2').to.equal(pocketPieces[0].playerIndex);
+    expect('s3-piece').to.equal(pocketPieces[1].role);
+    expect('p1').to.equal(pocketPieces[1].playerIndex);
   });
 });
