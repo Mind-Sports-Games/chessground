@@ -139,6 +139,7 @@ function baseUserMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piec
   if (result) {
     state.movable.dests = undefined;
     state.dropmode.dropDests = undefined;
+    state.liftable.liftDests = undefined;
     state.turnPlayerIndex = opposite(state.turnPlayerIndex);
     state.animation.current = undefined;
   }
@@ -195,6 +196,10 @@ export function userLift(state: HeadlessState, dest: cg.Key): boolean {
     } else {
       state.pieces.delete(dest);
     }
+    state.movable.dests = undefined;
+    state.dropmode.dropDests = undefined;
+    state.liftable.liftDests = undefined;
+    state.animation.current = undefined;
 
     callUserFunction(state.liftable.events.after, dest);
     return true;
