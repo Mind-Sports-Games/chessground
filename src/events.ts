@@ -2,7 +2,7 @@ import { State } from './state';
 import * as drag from './drag';
 import * as draw from './draw';
 import { cancelDropMode, drop } from './drop';
-import { eventPosition, isRightButton } from './util';
+import { eventPosition, isRightButton, backgammonPosDiff } from './util';
 import * as cg from './types';
 import { areDiceAtDomPos, getKeyAtDomPos, userMove, userLift, reorderDice } from './board';
 import { Piece } from './types';
@@ -108,10 +108,15 @@ function startDragOrDraw(s: State): MouchBind {
             const isLiftDest =
               s.liftable.liftDests && s.liftable.liftDests?.length > 0 && s.liftable.liftDests.includes(orig);
             const hasMovableDest = s.movable.dests && s.movable.dests.has(orig);
+            const activeDiceValue = s.dice.length > 0 && s.dice[0].isAvailable ? s.dice[0].value : undefined;
             //assumption that a piece cant both lift and move otherwise what do we do on a single click?
             if (piece && piece.playerIndex === s.turnPlayerIndex && hasMovableDest) {
               const dest = s.movable.dests!.get(orig)![0];
-              userMove(s, orig, dest);
+              if (activeDiceValue !== undefined && isLiftDest && activeDiceValue !== backgammonPosDiff(orig, dest)) {
+                userLift(s, orig);
+              } else {
+                userMove(s, orig, dest);
+              }
               s.dom.redraw();
             } else if (piece && piece.playerIndex === s.turnPlayerIndex && isLiftDest) {
               userLift(s, orig);

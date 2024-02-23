@@ -325,6 +325,18 @@ export function calculateBackgammonScores(
   };
 }
 
+export function backgammonPosDiff(orig: cg.Key, dest: cg.Key): number {
+  const origFile = key2pos(orig)[0];
+  const origRank = key2pos(orig)[1];
+  const destFile = key2pos(dest)[0];
+  const destRank = key2pos(dest)[1];
+  if (origRank === destRank) {
+    return Math.abs(origFile - destFile);
+  } else {
+    return origFile + destFile - 1;
+  }
+}
+
 export type Callback = (...args: any[]) => void;
 
 export function callUserFunction(f: Callback | undefined, ...args: any[]): void {
