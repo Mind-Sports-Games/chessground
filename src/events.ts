@@ -99,7 +99,7 @@ function startDragOrDraw(s: State): MouchBind {
             const bounds = s.dom.bounds(),
               position = eventPosition(e)!,
               orig = getKeyAtDomPos(position, s.orientation, bounds, s.dimensions, s.variant);
-            if (areDiceAtDomPos(position, s.orientation, bounds, s.variant)) {
+            if (areDiceAtDomPos(position, s.turnPlayerIndex, bounds, s.variant)) {
               reorderDice(s);
               return;
             }

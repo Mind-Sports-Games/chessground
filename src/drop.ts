@@ -34,11 +34,29 @@ export function drop(s: State, e: cg.MouchEvent): void {
   if (piece) {
     s.pieces.set('a0', piece);
     const position = util.eventPosition(e);
-    const dest = position && board.getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
-    if (dest) board.dropNewPiece(s, 'a0', dest, s.variant === 'backgammon' || s.variant === 'nackgammon');
+    if (position && board.isPocketAtDomPos(position, s.orientation, s.myPlayerIndex, s.dom.bounds(), s.variant)) {
+      dropFromPocket(s, piece.role);
+    } else {
+      const dest = position && board.getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
+      if (dest) board.dropNewPiece(s, 'a0', dest, s.variant === 'backgammon' || s.variant === 'nackgammon');
+    }
   }
   //stop processing event clicks, as click drops will trigger a screen click and select a piece.
   e.stopPropagation();
   e.preventDefault();
   s.dom.redraw();
+}
+
+function dropFromPocket(s: State, role: cg.Role): void {
+  const activeDiceValue = s.dice.length > 0 && s.dice[0].isAvailable ? s.dice[0].value : undefined;
+  const activeDiceKey = activeDiceValue
+    ? util.pos2key([s.dimensions.width + 1 - activeDiceValue, s.myPlayerIndex === 'p1' ? 2 : 1])
+    : undefined;
+  const dest =
+    s.dropmode.dropDests && s.dropmode.dropDests.has(role) && activeDiceKey
+      ? s.dropmode.dropDests.get(role)?.includes(activeDiceKey)
+        ? activeDiceKey
+        : s.dropmode.dropDests.get(role)![0]
+      : false;
+  if (dest) board.dropNewPiece(s, 'a0', dest, s.variant === 'backgammon' || s.variant === 'nackgammon');
 }

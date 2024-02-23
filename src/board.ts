@@ -485,17 +485,31 @@ export function getKeyAtDomPos(
 
 export function areDiceAtDomPos(
   pos: cg.NumberPair,
-  orientation: cg.Orientation,
+  turnPlayerIndex: cg.PlayerIndex,
   bounds: ClientRect,
   variant: cg.Variant = 'chess'
 ): boolean {
-  //TODO deicde which side player's dice are on and if they flip during orientation
   const correctWidth =
-    orientation === 'p2'
+    turnPlayerIndex === 'p2'
       ? (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15
       : (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15;
   const correctHeight =
     (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
+  return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
+}
+
+export function isPocketAtDomPos(
+  pos: cg.NumberPair,
+  orientation: cg.Orientation,
+  myPlayerIndex: cg.PlayerIndex,
+  bounds: ClientRect,
+  variant: cg.Variant = 'chess'
+): boolean {
+  const correctWidth = (pos[0] - bounds.left) / bounds.width < 8 / 15 && (pos[0] - bounds.left) / bounds.width > 7 / 15;
+  const correctHeight =
+    orientation === myPlayerIndex
+      ? (pos[1] - bounds.top) / bounds.height > 8 / 15 && (pos[1] - bounds.top) / bounds.height < 13 / 15
+      : (pos[1] - bounds.top) / bounds.height > 2 / 15 && (pos[1] - bounds.top) / bounds.height < 7 / 15;
   return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
 }
 
