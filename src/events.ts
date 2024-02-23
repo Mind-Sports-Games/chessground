@@ -75,6 +75,10 @@ function startDragOrDraw(s: State): MouchBind {
       if (s.drawable.enabled) draw.start(s, e);
     } else if (!s.viewOnly) {
       if (!s.selectOnly) {
+        if (areDiceAtDomPos(eventPosition(e)!, s.turnPlayerIndex, s.dom.bounds(), s.variant)) {
+          reorderDice(s);
+          return;
+        }
         if (
           s.dropmode.active &&
           (undefined === squareOccupied(s, e) || s.variant === 'backgammon' || s.variant === 'nackgammon')
@@ -99,17 +103,13 @@ function startDragOrDraw(s: State): MouchBind {
             const bounds = s.dom.bounds(),
               position = eventPosition(e)!,
               orig = getKeyAtDomPos(position, s.orientation, bounds, s.dimensions, s.variant);
-            if (areDiceAtDomPos(position, s.turnPlayerIndex, bounds, s.variant)) {
-              reorderDice(s);
-              return;
-            }
             if (!orig) return;
             const piece = s.pieces.get(orig);
             const isLiftDest =
               s.liftable.liftDests && s.liftable.liftDests?.length > 0 && s.liftable.liftDests.includes(orig);
             const hasMovableDest = s.movable.dests && s.movable.dests.has(orig);
             const activeDiceValue = s.dice.length > 0 && s.dice[0].isAvailable ? s.dice[0].value : undefined;
-            //assumption that a piece cant both lift and move otherwise what do we do on a single click?
+            //if a piece can both lift and move then use dice to decide what todo on a single click?
             if (piece && piece.playerIndex === s.turnPlayerIndex && hasMovableDest) {
               const dest = s.movable.dests!.get(orig)![0];
               if (activeDiceValue !== undefined && isLiftDest && activeDiceValue !== backgammonPosDiff(orig, dest)) {

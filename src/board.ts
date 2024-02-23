@@ -508,8 +508,8 @@ export function isPocketAtDomPos(
   const correctWidth = (pos[0] - bounds.left) / bounds.width < 8 / 15 && (pos[0] - bounds.left) / bounds.width > 7 / 15;
   const correctHeight =
     orientation === turnPlayerIndex
-      ? (pos[1] - bounds.top) / bounds.height > 2 / 15 && (pos[1] - bounds.top) / bounds.height < 7 / 15
-      : (pos[1] - bounds.top) / bounds.height > 8 / 15 && (pos[1] - bounds.top) / bounds.height < 13 / 15;
+      ? (pos[1] - bounds.top) / bounds.height > 2 / 15 && (pos[1] - bounds.top) / bounds.height < 7.4 / 15
+      : (pos[1] - bounds.top) / bounds.height > 7.6 / 15 && (pos[1] - bounds.top) / bounds.height < 13 / 15;
   return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
 }
 
