@@ -516,8 +516,8 @@ export function isPocketAtDomPos(
 export function reorderDice(state: HeadlessState): void {
   if (state.dice.length === 2 && state.dice[0].isAvailable && state.dice[1].isAvailable) {
     state.dice = [state.dice[1], state.dice[0]];
-    callUserFunction(state.events.selectDice, state.dice);
   }
+  callUserFunction(state.events.selectDice, state.dice);
 }
 
 export function p1Pov(s: HeadlessState): boolean {
