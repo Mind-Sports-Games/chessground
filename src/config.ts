@@ -6,7 +6,7 @@ import * as cg from './types';
 
 export interface Config {
   fen?: cg.FEN; // chess position in Forsyth notation
-  orientation?: cg.Orientation; // board orientation. p1 | p2 | left | right
+  orientation?: cg.Orientation; // board orientation. p1 | p2 | left | right | p1vflip
   myPlayerIndex?: cg.PlayerIndex; // turn of player p1 | p2
   turnPlayerIndex?: cg.PlayerIndex; // turn to play. p1 | p2
   check?: cg.PlayerIndex | boolean; // true for current playerIndex, false to unset

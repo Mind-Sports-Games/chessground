@@ -11,6 +11,7 @@ import {
   callUserFunction,
   calculatePieceGroup,
   calculateGoScores,
+  oppositeOrientationBG,
 } from './util';
 import { premove, queen, knight } from './premove';
 import predrop from './predrop';
@@ -23,7 +24,9 @@ export function setOrientation(state: HeadlessState, o: cg.Orientation): void {
 }
 
 export function toggleOrientation(state: HeadlessState): void {
-  setOrientation(state, oppositeOrientation(state.orientation));
+  if (state.variant === 'backgammon' || state.variant === 'nackgammon') {
+    setOrientation(state, oppositeOrientationBG(state.orientation));
+  } else setOrientation(state, oppositeOrientation(state.orientation));
 }
 
 export function reset(state: HeadlessState): void {
@@ -473,7 +476,9 @@ export function getKeyAtDomPos(
       : Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
   const rank =
     variant === 'backgammon' || variant === 'nackgammon'
-      ? (pos[1] - bounds.top) / bounds.height <= 1 / 15 || (pos[1] - bounds.top) / bounds.height >= 14 / 15
+      ? (pos[1] - bounds.top) / bounds.height <= 1 / 15 ||
+        (pos[1] - bounds.top) / bounds.height >= 14 / 15 ||
+        ((pos[1] - bounds.top) / bounds.height >= 6 / 15 && (pos[1] - bounds.top) / bounds.height <= 9 / 15)
         ? undefined
         : Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height))
       : Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height));
@@ -485,12 +490,13 @@ export function getKeyAtDomPos(
 
 export function areDiceAtDomPos(
   pos: cg.NumberPair,
+  orientation: cg.Orientation,
   turnPlayerIndex: cg.PlayerIndex,
   bounds: ClientRect,
   variant: cg.Variant = 'chess'
 ): boolean {
   const correctWidth =
-    turnPlayerIndex === 'p2'
+    (orientation === 'p1' && turnPlayerIndex === 'p2') || (orientation === 'p1vflip' && turnPlayerIndex === 'p1')
       ? (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15
       : (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15;
   const correctHeight =
@@ -507,7 +513,7 @@ export function isPocketAtDomPos(
 ): boolean {
   const correctWidth = (pos[0] - bounds.left) / bounds.width < 8 / 15 && (pos[0] - bounds.left) / bounds.width > 7 / 15;
   const correctHeight =
-    orientation === turnPlayerIndex
+    (orientation === 'p1' && turnPlayerIndex === 'p1') || (orientation === 'p1vflip' && turnPlayerIndex === 'p2')
       ? (pos[1] - bounds.top) / bounds.height > 2 / 15 && (pos[1] - bounds.top) / bounds.height < 7.4 / 15
       : (pos[1] - bounds.top) / bounds.height > 7.6 / 15 && (pos[1] - bounds.top) / bounds.height < 13 / 15;
   return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;

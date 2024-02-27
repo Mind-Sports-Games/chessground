@@ -79,8 +79,18 @@ const flipOrientationLookup: Record<cg.Orientation, cg.Orientation> = {
   p2: 'p1',
   left: 'right',
   right: 'left',
+  p1vflip: 'p1',
+};
+const flipOrientationLookupBG: Record<cg.Orientation, cg.Orientation> = {
+  p1: 'p1vflip',
+  p1vflip: 'p1',
+  //these are unsued for backgammon but mandatory
+  p2: 'p2',
+  left: 'left',
+  right: 'right',
 };
 export const oppositeOrientation = (c: cg.Orientation): cg.Orientation => flipOrientationLookup[c];
+export const oppositeOrientationBG = (c: cg.Orientation): cg.Orientation => flipOrientationLookupBG[c];
 const flipOrientationLookupForLOA: Record<cg.PlayerIndex, cg.Orientation> = {
   p1: 'right',
   p2: 'p1',
@@ -91,6 +101,18 @@ const orientationLookupForLOA: Record<cg.PlayerIndex, cg.Orientation> = {
   p2: 'right',
 };
 export const orientationForLOA = (c: cg.PlayerIndex): cg.Orientation => orientationLookupForLOA[c];
+const flipOrientationLookupForBackgammon: Record<cg.PlayerIndex, cg.Orientation> = {
+  p1: 'p1vflip',
+  p2: 'p1',
+};
+export const oppositeOrientationForBackgammon = (c: cg.PlayerIndex): cg.Orientation =>
+  flipOrientationLookupForBackgammon[c];
+const orientationLookupForBackgammon: Record<cg.PlayerIndex, cg.Orientation> = {
+  p1: 'p1',
+  p2: 'p1vflip',
+};
+export const orientationForBackgammon = (c: cg.PlayerIndex): cg.Orientation => orientationLookupForBackgammon[c];
+
 export const isPlayerIndex = (c: cg.Orientation): c is cg.PlayerIndex => c === 'p1' || c === 'p2';
 
 export function containsX<X>(xs: X[] | undefined, x: X): boolean {

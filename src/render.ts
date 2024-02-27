@@ -192,7 +192,7 @@ export function render(s: State): void {
       pieceNode = createEl('piece', 'pocket ' + pieceName) as cg.PieceNode;
 
     pieceNode.cgPiece = pieceName;
-    pieceNode.cgKey = s.orientation === 'p1' ? 'a2' : 'l1'; // always have 0 transform (top left corner)
+    pieceNode.cgKey = s.orientation === 'p1' ? 'a2' : 'a1'; // always have 0 transform (top left corner)
 
     boardEl.appendChild(pieceNode);
   }
@@ -252,7 +252,7 @@ function pieceNameOf(
 
 function backgammonPosClass(k: cg.Key, orientation: cg.Orientation): string {
   const pos = key2pos(k);
-  const leftOrRight = orientation === 'p1' ? (pos[0] <= 6 ? 'left' : 'right') : pos[0] <= 6 ? 'right' : 'left';
+  const leftOrRight = pos[0] <= 6 ? 'left' : 'right';
   const topOrBottom = orientation === 'p1' ? (pos[1] <= 1 ? 'bottom' : 'top') : pos[1] <= 1 ? 'top' : 'bottom';
   return ` ${topOrBottom} ${leftOrRight}`;
 }
