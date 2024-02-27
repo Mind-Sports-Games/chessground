@@ -476,7 +476,9 @@ export function getKeyAtDomPos(
       : Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
   const rank =
     variant === 'backgammon' || variant === 'nackgammon'
-      ? (pos[1] - bounds.top) / bounds.height <= 1 / 15 || (pos[1] - bounds.top) / bounds.height >= 14 / 15
+      ? (pos[1] - bounds.top) / bounds.height <= 1 / 15 ||
+        (pos[1] - bounds.top) / bounds.height >= 14 / 15 ||
+        ((pos[1] - bounds.top) / bounds.height >= 6 / 15 && (pos[1] - bounds.top) / bounds.height <= 9 / 15)
         ? undefined
         : Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height))
       : Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height));
