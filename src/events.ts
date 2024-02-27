@@ -75,7 +75,7 @@ function startDragOrDraw(s: State): MouchBind {
       if (s.drawable.enabled) draw.start(s, e);
     } else if (!s.viewOnly) {
       if (!s.selectOnly) {
-        if (areDiceAtDomPos(eventPosition(e)!, s.turnPlayerIndex, s.dom.bounds(), s.variant)) {
+        if (areDiceAtDomPos(eventPosition(e)!, s.orientation, s.turnPlayerIndex, s.dom.bounds(), s.variant)) {
           reorderDice(s);
           return;
         }

@@ -488,12 +488,13 @@ export function getKeyAtDomPos(
 
 export function areDiceAtDomPos(
   pos: cg.NumberPair,
+  orientation: cg.Orientation,
   turnPlayerIndex: cg.PlayerIndex,
   bounds: ClientRect,
   variant: cg.Variant = 'chess'
 ): boolean {
   const correctWidth =
-    turnPlayerIndex === 'p2'
+    (orientation === 'p1' && turnPlayerIndex === 'p2') || (orientation === 'p1vflip' && turnPlayerIndex === 'p1')
       ? (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15
       : (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15;
   const correctHeight =

@@ -192,7 +192,7 @@ export function render(s: State): void {
       pieceNode = createEl('piece', 'pocket ' + pieceName) as cg.PieceNode;
 
     pieceNode.cgPiece = pieceName;
-    pieceNode.cgKey = s.orientation === 'p1' ? 'a2' : 'l1'; // always have 0 transform (top left corner)
+    pieceNode.cgKey = s.orientation === 'p1' ? 'a2' : 'a1'; // always have 0 transform (top left corner)
 
     boardEl.appendChild(pieceNode);
   }
