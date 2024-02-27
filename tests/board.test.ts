@@ -529,4 +529,26 @@ describe('getKeyAtDomPos() backgammon test', () => {
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
     expect(expected).to.equal(key);
   });
+  it('testing clicking top right square from p1 view', () => {
+    const bpos: NumberPair = [12.5, 0.5];
+    const orientation = 'p1vflip';
+    const bounds = {
+      height: 15 / 6.5,
+      width: 15,
+      x: 0,
+      y: 0,
+      bottom: 15 / 6.5,
+      left: 0,
+      right: 15,
+      top: 0,
+      toJSON(): any {
+        return 'None';
+      },
+    };
+    const bd: BoardDimensions = { width: 12, height: 2 };
+
+    const expected = 'k1';
+    const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
+    expect(expected).to.equal(key);
+  });
 });

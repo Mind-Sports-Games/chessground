@@ -8,7 +8,7 @@ import * as cg from './types';
 export interface HeadlessState {
   pieces: cg.Pieces;
   pocketPieces: cg.Piece[]; // only currently used for backgammon as pockets are displayed on the board
-  orientation: cg.Orientation; // board orientation. p1 | p2 | left | right
+  orientation: cg.Orientation; // board orientation. p1 | p2 | left | right | p1vflip
   myPlayerIndex: cg.PlayerIndex; // to determine piece is ally or enemy
   startPlayerIndex: cg.PlayerIndex; //starting playerIndex
   turnPlayerIndex: cg.PlayerIndex; // turn to play. p1 | p2

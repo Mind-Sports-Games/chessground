@@ -162,7 +162,8 @@ export type Unbind = () => void;
 export type Milliseconds = number;
 export type KHz = number;
 
-export const orientations = ['p1', 'p2', 'left', 'right'] as const; // where the player is sat on the board with p1 at the bottom
+// where the player is sat on the board with p1 at the bottom (or for backgammon p2 has the board flipped vertically from p1 - p1vflip)
+export const orientations = ['p1', 'p2', 'left', 'right', 'p1vflip'] as const;
 export const playerIndexs = ['p1', 'p2'] as const;
 export const files = [
   'a',

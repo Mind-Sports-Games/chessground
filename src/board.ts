@@ -11,6 +11,7 @@ import {
   callUserFunction,
   calculatePieceGroup,
   calculateGoScores,
+  oppositeOrientationBG,
 } from './util';
 import { premove, queen, knight } from './premove';
 import predrop from './predrop';
@@ -23,7 +24,9 @@ export function setOrientation(state: HeadlessState, o: cg.Orientation): void {
 }
 
 export function toggleOrientation(state: HeadlessState): void {
-  setOrientation(state, oppositeOrientation(state.orientation));
+  if (state.variant === 'backgammon' || state.variant === 'nackgammon') {
+    setOrientation(state, oppositeOrientationBG(state.orientation));
+  } else setOrientation(state, oppositeOrientation(state.orientation));
 }
 
 export function reset(state: HeadlessState): void {
@@ -507,7 +510,7 @@ export function isPocketAtDomPos(
 ): boolean {
   const correctWidth = (pos[0] - bounds.left) / bounds.width < 8 / 15 && (pos[0] - bounds.left) / bounds.width > 7 / 15;
   const correctHeight =
-    orientation === turnPlayerIndex
+    (orientation === 'p1' && turnPlayerIndex === 'p1') || (orientation === 'p1vflip' && turnPlayerIndex === 'p2')
       ? (pos[1] - bounds.top) / bounds.height > 2 / 15 && (pos[1] - bounds.top) / bounds.height < 7.4 / 15
       : (pos[1] - bounds.top) / bounds.height > 7.6 / 15 && (pos[1] - bounds.top) / bounds.height < 13 / 15;
   return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
