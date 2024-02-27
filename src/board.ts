@@ -485,13 +485,12 @@ export function getKeyAtDomPos(
 
 export function areDiceAtDomPos(
   pos: cg.NumberPair,
-  orientation: cg.Orientation,
+  turnPlayerIndex: cg.PlayerIndex,
   bounds: ClientRect,
   variant: cg.Variant = 'chess'
 ): boolean {
-  //TODO deicde which side player's dice are on and if they flip during orientation
   const correctWidth =
-    orientation === 'p2'
+    turnPlayerIndex === 'p2'
       ? (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15
       : (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15;
   const correctHeight =
@@ -499,11 +498,26 @@ export function areDiceAtDomPos(
   return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
 }
 
+export function isPocketAtDomPos(
+  pos: cg.NumberPair,
+  orientation: cg.Orientation,
+  turnPlayerIndex: cg.PlayerIndex,
+  bounds: ClientRect,
+  variant: cg.Variant = 'chess'
+): boolean {
+  const correctWidth = (pos[0] - bounds.left) / bounds.width < 8 / 15 && (pos[0] - bounds.left) / bounds.width > 7 / 15;
+  const correctHeight =
+    orientation === turnPlayerIndex
+      ? (pos[1] - bounds.top) / bounds.height > 2 / 15 && (pos[1] - bounds.top) / bounds.height < 7.4 / 15
+      : (pos[1] - bounds.top) / bounds.height > 7.6 / 15 && (pos[1] - bounds.top) / bounds.height < 13 / 15;
+  return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
+}
+
 export function reorderDice(state: HeadlessState): void {
   if (state.dice.length === 2 && state.dice[0].isAvailable && state.dice[1].isAvailable) {
     state.dice = [state.dice[1], state.dice[0]];
-    callUserFunction(state.events.selectDice, state.dice);
   }
+  callUserFunction(state.events.selectDice, state.dice);
 }
 
 export function p1Pov(s: HeadlessState): boolean {
