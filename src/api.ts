@@ -29,6 +29,12 @@ export interface Api {
   // perform a move programmatically but with no animation
   moveNoAnim(orig: cg.Key, dest: cg.Key): void;
 
+  //perform a lift programmatically
+  lift(dest: cg.Key): void;
+
+  //perform a lift programmatically but with no animation
+  liftNoAnim(dest: cg.Key): void;
+
   // add and/or remove arbitrary pieces on the board
   setPieces(pieces: cg.PiecesDiff): void;
 
@@ -143,6 +149,15 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
 
     moveNoAnim(orig, dest): void {
       board.baseMove(state, orig, dest);
+      state.dom.redraw();
+    },
+
+    lift(dest): void {
+      anim(state => board.userLift(state, dest), state);
+    },
+
+    liftNoAnim(dest): void {
+      board.userLift(state, dest);
       state.dom.redraw();
     },
 
