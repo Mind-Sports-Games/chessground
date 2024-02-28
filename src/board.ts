@@ -452,7 +452,12 @@ export function cancelMove(state: HeadlessState): void {
 }
 
 export function stop(state: HeadlessState): void {
-  state.movable.playerIndex = state.movable.dests = state.dropmode.dropDests = state.animation.current = undefined;
+  state.movable.playerIndex =
+    state.movable.dests =
+    state.dropmode.dropDests =
+    state.liftable.liftDests =
+    state.animation.current =
+      undefined;
   cancelMove(state);
 }
 
