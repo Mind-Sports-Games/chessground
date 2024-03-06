@@ -182,7 +182,7 @@ export function userLift(state: HeadlessState, dest: cg.Key): boolean {
     piece &&
     state.liftable.liftDests &&
     state.liftable.liftDests.length > 0 &&
-    state.liftable.liftDests?.includes(dest) &&
+    state.liftable.liftDests.includes(dest) &&
     state.turnPlayerIndex === piece.playerIndex
   ) {
     if (state.variant === 'backgammon' || state.variant === 'nackgammon') {
@@ -493,13 +493,15 @@ export function getKeyAtDomPos(
   return pos[0] > 0 && pos[0] < bd.width + 1 && pos[1] > 0 && pos[1] < bd.height + 1 ? pos2key(pos) : undefined;
 }
 
-export function areDiceAtDomPos(
+export function areMyDiceAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
   turnPlayerIndex: cg.PlayerIndex,
+  myPlayerIndex: cg.PlayerIndex,
   bounds: ClientRect,
   variant: cg.Variant = 'chess'
 ): boolean {
+  if (turnPlayerIndex !== myPlayerIndex) return false;
   const correctWidth =
     (orientation === 'p1' && turnPlayerIndex === 'p2') || (orientation === 'p1vflip' && turnPlayerIndex === 'p1')
       ? (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15
