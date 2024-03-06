@@ -4,7 +4,7 @@ import * as draw from './draw';
 import { cancelDropMode, drop } from './drop';
 import { eventPosition, isRightButton, backgammonPosDiff } from './util';
 import * as cg from './types';
-import { areDiceAtDomPos, getKeyAtDomPos, userMove, userLift, reorderDice } from './board';
+import { areMyDiceAtDomPos, getKeyAtDomPos, userMove, userLift, reorderDice } from './board';
 import { Piece } from './types';
 
 type MouchBind = (e: cg.MouchEvent) => void;
@@ -75,8 +75,18 @@ function startDragOrDraw(s: State): MouchBind {
       if (s.drawable.enabled) draw.start(s, e);
     } else if (!s.viewOnly) {
       if (!s.selectOnly) {
-        if (areDiceAtDomPos(eventPosition(e)!, s.orientation, s.turnPlayerIndex, s.dom.bounds(), s.variant)) {
+        if (
+          areMyDiceAtDomPos(
+            eventPosition(e)!,
+            s.orientation,
+            s.turnPlayerIndex,
+            s.myPlayerIndex,
+            s.dom.bounds(),
+            s.variant
+          )
+        ) {
           reorderDice(s);
+          stopProcessingClick(e);
           return;
         }
         if (
@@ -106,7 +116,7 @@ function startDragOrDraw(s: State): MouchBind {
             if (!orig) return;
             const piece = s.pieces.get(orig);
             const isLiftDest =
-              s.liftable.liftDests && s.liftable.liftDests?.length > 0 && s.liftable.liftDests.includes(orig);
+              s.liftable.liftDests && s.liftable.liftDests.length > 0 && s.liftable.liftDests.includes(orig);
             const hasMovableDest = s.movable.dests && s.movable.dests.has(orig);
             const activeDiceValue = s.dice.length > 0 && s.dice[0].isAvailable ? s.dice[0].value : undefined;
             //if a piece can both lift and move then use dice to decide what todo on a single click?
@@ -114,12 +124,15 @@ function startDragOrDraw(s: State): MouchBind {
               const dest = s.movable.dests!.get(orig)![0];
               if (activeDiceValue !== undefined && isLiftDest && activeDiceValue !== backgammonPosDiff(orig, dest)) {
                 userLift(s, orig);
+                stopProcessingClick(e);
               } else {
                 userMove(s, orig, dest);
+                stopProcessingClick(e);
               }
               s.dom.redraw();
             } else if (piece && piece.playerIndex === s.turnPlayerIndex && isLiftDest) {
               userLift(s, orig);
+              stopProcessingClick(e);
               s.dom.redraw();
             }
           } else {
@@ -131,6 +144,12 @@ function startDragOrDraw(s: State): MouchBind {
       }
     }
   };
+}
+
+function stopProcessingClick(e: cg.MouchEvent): void {
+  //stop processing event clicks, as a click will trigger a screen click and do something unwanted
+  e.stopPropagation();
+  e.preventDefault();
 }
 
 function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind): MouchBind {
