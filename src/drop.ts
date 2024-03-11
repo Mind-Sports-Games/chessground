@@ -48,7 +48,8 @@ export function drop(s: State, e: cg.MouchEvent): void {
 }
 
 function dropFromPocket(s: State, role: cg.Role): void {
-  const activeDiceValue = s.dice.length > 0 && s.dice[0].isAvailable ? s.dice[0].value : undefined;
+  const activeDiceValue =
+    s.dice.filter(d => d.isAvailable).length > 0 ? s.dice.filter(d => d.isAvailable)[0].value : undefined;
   const activeDiceKey = activeDiceValue
     ? util.pos2key([s.dimensions.width + 1 - activeDiceValue, s.myPlayerIndex === 'p1' ? 2 : 1])
     : undefined;
