@@ -118,7 +118,8 @@ function startDragOrDraw(s: State): MouchBind {
             const isLiftDest =
               s.liftable.liftDests && s.liftable.liftDests.length > 0 && s.liftable.liftDests.includes(orig);
             const hasMovableDest = s.movable.dests && s.movable.dests.has(orig);
-            const activeDiceValue = s.dice.length > 0 && s.dice[0].isAvailable ? s.dice[0].value : undefined;
+            const activeDiceValue =
+              s.dice.filter(d => d.isAvailable).length > 0 ? s.dice.filter(d => d.isAvailable)[0].value : undefined;
             //if a piece can both lift and move then use dice to decide what todo on a single click?
             if (piece && piece.playerIndex === s.turnPlayerIndex && hasMovableDest) {
               const dest = s.movable.dests!.get(orig)![0];
