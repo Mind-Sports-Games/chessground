@@ -20,6 +20,9 @@ export interface HeadlessState {
   coordinates: boolean; // include coords attributes
   boardScores: boolean; //include board-scores attributes
   dice: cg.Dice[]; // dice to display on the board
+  canUndo: boolean; // can user undo their last action (backgammon)
+  showUndoButton: boolean; // render the undo button (backgammon)
+  gameButtonsActive: boolean; // can user process game buttons (e.g. swap dice, undo)
   autoCastle: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly: boolean; // don't bind events: the user will never be able to move pieces around
   selectOnly: boolean; // only allow user to select squares/pieces (multiple selection allowed)
@@ -121,6 +124,7 @@ export interface HeadlessState {
     select?: (key: cg.Key) => void; // called when a square is selected
     insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
     selectDice?: (dice: cg.Dice[]) => void; //when the dice have been selected (to swap order)
+    undoButton?: () => void; //when the undo button hass been selected for backgammon
   };
   drawable: Drawable;
   exploding?: cg.Exploding;
@@ -149,6 +153,9 @@ export function defaults(): HeadlessState {
     coordinates: true,
     boardScores: false,
     dice: [],
+    canUndo: false,
+    showUndoButton: false,
+    gameButtonsActive: true,
     autoCastle: true,
     selectedPieces: new Map<cg.Key, cg.Piece>(),
     viewOnly: false,

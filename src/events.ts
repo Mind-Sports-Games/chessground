@@ -4,7 +4,15 @@ import * as draw from './draw';
 import { cancelDropMode, drop } from './drop';
 import { eventPosition, isRightButton, backgammonPosDiff } from './util';
 import * as cg from './types';
-import { areMyDiceAtDomPos, getKeyAtDomPos, userMove, userLift, reorderDice } from './board';
+import {
+  areMyDiceAtDomPos,
+  isButtonAtDomPos,
+  getKeyAtDomPos,
+  userMove,
+  userLift,
+  reorderDice,
+  undoButtonPressed,
+} from './board';
 import { Piece } from './types';
 
 type MouchBind = (e: cg.MouchEvent) => void;
@@ -86,6 +94,20 @@ function startDragOrDraw(s: State): MouchBind {
           )
         ) {
           reorderDice(s);
+          stopProcessingClick(e);
+          return;
+        }
+        if (
+          isButtonAtDomPos(
+            eventPosition(e)!,
+            s.orientation,
+            s.turnPlayerIndex,
+            s.myPlayerIndex,
+            s.dom.bounds(),
+            s.variant
+          )
+        ) {
+          undoButtonPressed(s);
           stopProcessingClick(e);
           return;
         }

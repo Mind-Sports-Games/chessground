@@ -458,6 +458,7 @@ export function stop(state: HeadlessState): void {
     state.liftable.liftDests =
     state.animation.current =
       undefined;
+  state.gameButtonsActive = false;
   cancelMove(state);
 }
 
@@ -511,6 +512,24 @@ export function areMyDiceAtDomPos(
   return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
 }
 
+export function isButtonAtDomPos(
+  pos: cg.NumberPair,
+  orientation: cg.Orientation,
+  turnPlayerIndex: cg.PlayerIndex,
+  myPlayerIndex: cg.PlayerIndex,
+  bounds: ClientRect,
+  variant: cg.Variant = 'chess'
+): boolean {
+  if (turnPlayerIndex !== myPlayerIndex) return false;
+  const correctWidth =
+    (orientation === 'p1' && turnPlayerIndex === 'p2') || (orientation === 'p1vflip' && turnPlayerIndex === 'p1')
+      ? (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15
+      : (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15;
+  const correctHeight =
+    (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
+  return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
+}
+
 export function isPocketAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
@@ -527,10 +546,18 @@ export function isPocketAtDomPos(
 }
 
 export function reorderDice(state: HeadlessState): void {
-  if (state.dice.length === 2 && state.dice[0].isAvailable && state.dice[1].isAvailable) {
-    state.dice = [state.dice[1], state.dice[0]];
+  if (state.gameButtonsActive) {
+    if (state.dice.length === 2 && state.dice[0].isAvailable && state.dice[1].isAvailable) {
+      state.dice = [state.dice[1], state.dice[0]];
+    }
+    callUserFunction(state.events.selectDice, state.dice);
   }
-  callUserFunction(state.events.selectDice, state.dice);
+}
+
+export function undoButtonPressed(state: HeadlessState): void {
+  if (state.gameButtonsActive) {
+    callUserFunction(state.events.undoButton);
+  }
 }
 
 export function p1Pov(s: HeadlessState): boolean {

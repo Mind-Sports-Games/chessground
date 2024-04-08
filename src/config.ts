@@ -15,6 +15,9 @@ export interface Config {
   coordinates?: boolean; // include coords attributes
   boardScores?: boolean; //include board-scores attributes
   dice?: cg.Dice[]; // dice to display on the board
+  canUndo?: boolean; // can user undo thier last action
+  showUndoButton?: boolean; //show the undo button
+  gameButtonsActive?: boolean; // can user process game buttons (e.g. swap dice, undo)
   autoCastle?: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly?: boolean; // don't bind events: the user will never be able to move pieces around
   selectOnly?: boolean; // only allow user to select squares/pieces (multiple selection allowed)
@@ -92,6 +95,7 @@ export interface Config {
     select?: (key: cg.Key) => void; // called when a square is selected
     insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
     selectDice?: (dice: cg.Dice[]) => void; //when the dice have been selected (to swap order)
+    undoButton?: () => void; //when the undo button hass been selected for backgammon
   };
   dropmode?: {
     active?: boolean;

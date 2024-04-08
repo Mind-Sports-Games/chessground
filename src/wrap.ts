@@ -170,7 +170,12 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     }
   }
 
-  if (s.dice.length > 0) container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
+  if (s.dice.length > 0) {
+    container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
+    if (s.showUndoButton) {
+      container.appendChild(renderUndoButton(s.canUndo, s.turnPlayerIndex));
+    }
+  }
 
   let ghost: HTMLElement | undefined;
   if (s.draggable.showGhost && !relative) {
@@ -233,6 +238,14 @@ function renderDice(dice: Dice[], className: string): HTMLElement {
     d = createEl('dice', diceClass[elem.value - 1] + (elem.isAvailable ? ' available' : ' unavailable'));
     el.appendChild(d);
   }
+  return el;
+}
+
+function renderUndoButton(canUndo: boolean, className: string): HTMLElement {
+  const el = createEl('cg-buttons', className);
+  const d: HTMLElement = createEl('cg-button', 'undo ' + (canUndo ? 'available' : 'unavailable'));
+  d.textContent = 'UNDO';
+  el.appendChild(d);
   return el;
 }
 
