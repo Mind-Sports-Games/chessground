@@ -17,6 +17,7 @@ export interface Config {
   dice?: cg.Dice[]; // dice to display on the board
   canUndo?: boolean; // can user undo thier last action
   showUndoButton?: boolean; //show the undo button
+  gameButtonsActive?: boolean; // can user process game buttons (e.g. swap dice, undo)
   autoCastle?: boolean; // immediately complete the castle by moving the rook after king move
   viewOnly?: boolean; // don't bind events: the user will never be able to move pieces around
   selectOnly?: boolean; // only allow user to select squares/pieces (multiple selection allowed)
