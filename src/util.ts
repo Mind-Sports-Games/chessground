@@ -42,6 +42,17 @@ export function adjacentKeys(bd: cg.BoardDimensions, key: cg.Key): cg.Key[] {
     .map(p => pos2key(p as cg.Pos));
 }
 
+export const surroundedDirections: number[][] = [
+  [1, 1],
+  [1, 0],
+  [1, -1],
+  [0, 1],
+  [0, -1],
+  [-1, 1],
+  [-1, 0],
+  [-1, -1],
+];
+
 export function memo<A>(f: () => A): cg.Memo<A> {
   let v: A | undefined;
   const ret = (): A => {
@@ -288,6 +299,18 @@ export function calculatePieceGroup(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.
   return assignNextWave([pieceKey]);
 }
 
+export function calculateGoCaptures(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
+  const borderKeys = calculateBorder([pieceKey], bd);
+  const enemyKeys = borderKeys.filter(
+    k => pieces.get(k) && pieces.get(k)?.playerIndex !== pieces.get(pieceKey)?.playerIndex
+  );
+  const enemyPieces = enemyKeys.map(k => calculatePieceGroup(k, pieces, bd));
+  const capturedPieces = enemyPieces.filter(
+    enemyGroup => calculateBorder(enemyGroup, bd).filter(k => !pieces.has(k)).length === 0
+  );
+  return [...new Set(capturedPieces.flat())];
+}
+
 export function calculateGoScores(deadStones: cg.Pieces, pieces: cg.Pieces, bd: cg.BoardDimensions): cg.SimpleGoScores {
   let p1Score = 0;
   let p2Score = 0;
@@ -357,6 +380,313 @@ export function backgammonPosDiff(orig: cg.Key, dest: cg.Key): number {
   } else {
     return origFile + destFile - 1;
   }
+}
+
+export function calculateFlippingPieces(
+  bd: cg.BoardDimensions,
+  pieces: cg.Pieces,
+  piece: cg.Piece,
+  key: cg.Key
+): cg.Key[] {
+  const flipping: cg.Key[] = [];
+  const orig: cg.Pos = key2pos(key);
+  let flip_list: cg.Key[] = [];
+
+  for (const direction of surroundedDirections) {
+    flip_list = [];
+    for (let step = 1; step < bd.width; step++) {
+      const pos: [number, number] = [orig[0] + step * direction[0], orig[1] + step * direction[1]];
+      if (pos[0] < 1 || pos[0] > bd.width || pos[1] < 1 || pos[1] > bd.height) {
+        break;
+      }
+      const k = pos2key(pos);
+      const p = pieces.get(k);
+      if (p && p.playerIndex === piece.playerIndex) {
+        flip_list.forEach(x => flipping.push(x));
+        break;
+      } else if (p && p.playerIndex !== piece.playerIndex) {
+        flip_list.push(pos2key(pos));
+      } else {
+        break;
+      }
+    }
+  }
+
+  return flipping;
+}
+
+export function owareUpdatePiecesFromMove(
+  bd: cg.BoardDimensions,
+  pieces: cg.Pieces,
+  orig: cg.Key,
+  dest: cg.Key
+): cg.PiecesDiff {
+  const boardWidth = bd.width;
+  const boardArray = createMancalaBoardArrayFromPieces(pieces, bd);
+  const origBoardIndex = boardIndexFromUci(orig, boardWidth);
+  const destBoardIndex = boardIndexFromUci(dest, boardWidth);
+  const stones = boardArray[origBoardIndex];
+  const extraStoneArray = Array<number>(boardWidth * 2).fill(0);
+
+  //calculate where the stones from moving piece will land
+  for (let i = 1; i < stones + 1; i++) {
+    const missingOwnHouse = Math.floor((i - 1) / (boardWidth * 2 - 1));
+    const indexToAdd = (origBoardIndex + i + missingOwnHouse) % (boardWidth * 2);
+    extraStoneArray[indexToAdd] += 1;
+  }
+
+  //remove piece that is moving
+  const boardArrayRemovedMovingPiece = boardArray.slice(0, boardArray.length);
+  boardArrayRemovedMovingPiece[origBoardIndex] = 0;
+
+  //add moving stones to board
+  const finalBoardArray = boardArrayRemovedMovingPiece.map((v, i) => v + extraStoneArray[i]);
+
+  //remove any captured pieces (must check for grandslam!)
+  if (dest[1] !== orig[1] && !isGrandSlam(finalBoardArray, destBoardIndex, boardWidth)) {
+    for (let i = 0; i < (destBoardIndex % boardWidth) + 1; i++) {
+      const captureIndex = destBoardIndex - i;
+      if (finalBoardArray[captureIndex] === 2 || finalBoardArray[captureIndex] === 3) {
+        finalBoardArray[captureIndex] = 0;
+      } else {
+        break;
+      }
+    }
+  }
+
+  //calculate the new pieces of the board to update chessground with
+  const updatedPieces: cg.PiecesDiff = new Map();
+  const defaultPieceLetter = 's';
+  for (let i = 0; i < finalBoardArray.length; i++) {
+    const playerIndex: 'p1' | 'p2' = i < boardWidth ? 'p1' : 'p2';
+    const numStones = finalBoardArray[i];
+    const pos: cg.Pos = [i < boardWidth ? i + 1 : boardWidth * 2 - i, i < boardWidth ? 1 : 2] as cg.Pos;
+    const k: cg.Key = pos2key(pos);
+    if (numStones === 0) {
+      updatedPieces.set(k, undefined);
+    } else {
+      const piece: cg.Piece = {
+        role: `${defaultPieceLetter}${finalBoardArray[i]}-piece` as cg.Role,
+        playerIndex: playerIndex,
+      };
+      updatedPieces.set(k, piece);
+    }
+  }
+
+  return updatedPieces;
+}
+
+export function togyzkumalakUpdatePiecesFromMove(
+  bd: cg.BoardDimensions,
+  pieces: cg.Pieces,
+  orig: cg.Key,
+  dest: cg.Key
+): cg.PiecesDiff {
+  const boardWidth = bd.width;
+  const boardArray = createMancalaBoardArrayFromPieces(pieces, bd);
+  const origBoardIndex = boardIndexFromUci(orig, boardWidth);
+  const destBoardIndex = boardIndexFromUci(dest, boardWidth);
+  const stones = boardArray[origBoardIndex];
+  const extraStoneArray = Array<number>(boardWidth * 2).fill(0);
+
+  //calculate where the stones from moving piece will land
+  if (stones === 1) {
+    extraStoneArray[(origBoardIndex + 1) % (boardWidth * 2)] = 1;
+  } else {
+    for (let i = 0; i < stones; i++) {
+      const indexToAdd = (origBoardIndex + i) % (boardWidth * 2);
+      extraStoneArray[indexToAdd] += 1;
+    }
+  }
+  //remove piece that is moving (it will always get replaced by a new piece if not count 1)
+  const boardArrayRemovedMovingPiece = boardArray.slice(0, boardArray.length);
+  boardArrayRemovedMovingPiece[origBoardIndex] = 0;
+
+  //add moving stones to board
+  const finalBoardArray = boardArrayRemovedMovingPiece.map((v, i) => v + extraStoneArray[i]);
+
+  //remove any normal (even) captured pieces from dest
+  if (dest[1] !== orig[1] && finalBoardArray[destBoardIndex] % 2 === 0) {
+    finalBoardArray[destBoardIndex] = 0;
+  }
+
+  // get current board array index of tuzdik
+  const existingTuzdik = [...pieces.entries()]
+    .filter(it => it[1].role === 't-piece')
+    .map(([k, _], __) => boardIndexFromUci(k, bd.width));
+
+  //is tuzdik created
+  const createdTuzdik =
+    existingTuzdik.length !== 2 &&
+    destBoardIndex !== boardWidth - 1 &&
+    destBoardIndex !== boardWidth * 2 - 1 &&
+    finalBoardArray[destBoardIndex] === 3 &&
+    (existingTuzdik.length === 0 ||
+      (existingTuzdik.length === 1 &&
+        existingTuzdik[0] % boardWidth !== destBoardIndex % boardWidth &&
+        Math.floor(existingTuzdik[0] / boardWidth) !== Math.floor(destBoardIndex / boardWidth)));
+
+  //remove potential stones where there is a tuzdik
+  if (createdTuzdik) finalBoardArray[destBoardIndex] = 0;
+  existingTuzdik.map(i => (finalBoardArray[i] = 0));
+
+  //calculate the new pieces of the board to update chessground with
+  const updatedPieces: cg.PiecesDiff = new Map();
+  const defaultPieceLetter = 's';
+  for (let i = 0; i < finalBoardArray.length; i++) {
+    const playerIndex: 'p1' | 'p2' = i < boardWidth ? 'p1' : 'p2';
+    const numStones = finalBoardArray[i];
+    const pos: cg.Pos = [i < boardWidth ? i + 1 : boardWidth * 2 - i, i < boardWidth ? 1 : 2] as cg.Pos;
+    const k: cg.Key = pos2key(pos);
+    if (numStones === 0) {
+      if ((createdTuzdik && destBoardIndex === i) || existingTuzdik.includes(i)) {
+        const piece: cg.Piece = {
+          role: `t-piece` as cg.Role,
+          playerIndex: playerIndex, //who owns this?
+        };
+        updatedPieces.set(k, piece);
+      } else {
+        updatedPieces.set(k, undefined);
+      }
+    } else {
+      const piece: cg.Piece = {
+        role: `${defaultPieceLetter}${finalBoardArray[i]}-piece` as cg.Role,
+        playerIndex: playerIndex,
+      };
+      updatedPieces.set(k, piece);
+    }
+  }
+  return updatedPieces;
+}
+
+function createMancalaBoardArrayFromPieces(pieces: cg.Pieces, bd: cg.BoardDimensions): number[] {
+  function countAtKey(key: cg.Key): number {
+    const piece = pieces.get(key);
+    if (piece) {
+      return Number(piece.role.split('-')[0].substring(1));
+    } else return 0;
+  }
+  // we want to traverse anti-clockwise around the board from a1 to a2
+  function boardSort(a: cg.Key, b: cg.Key): number {
+    return (
+      (Number(a.substring(1)) * -2 + 3) * a.charCodeAt(0) +
+      Number(a.substring(1)) * 100 -
+      (Number(a.substring(1)) * -2 + 3) * b.charCodeAt(0) -
+      Number(b.substring(1)) * 100
+    );
+  }
+  return allKeys(bd)
+    .sort((a, b) => boardSort(a, b))
+    .map(countAtKey);
+}
+
+function boardIndexFromUci(uci: cg.Key, boardWidth: number): number {
+  return uci[1] === '1' ? uci[0].charCodeAt(0) - 97 : 96 - uci.charCodeAt(0) + 2 * boardWidth;
+}
+
+//assumption - move has been played but oware stones not captured, dest is on opponents side
+function isGrandSlam(finalBoardArray: number[], destBoardIndex: number, boardWidth: number): boolean {
+  //check spaces not possible to capture are 0
+  for (let i = 1; i < boardWidth - (destBoardIndex % boardWidth); i++) {
+    if (finalBoardArray[destBoardIndex + i] !== 0) return false;
+  }
+  //check captures to edge and then non-zeros
+  let checkCapture = true;
+  for (let i = 0; i < (destBoardIndex % boardWidth) + 1; i++) {
+    const captureIndex = destBoardIndex - i;
+    if (checkCapture && (finalBoardArray[captureIndex] === 2 || finalBoardArray[captureIndex] === 3)) {
+      continue;
+    } else {
+      checkCapture = false;
+      if (finalBoardArray[captureIndex] !== 0) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+export function calculateBackgammonDropChanges(pieces: cg.Pieces, piece: cg.Piece, key: cg.Key): cg.PiecesDiff {
+  const diff: cg.PiecesDiff = new Map();
+  const roleLetter = 's';
+
+  const destPiece = pieces.get(key);
+  if (destPiece) {
+    const dCount = +destPiece.role.split('-')[0].substring(1);
+    const dPlayerIndex = destPiece.playerIndex;
+    if (dPlayerIndex === piece.playerIndex) {
+      const newPiece = {
+        role: `${roleLetter}${dCount + 1}-piece`,
+        playerIndex: piece.playerIndex,
+      } as cg.Piece;
+      diff.set(key, newPiece);
+    } else {
+      const newPiece = {
+        role: `${roleLetter}1-piece`,
+        playerIndex: piece.playerIndex,
+      } as cg.Piece;
+      diff.set(key, newPiece);
+    }
+  } else {
+    //empty space
+    const newPiece = {
+      role: `${roleLetter}1-piece`,
+      playerIndex: piece.playerIndex,
+    } as cg.Piece;
+    diff.set(key, newPiece);
+  }
+  return diff;
+}
+
+export function backgammonUpdatePiecesFromMove(pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): cg.PiecesDiff {
+  const origPiece = pieces.get(orig),
+    destPiece = pieces.get(dest);
+
+  const diff: cg.PiecesDiff = new Map();
+  //Update orig and dest squares as they may have changed
+  if (origPiece) {
+    const oCount = +origPiece.role.split('-')[0].substring(1);
+    const oRoleLetter = origPiece.role.charAt(0);
+    const oPlayerIndex = origPiece.playerIndex;
+    if (oCount > 1) {
+      const piece = {
+        role: `${oRoleLetter}${oCount - 1}-piece`,
+        playerIndex: oPlayerIndex,
+      } as cg.Piece;
+      diff.set(orig, piece);
+    } else {
+      diff.set(orig, undefined);
+    }
+
+    //where did we land?
+    if (destPiece) {
+      const dCount = +destPiece.role.split('-')[0].substring(1);
+      //const dRoleLetter = destPiece.role.charAt(0);
+      const dPlayerIndex = destPiece.playerIndex;
+      if (dPlayerIndex === oPlayerIndex) {
+        const piece = {
+          role: `${oRoleLetter}${dCount + 1}-piece`,
+          playerIndex: oPlayerIndex,
+        } as cg.Piece;
+        diff.set(dest, piece);
+      } else {
+        const piece = {
+          role: `${oRoleLetter}1-piece`,
+          playerIndex: oPlayerIndex,
+        } as cg.Piece;
+        diff.set(dest, piece);
+      }
+    } else {
+      //empty space
+      const piece = {
+        role: `${oRoleLetter}1-piece`,
+        playerIndex: oPlayerIndex,
+      } as cg.Piece;
+      diff.set(dest, piece);
+    }
+  }
+  return diff;
 }
 
 export type Callback = (...args: any[]) => void;
