@@ -153,11 +153,11 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     lift(dest): void {
-      anim(state => board.userLift(state, dest), state);
+      anim(state => board.baseLift(state, dest), state);
     },
 
     liftNoAnim(dest): void {
-      board.userLift(state, dest);
+      board.baseLift(state, dest);
       state.dom.redraw();
     },
 

@@ -11,7 +11,13 @@ import {
   callUserFunction,
   calculatePieceGroup,
   calculateGoScores,
+  calculateGoCaptures,
+  calculateBackgammonDropChanges,
   oppositeOrientationBG,
+  owareUpdatePiecesFromMove,
+  togyzkumalakUpdatePiecesFromMove,
+  backgammonUpdatePiecesFromMove,
+  calculateFlippingPieces,
 } from './util';
 import { premove, queen, knight } from './premove';
 import predrop from './predrop';
@@ -104,36 +110,145 @@ function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolea
   return true;
 }
 
+//update state pieces based on drop for specific game logics
+function setDropVariantState(state: HeadlessState, piece: cg.Piece, key: cg.Key): void {
+  switch (state.variant) {
+    case 'flipello10':
+    case 'flipello': {
+      const flipping = calculateFlippingPieces(state.dimensions, state.pieces, piece, key);
+      const flipPiece: cg.Piece = { role: 'p-piece', playerIndex: state.turnPlayerIndex };
+      flipping.forEach(key => state.pieces.set(key, flipPiece));
+      state.pieces.set(key, piece);
+      break;
+    }
+    case 'go19x19':
+    case 'go13x13':
+    case 'go9x9': {
+      state.pieces.set(key, piece);
+      const captured: cg.Key[] = calculateGoCaptures(key, state.pieces, state.dimensions);
+      captured.map(k => state.pieces.delete(k));
+      break;
+    }
+    case 'nackgammon':
+    case 'backgammon': {
+      const destPiece = state.pieces.get(key);
+      const capture = destPiece ? destPiece.playerIndex !== piece.playerIndex : false;
+      const backgammonPieces: cg.PiecesDiff = calculateBackgammonDropChanges(state.pieces, piece, key);
+      setPieces(state, backgammonPieces);
+      updatePocketPieces(state, opposite(piece.playerIndex), true, capture);
+      break;
+    }
+    default:
+      state.pieces.set(key, piece);
+  }
+}
+
+function updatePocketPieces(
+  state: HeadlessState,
+  capturedPiecePlayerIndex: cg.PlayerIndex,
+  isDrop: boolean,
+  isCapture: boolean
+): void {
+  let playerCount = 0;
+  let enemyCount = 0;
+
+  state.pocketPieces.forEach(p => {
+    const pCount = +p.role.split('-')[0].substring(1);
+    if (p.playerIndex === capturedPiecePlayerIndex) {
+      enemyCount = pCount;
+    } else {
+      playerCount = pCount;
+    }
+  });
+
+  const newPocketPieces: cg.Piece[] = [];
+  if (enemyCount > 0 || isCapture) {
+    const piece = {
+      role: `s${enemyCount + (isCapture ? 1 : 0)}-piece`,
+      playerIndex: capturedPiecePlayerIndex,
+    } as cg.Piece;
+    newPocketPieces.push(piece);
+  }
+  if ((playerCount > 0 && !isDrop) || (isDrop && playerCount > 1)) {
+    const piece = {
+      role: `s${playerCount - (isDrop ? 1 : 0)}-piece`,
+      playerIndex: opposite(capturedPiecePlayerIndex),
+    } as cg.Piece;
+    newPocketPieces.push(piece);
+  }
+
+  state.pocketPieces = newPocketPieces;
+}
+
 export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   const origPiece = state.pieces.get(orig),
     destPiece = state.pieces.get(dest);
   if ((orig === dest && state.variant !== 'togyzkumalak') || !origPiece) return false;
-  const captured = destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
+  const captured = isCapture(state.variant, destPiece, origPiece);
   if (dest === state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captured);
-  if (!tryAutoCastle(state, orig, dest)) {
-    state.pieces.set(dest, origPiece);
-    state.pieces.delete(orig);
+
+  switch (state.variant) {
+    case 'togyzkumalak':
+      setPieces(state, togyzkumalakUpdatePiecesFromMove(state.dimensions, state.pieces, orig, dest));
+      break;
+    case 'oware':
+      setPieces(state, owareUpdatePiecesFromMove(state.dimensions, state.pieces, orig, dest));
+      break;
+    case 'nackgammon':
+    case 'backgammon':
+      if (captured) {
+        updatePocketPieces(state, opposite(origPiece.playerIndex), false, true);
+      }
+      setPieces(state, backgammonUpdatePiecesFromMove(state.pieces, orig, dest));
+      break;
+    default:
+      if (!tryAutoCastle(state, orig, dest)) {
+        state.pieces.set(dest, origPiece);
+        state.pieces.delete(orig);
+      }
   }
+
   state.lastMove = [orig, dest];
   state.check = undefined;
   callUserFunction(state.events.change);
   return captured || true;
 }
 
+function isCapture(variant: cg.Variant, destPiece: cg.Piece | undefined, origPiece: cg.Piece): cg.Piece | undefined {
+  switch (variant) {
+    case 'togyzkumalak': {
+      //TODO account for wrapping around board (simimlar to oware capture)
+      const count = destPiece && Number(destPiece.role.split('-')[0].substring(1));
+      return destPiece && destPiece.playerIndex !== origPiece.playerIndex && count && (count === 2 || count % 2 === 1)
+        ? destPiece
+        : undefined;
+    }
+    case 'oware':
+      //TODO this is more complicated to calculate... (but its only used for sound in lila atm)
+      return destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
+    default:
+      return destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
+  }
+}
+
 export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key, force?: boolean): boolean {
-  if (state.pieces.has(key)) {
+  if (state.pieces.has(key) && !(state.variant === 'backgammon' || state.variant === 'nackgammon')) {
     if (force) state.pieces.delete(key);
     else return false;
   }
   callUserFunction(state.events.dropNewPiece, piece, key);
-  state.pieces.set(key, piece);
+  setDropVariantState(state, piece, key);
+
   state.lastMove = [key];
   state.check = undefined;
   callUserFunction(state.events.change);
   state.movable.dests = undefined;
   state.dropmode.dropDests = undefined;
-  state.turnPlayerIndex = opposite(state.turnPlayerIndex);
+  if (!(state.variant === 'backgammon' || state.variant === 'nackgammon')) {
+    //end turn action is used for backgammon games
+    state.turnPlayerIndex = opposite(state.turnPlayerIndex);
+  }
   return true;
 }
 
@@ -143,10 +258,36 @@ function baseUserMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piec
     state.movable.dests = undefined;
     state.dropmode.dropDests = undefined;
     state.liftable.liftDests = undefined;
-    state.turnPlayerIndex = opposite(state.turnPlayerIndex);
+    if (!(state.variant === 'backgammon' || state.variant === 'nackgammon')) {
+      //end turn manually for backgammon games
+      state.turnPlayerIndex = opposite(state.turnPlayerIndex);
+    }
     state.animation.current = undefined;
   }
   return result;
+}
+
+export function baseLift(state: HeadlessState, dest: cg.Key): boolean {
+  const piece = state.pieces.get(dest);
+  if (piece) {
+    if (state.variant === 'backgammon' || state.variant === 'nackgammon') {
+      const count = piece.role.split('-')[0].substring(1);
+      const letter = piece.role.charAt(0);
+      if (count === '1') {
+        state.pieces.delete(dest);
+      } else {
+        state.pieces.set(dest, {
+          role: `${letter}${+count - 1}-piece` as cg.Role,
+          playerIndex: piece.playerIndex,
+        });
+      }
+    } else {
+      state.pieces.delete(dest);
+    }
+    return true;
+  } else {
+    return false;
+  }
 }
 
 export function userMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
@@ -185,27 +326,16 @@ export function userLift(state: HeadlessState, dest: cg.Key): boolean {
     state.liftable.liftDests.includes(dest) &&
     state.turnPlayerIndex === piece.playerIndex
   ) {
-    if (state.variant === 'backgammon' || state.variant === 'nackgammon') {
-      const count = piece.role.split('-')[0].substring(1);
-      const letter = piece.role.charAt(0);
-      if (count === '1') {
-        state.pieces.delete(dest);
-      } else {
-        state.pieces.set(dest, {
-          role: `${letter}${+count - 1}-piece` as cg.Role,
-          playerIndex: piece.playerIndex,
-        });
-      }
-    } else {
-      state.pieces.delete(dest);
-    }
-    state.movable.dests = undefined;
-    state.dropmode.dropDests = undefined;
-    state.liftable.liftDests = undefined;
-    state.animation.current = undefined;
+    const result = baseLift(state, dest);
+    if (result) {
+      state.movable.dests = undefined;
+      state.dropmode.dropDests = undefined;
+      state.liftable.liftDests = undefined;
+      state.animation.current = undefined;
 
-    callUserFunction(state.liftable.events.after, dest);
-    return true;
+      callUserFunction(state.liftable.events.after, dest);
+      return true;
+    }
   } else {
     unsetPremove(state);
     unsetPredrop(state);
