@@ -518,9 +518,10 @@ export function togyzkumalakUpdatePiecesFromMove(
   //is tuzdik created
   const createdTuzdik =
     existingTuzdik.length !== 2 &&
+    finalBoardArray[destBoardIndex] === 3 &&
+    dest[1] !== orig[1] &&
     destBoardIndex !== boardWidth - 1 &&
     destBoardIndex !== boardWidth * 2 - 1 &&
-    finalBoardArray[destBoardIndex] === 3 &&
     (existingTuzdik.length === 0 ||
       (existingTuzdik.length === 1 &&
         existingTuzdik[0] % boardWidth !== destBoardIndex % boardWidth &&
