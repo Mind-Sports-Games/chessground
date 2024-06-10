@@ -3,11 +3,8 @@
   "filesGlob": ["src/*.ts"],
   "exclude": [],
   "compilerOptions": {
-    "outDir": "./build/",
-    "baseUrl": "src",
+    "outDir": "./",
     "declaration": true,
-    "declarationDir": "./build/",
-    "declarationMap": true,
     "removeComments": true,
     "noEmitOnError": false,
     "noUnusedLocals": true,
