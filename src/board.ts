@@ -471,9 +471,10 @@ function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
     (state.movable.playerIndex === 'both' ||
       (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex)) &&
     !!(
-      state.dropmode.dropDests &&
-      state.dropmode.dropDests.has(piece.role) &&
-      state.dropmode.dropDests.get(piece.role)?.includes(dest)
+      (state.dropmode.dropDests &&
+        state.dropmode.dropDests.has(piece.role) &&
+        state.dropmode.dropDests.get(piece.role)?.includes(dest)) ||
+      state.variant === 'crazyhouse'
     )
   );
 }
