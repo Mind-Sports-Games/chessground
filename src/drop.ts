@@ -38,7 +38,7 @@ export function drop(s: State, e: cg.MouchEvent): void {
       dropFromPocket(s, piece.role);
     } else {
       const dest = position && board.getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
-      if (dest) board.dropNewPiece(s, 'a0', dest, s.variant === 'backgammon' || s.variant === 'nackgammon');
+      if (dest) board.dropNewPiece(s, 'a0', dest);
     }
   }
   //stop processing event clicks, as click drops will trigger a screen click and select a piece.
@@ -59,5 +59,5 @@ function dropFromPocket(s: State, role: cg.Role): void {
         ? activeDiceKey
         : s.dropmode.dropDests.get(role)![0]
       : false;
-  if (dest) board.dropNewPiece(s, 'a0', dest, s.variant === 'backgammon' || s.variant === 'nackgammon');
+  if (dest) board.dropNewPiece(s, 'a0', dest);
 }

@@ -367,7 +367,7 @@ export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, f
   } else {
     unsetPremove(state);
     unsetPredrop(state);
-    cancelDropMode(state);
+    if (!state.onlyDropsVariant) cancelDropMode(state);
   }
   state.pieces.delete(orig);
   unselect(state);
@@ -467,9 +467,14 @@ function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces.get(orig);
   return (
     !!piece &&
-    (orig === dest || !state.pieces.has(dest)) &&
+    (orig === dest || !state.pieces.has(dest) || state.variant === 'backgammon' || state.variant === 'nackgammon') &&
     (state.movable.playerIndex === 'both' ||
-      (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex))
+      (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex)) &&
+    !!(
+      state.dropmode.dropDests &&
+      state.dropmode.dropDests.has(piece.role) &&
+      state.dropmode.dropDests.get(piece.role)?.includes(dest)
+    )
   );
 }
 
