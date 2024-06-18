@@ -4,6 +4,7 @@ import * as cg from './types';
 type DropMobility = (x: number, y: number) => boolean;
 
 const wholeBoard = (_x: number, _y: number) => true;
+const noSquares = (_x: number, _y: number) => false;
 
 /**
  *
@@ -142,6 +143,10 @@ export default function predrop(
       mobility = emptysquares(pieces); // cant drop on current pieces (either side) as they cant move
       break;
 
+    case 'nackgammon':
+    case 'backgammon':
+      mobility = noSquares; // dont allow predrop for backgammon
+      break;
     default:
       console.warn('Unknown drop variant', variant);
   }
