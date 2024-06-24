@@ -88,20 +88,26 @@ More? Please make a pull request to include it here.
 
 ## Development
 
+node version : 20
+
 Install build dependencies:
 
 ```sh
-yarn install
+npm install
 ```
 
 To build the node module:
 
 ```sh
-yarn run compile -- --watch
+npm run compile -- --watch
 ```
 
-To build the standalone:
+To build the dist files:
 
 ```sh
-yarn run dist -- --watch
+npm run dev -- --watch
+```
+
+```sh
+npm run prod -- --watch
 ```
