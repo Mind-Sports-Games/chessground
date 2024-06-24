@@ -53,13 +53,15 @@ export type Variant =
   | 'go19x19'
   | 'backgammon'
   | 'nackgammon'
+  | 'breakthroughtroyka'
+  | 'minibreakthroughtroyka'
   | undefined;
-export type PlayerIndex = typeof playerIndexs[number];
-export type Letter = typeof letters[number];
-export type StoneCount = typeof stoneCounts[number];
+export type PlayerIndex = (typeof playerIndexs)[number];
+export type Letter = (typeof letters)[number];
+export type StoneCount = (typeof stoneCounts)[number];
 export type Role = `${Letter}-piece` | `p${Letter}-piece` | `s${StoneCount}-piece`;
-export type File = typeof files[number];
-export type Rank = typeof ranks19[number];
+export type File = (typeof files)[number];
+export type Rank = (typeof ranks19)[number];
 export type Key = 'a0' | `${File}${Rank}`;
 export type FEN = string;
 export type Pos = [number, number];
@@ -81,7 +83,7 @@ export type NumberPair = [number, number];
 
 export type NumberQuad = [number, number, number, number];
 
-export type Orientation = typeof orientations[number];
+export type Orientation = (typeof orientations)[number];
 export type TransformToP1 = (_: Pos, bt: BoardDimensions) => Pos;
 export type TranslateBase = (pos: Pos, xFactor: number, yFactor: number, bt: BoardDimensions) => NumberPair;
 

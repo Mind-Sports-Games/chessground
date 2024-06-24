@@ -528,6 +528,17 @@ function amazonsQueen(pieces: cg.Pieces): Mobility {
   };
 }
 
+const breakthroughPawn = (pieces: cg.Pieces, playerIndex: cg.PlayerIndex): Mobility => {
+  return (x1, y1, x2, y2) => {
+    if (!diff(x1, x2)) {
+      // prevents a premove in front of us on a friendly pawn
+      const pos = util.pos2key([x1, y1 + (playerIndex === 'p1' ? 1 : -1)]) as cg.Key;
+      if (pieces.has(pos) && pieces.get(pos)?.playerIndex === playerIndex) return false;
+    }
+    return diff(x1, x2) < 2 && (playerIndex === 'p1' ? y2 === y1 + 1 : y2 === y1 - 1);
+  };
+};
+
 const noMovement: Mobility = (_, __, ___, ____) => {
   return false;
 };
@@ -1129,6 +1140,11 @@ export function premove(
             : kingCapa(playerIndex, rookFilesOf(pieces, playerIndex), canCastle);
           break; // king
       }
+      break;
+
+    case 'breakthroughtroyka':
+    case 'minibreakthroughtroyka':
+      mobility = breakthroughPawn(pieces, playerIndex);
       break;
 
     // Variants using standard pieces and additional fairy pieces like S-chess, Capablanca, etc.

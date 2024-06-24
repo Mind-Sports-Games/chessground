@@ -214,3 +214,105 @@ describe('premove() test', () => {
     expect(premoves).to.have.members(expected);
   });
 });
+
+describe('premove() test', () => {
+  it('breakthroughTroyka pawns can premove forward diagonally and in front of them when there is no piece', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions: { width: 8, height: 8 },
+      variant: 'breakthroughtroyka',
+      fen: 'pppppppp/pppppppp/8/8/8/8/PPPPPPPP/PPPPPPPP',
+    });
+
+    const expected = ['e6', 'f6', 'g6'];
+    const premoves = premove(
+      state.pieces,
+      'f7',
+      state.premovable.castle,
+      state.dimensions,
+      state.variant,
+      state.chess960
+    );
+    expect(premoves).to.have.members(expected);
+  });
+
+  it('breakthroughTroyka pawns on the edge can not premove outside the board', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions: { width: 8, height: 8 },
+      variant: 'breakthroughtroyka',
+      fen: 'pppppppp/pppppppp/8/8/8/8/PPPPPPPP/PPPPPPPP',
+    });
+
+    const expected = ['g6', 'h6'];
+    const premoves = premove(
+      state.pieces,
+      'h7',
+      state.premovable.castle,
+      state.dimensions,
+      state.variant,
+      state.chess960
+    );
+    expect(premoves).to.have.members(expected);
+  });
+
+  it('breakthroughTroyka pawns can premove to opponent pawn in front of them', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions: { width: 8, height: 8 },
+      variant: 'breakthroughtroyka',
+      fen: 'pppppppp/ppp1pppp/8/4p3/4P3/8/PPPP1PPP/PPPPPPPP',
+    });
+
+    const expected = ['d4', 'e4', 'f4'];
+    const premoves = premove(
+      state.pieces,
+      'e5',
+      state.premovable.castle,
+      state.dimensions,
+      state.variant,
+      state.chess960
+    );
+    expect(premoves).to.have.members(expected);
+  });
+
+  it('breakthroughTroyka pawns can not premove to friendly pawn in front of them', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions: { width: 8, height: 8 },
+      variant: 'breakthroughtroyka',
+      fen: 'pppppppp/ppp1p1pp/4p3/4p3/4P3/4P3/PPP2PPP/PPPPPPPP',
+    });
+
+    const expected = ['d5', 'f5'];
+    const premoves = premove(
+      state.pieces,
+      'e6',
+      state.premovable.castle,
+      state.dimensions,
+      state.variant,
+      state.chess960
+    );
+    expect(premoves).to.have.members(expected);
+  });
+
+  it('breakthroughTroyka pawns can premove to friendly and opponent pawn in diagonal', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions: { width: 8, height: 8 },
+      variant: 'breakthroughtroyka',
+      fen: 'pppppppp/ppp1p1pp/8/4p3/3pPP2/4P3/PPP3PP/PPPPPPPP',
+    });
+
+    const expected = ['d4', 'e4', 'f4'];
+    const premoves = premove(
+      state.pieces,
+      'e5',
+      state.premovable.castle,
+      state.dimensions,
+      state.variant,
+      state.chess960
+    );
+    expect(premoves).to.have.members(expected);
+  });
+});
