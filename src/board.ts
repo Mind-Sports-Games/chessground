@@ -284,6 +284,13 @@ export function baseLift(state: HeadlessState, dest: cg.Key): boolean {
     } else {
       state.pieces.delete(dest);
     }
+    state.lastMove = [dest];
+    state.check = undefined;
+    state.movable.dests = undefined;
+    state.dropmode.dropDests = undefined;
+    state.liftable.liftDests = undefined;
+    state.animation.current = undefined;
+    callUserFunction(state.events.change);
     return true;
   } else {
     return false;
