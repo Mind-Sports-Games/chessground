@@ -88,26 +88,24 @@ More? Please make a pull request to include it here.
 
 ## Development
 
-node version : 20
-
 Install build dependencies:
 
 ```sh
-npm install
+yarn install
 ```
 
 To build the node module:
 
 ```sh
-npm run compile -- --watch
+yarn compile -- --watch
 ```
 
 To build the dist files:
 
 ```sh
-npm run dev -- --watch
+yarn dev -- --watch
 ```
 
 ```sh
-npm run prod -- --watch
+yarn prod -- --watch
 ```
