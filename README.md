@@ -58,7 +58,7 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 ## Installation
 
 ```sh
-npm install --save chessground
+pnpm install --save chessground
 ```
 
 ### Usage
@@ -103,5 +103,5 @@ pnpm compile --watch
 To build the dist files:
 
 ```sh
-pnpm dist --watch
+pnpm dist
 ```
