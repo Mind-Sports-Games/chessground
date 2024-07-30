@@ -12,6 +12,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
   const maybeState: State | HeadlessState = defaults();
   configure(maybeState, config || {});
   function redrawAll(): State {
+    console.log("test");
     const prevUnbind = 'dom' in maybeState ? maybeState.dom.unbind : undefined;
     // compute bounds from existing board element if possible
     // this allows non-square boards from CSS to be handled (for 3D)
