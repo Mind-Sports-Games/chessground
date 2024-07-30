@@ -26,7 +26,6 @@ jobs:
           run_install: |
             - recursive: false
             - args: [--no-frozen-lockfile, --strict-peer-dependencies]
-      # - run: pnpm install --no-frozen-lockfile
       - run: pnpm run lint
       - run: pnpm run check-format
       - run: pnpm run dist
