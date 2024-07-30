@@ -7,7 +7,7 @@ settings:
 importers:
 
   .:
-    devDependencies:
+    dependencies:
       '@types/node':
         specifier: 20.12.2
         version: 20.12.2
