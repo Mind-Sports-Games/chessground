@@ -91,21 +91,17 @@ More? Please make a pull request to include it here.
 Install build dependencies:
 
 ```sh
-yarn install
+pnpm install
 ```
 
 To build the node module:
 
 ```sh
-pnpm run compile --watch
+pnpm compile --watch
 ```
 
 To build the dist files:
 
 ```sh
-yarn dev -- --watch
-```
-
-```sh
-yarn prod -- --watch
+pnpm dist --watch
 ```
