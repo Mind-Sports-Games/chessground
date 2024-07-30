@@ -89,7 +89,7 @@ export function processDraw(state: State): void {
         state.orientation,
         state.dom.bounds(),
         state.dimensions,
-        state.variant
+        state.variant,
       );
       if (!keyAtDomPos) {
         cur.snapToValidMove = false;

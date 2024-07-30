@@ -238,7 +238,7 @@ function pieceNameOf(
   myPlayerIndex: cg.PlayerIndex,
   orientation: cg.Orientation,
   variant: cg.Variant,
-  k: cg.Key
+  k: cg.Key,
 ): string {
   const promoted = piece.promoted ? 'promoted ' : '';
   const side =
@@ -296,7 +296,7 @@ function computeSquareClasses(s: State): SquareClasses {
           addSquare(
             squares,
             k,
-            'move-dest' + (s.pieces.has(k) ? ' oc' : '') + variantSpecificHighlightClass(s.variant, k, s.orientation)
+            'move-dest' + (s.pieces.has(k) ? ' oc' : '') + variantSpecificHighlightClass(s.variant, k, s.orientation),
           );
         }
       const pDests = s.premovable.dests;
@@ -305,7 +305,9 @@ function computeSquareClasses(s: State): SquareClasses {
           addSquare(
             squares,
             k,
-            'premove-dest' + (s.pieces.has(k) ? ' oc' : '') + variantSpecificHighlightClass(s.variant, k, s.orientation)
+            'premove-dest' +
+              (s.pieces.has(k) ? ' oc' : '') +
+              variantSpecificHighlightClass(s.variant, k, s.orientation),
           );
         }
     }

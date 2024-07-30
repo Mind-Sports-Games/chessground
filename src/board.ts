@@ -147,7 +147,7 @@ function updatePocketPieces(
   state: HeadlessState,
   capturedPiecePlayerIndex: cg.PlayerIndex,
   isDrop: boolean,
-  isCapture: boolean
+  isCapture: boolean,
 ): void {
   let playerCount = 0;
   let enemyCount = 0;
@@ -437,7 +437,7 @@ export function setSelected(state: HeadlessState, key: cg.Key): void {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
   } else {
     state.premovable.dests = undefined;
@@ -513,7 +513,7 @@ function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
     isPremovable(state, orig) &&
     containsX(
       premove(state.pieces, orig, state.premovable.castle, state.dimensions, state.variant, state.chess960),
-      dest
+      dest,
     )
   );
 }
@@ -610,7 +610,7 @@ export function getKeyAtDomPos(
   orientation: cg.Orientation,
   bounds: ClientRect,
   bd: cg.BoardDimensions,
-  variant: cg.Variant = 'chess'
+  variant: cg.Variant = 'chess',
 ): cg.Key | undefined {
   const bgBorder = 1 / 15;
   const file =
@@ -620,8 +620,10 @@ export function getKeyAtDomPos(
         ((pos[0] - bounds.left) / bounds.width >= 7 / 15 && (pos[0] - bounds.left) / bounds.width <= 8 / 15)
         ? undefined
         : (pos[0] - bounds.left) / bounds.width <= 7 / 15
-        ? Math.ceil(bd.width * ((pos[0] - bounds.left - bounds.width * bgBorder) / (bounds.width * 12 * bgBorder)))
-        : Math.ceil(bd.width * ((pos[0] - bounds.left - bounds.width * 2 * bgBorder) / (bounds.width * 12 * bgBorder)))
+          ? Math.ceil(bd.width * ((pos[0] - bounds.left - bounds.width * bgBorder) / (bounds.width * 12 * bgBorder)))
+          : Math.ceil(
+              bd.width * ((pos[0] - bounds.left - bounds.width * 2 * bgBorder) / (bounds.width * 12 * bgBorder)),
+            )
       : Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
   const rank =
     variant === 'backgammon' || variant === 'nackgammon'
@@ -643,7 +645,7 @@ export function areMyDiceAtDomPos(
   turnPlayerIndex: cg.PlayerIndex,
   myPlayerIndex: cg.PlayerIndex,
   bounds: ClientRect,
-  variant: cg.Variant = 'chess'
+  variant: cg.Variant = 'chess',
 ): boolean {
   if (turnPlayerIndex !== myPlayerIndex) return false;
   const correctWidth =
@@ -661,7 +663,7 @@ export function isButtonAtDomPos(
   turnPlayerIndex: cg.PlayerIndex,
   myPlayerIndex: cg.PlayerIndex,
   bounds: ClientRect,
-  variant: cg.Variant = 'chess'
+  variant: cg.Variant = 'chess',
 ): boolean {
   if (turnPlayerIndex !== myPlayerIndex) return false;
   const correctWidth =
@@ -678,7 +680,7 @@ export function isPocketAtDomPos(
   orientation: cg.Orientation,
   turnPlayerIndex: cg.PlayerIndex,
   bounds: ClientRect,
-  variant: cg.Variant = 'chess'
+  variant: cg.Variant = 'chess',
 ): boolean {
   const correctWidth = (pos[0] - bounds.left) / bounds.width < 8 / 15 && (pos[0] - bounds.left) / bounds.width > 7 / 15;
   const correctHeight =
@@ -712,7 +714,7 @@ export function getSnappedKeyAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
   bounds: ClientRect,
-  bd: cg.BoardDimensions
+  bd: cg.BoardDimensions,
 ): cg.Key | undefined {
   const origPos = key2pos(orig);
   const validSnapPos = allPos(bd).filter(pos2 => {
@@ -722,7 +724,7 @@ export function getSnappedKeyAtDomPos(
   const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
   const [, closestSnapIndex] = validSnapDistances.reduce(
     (a, b, index) => (a[0] < b ? a : [b, index]),
-    [validSnapDistances[0], 0]
+    [validSnapDistances[0], 0],
   );
   return pos2key(validSnapPos[closestSnapIndex]);
 }

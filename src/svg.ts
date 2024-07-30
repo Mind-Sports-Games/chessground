@@ -76,14 +76,14 @@ export function renderSvg(state: State, svg: SVGElement, customSvg: SVGElement):
     shapes.filter(s => !s.shape.customSvg),
     d.brushes,
     arrowDests,
-    shapesEl
+    shapesEl,
   );
   syncShapes(
     state,
     shapes.filter(s => s.shape.customSvg),
     d.brushes,
     arrowDests,
-    customSvgsEl
+    customSvgsEl,
   );
 }
 
@@ -115,7 +115,7 @@ function syncShapes(
   shapes: Shape[],
   brushes: DrawBrushes,
   arrowDests: ArrowDests,
-  root: SVGElement
+  root: SVGElement,
 ): void {
   const bounds = state.dom.bounds(),
     hashesInDom = new Map(), // by hash
@@ -143,7 +143,7 @@ function shapeHash(
   { orig, dest, brush, piece, modifiers, customSvg }: DrawShape,
   arrowDests: ArrowDests,
   current: boolean,
-  bounds: ClientRect
+  bounds: ClientRect,
 ): Hash {
   return [
     bounds.width,
@@ -183,7 +183,7 @@ function renderShape(
   { shape, current, hash }: Shape,
   brushes: DrawBrushes,
   arrowDests: ArrowDests,
-  bounds: ClientRect
+  bounds: ClientRect,
 ): SVGElement {
   let el: SVGElement;
   if (shape.customSvg) {
@@ -197,7 +197,7 @@ function renderShape(
       bounds,
       state.dimensions,
       state.myPlayerIndex,
-      state.variant
+      state.variant,
     );
   else {
     const orig = orient(key2pos(shape.orig), state.orientation, state.dimensions);
@@ -211,7 +211,7 @@ function renderShape(
         current,
         (arrowDests.get(shape.dest) || 0) > 1,
         bounds,
-        state.dimensions
+        state.dimensions,
       );
     } else el = renderCircle(brushes[shape.brush!], orig, current, bounds, state.dimensions);
   }
@@ -242,7 +242,7 @@ function renderCircle(
   pos: cg.Pos,
   current: boolean,
   bounds: ClientRect,
-  bd: cg.BoardDimensions
+  bd: cg.BoardDimensions,
 ): SVGElement {
   const o = pos2px(pos, bounds, bd),
     widths = circleWidth(bounds, bd),
@@ -265,7 +265,7 @@ function renderArrow(
   current: boolean,
   shorten: boolean,
   bounds: ClientRect,
-  bd: cg.BoardDimensions
+  bd: cg.BoardDimensions,
 ): SVGElement {
   const m = arrowMargin(bounds, shorten && !current, bd),
     a = pos2px(orig, bounds, bd),
@@ -295,7 +295,7 @@ function renderPiece(
   bounds: ClientRect,
   bd: cg.BoardDimensions,
   myPlayerIndex: cg.PlayerIndex,
-  variant: cg.Variant
+  variant: cg.Variant,
 ): SVGElement {
   const o = pos2px(pos, bounds, bd),
     width = (bounds.width / bd.width) * (piece.scale || 1),
@@ -329,7 +329,7 @@ function renderMarker(brush: DrawBrush): SVGElement {
     setAttributes(createElement('path'), {
       d: 'M0,0 V4 L3,2 Z',
       fill: brush.color,
-    })
+    }),
   );
   marker.setAttribute('cgKey', brush.key);
   return marker;

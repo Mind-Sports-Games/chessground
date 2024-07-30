@@ -145,7 +145,7 @@ const posToTranslateBase = (
   orientation: cg.Orientation,
   xFactor: number,
   yFactor: number,
-  bt: cg.BoardDimensions
+  bt: cg.BoardDimensions,
 ): cg.NumberPair => {
   return T.translateBase[orientation](pos, xFactor, yFactor, bt);
 };
@@ -153,7 +153,7 @@ const posToTranslateBase = (
 export const posToTranslateAbs = (
   bounds: ClientRect,
   bt: cg.BoardDimensions,
-  variant: cg.Variant
+  variant: cg.Variant,
 ): ((pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair) => {
   const xFactor = (bounds.width / bt.width) * (variant === 'backgammon' || variant === 'nackgammon' ? 0.8 : 1),
     yFactor = bounds.height / bt.height;
@@ -164,14 +164,14 @@ export const posToTranslateRel = (
   pos: cg.Pos,
   orientation: cg.Orientation,
   bt: cg.BoardDimensions,
-  v: cg.Variant
+  v: cg.Variant,
 ): cg.NumberPair =>
   posToTranslateBase(
     pos,
     orientation,
     100,
     v === 'togyzkumalak' ? 150 : v === 'backgammon' || v === 'nackgammon' ? 116 : 100,
-    bt
+    bt,
   );
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
@@ -212,7 +212,7 @@ export function computeSquareCenter(
   key: cg.Key,
   orientation: cg.Orientation,
   bounds: ClientRect,
-  bd: cg.BoardDimensions
+  bd: cg.BoardDimensions,
 ): cg.NumberPair {
   const pos = T.mapToP1Inverse[orientation](key2pos(key), bd);
   return [
@@ -224,7 +224,7 @@ export function computeSquareCenter(
 export function calculatePlayerEmptyAreas(
   pieces: cg.Pieces,
   bd: cg.BoardDimensions,
-  deadStones: cg.Pieces
+  deadStones: cg.Pieces,
 ): Map<cg.Key, cg.PlayerIndex> {
   const emptySquares: cg.Key[] = allKeys(bd).filter(key => !pieces.has(key) || deadStones.has(key));
   const piecesToConsider = new Map<cg.Key, cg.Piece>();
@@ -264,7 +264,7 @@ export function calculateAreas(emptySquares: cg.Key[], bd: cg.BoardDimensions): 
         .slice(0, 1)
         .flat()
         .flatMap(s => adjacentKeys(bd, s))
-        .includes(stba)
+        .includes(stba),
     );
     const updatedEmptyAreas =
       emptySquaresToAdd.length === 0
@@ -287,7 +287,7 @@ export function calculatePieceGroup(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.
   function assignNextWave(pieceGroup: cg.Key[]): cg.Key[] {
     const borderKeys = calculateBorder(pieceGroup, bd);
     const newKeys = borderKeys.filter(
-      k => pieces.get(k) && pieces.get(k)?.playerIndex === pieces.get(pieceKey)?.playerIndex
+      k => pieces.get(k) && pieces.get(k)?.playerIndex === pieces.get(pieceKey)?.playerIndex,
     );
     if (newKeys.length > 0) {
       return assignNextWave(pieceGroup.concat(newKeys));
@@ -302,11 +302,11 @@ export function calculatePieceGroup(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.
 export function calculateGoCaptures(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
   const borderKeys = calculateBorder([pieceKey], bd);
   const enemyKeys = borderKeys.filter(
-    k => pieces.get(k) && pieces.get(k)?.playerIndex !== pieces.get(pieceKey)?.playerIndex
+    k => pieces.get(k) && pieces.get(k)?.playerIndex !== pieces.get(pieceKey)?.playerIndex,
   );
   const enemyPieces = enemyKeys.map(k => calculatePieceGroup(k, pieces, bd));
   const capturedPieces = enemyPieces.filter(
-    enemyGroup => calculateBorder(enemyGroup, bd).filter(k => !pieces.has(k)).length === 0
+    enemyGroup => calculateBorder(enemyGroup, bd).filter(k => !pieces.has(k)).length === 0,
   );
   return [...new Set(capturedPieces.flat())];
 }
@@ -338,7 +338,7 @@ export function calculateGoScores(deadStones: cg.Pieces, pieces: cg.Pieces, bd: 
 export function calculateBackgammonScores(
   pieces: cg.Pieces,
   pocketPieces: cg.Piece[],
-  bd: cg.BoardDimensions
+  bd: cg.BoardDimensions,
 ): cg.BackgammonScores {
   let p1Score = 0;
   let p2Score = 0;
@@ -386,7 +386,7 @@ export function calculateFlippingPieces(
   bd: cg.BoardDimensions,
   pieces: cg.Pieces,
   piece: cg.Piece,
-  key: cg.Key
+  key: cg.Key,
 ): cg.Key[] {
   const flipping: cg.Key[] = [];
   const orig: cg.Pos = key2pos(key);
@@ -419,7 +419,7 @@ export function owareUpdatePiecesFromMove(
   bd: cg.BoardDimensions,
   pieces: cg.Pieces,
   orig: cg.Key,
-  dest: cg.Key
+  dest: cg.Key,
 ): cg.PiecesDiff {
   const boardWidth = bd.width;
   const boardArray = createMancalaBoardArrayFromPieces(pieces, bd);
@@ -480,7 +480,7 @@ export function togyzkumalakUpdatePiecesFromMove(
   bd: cg.BoardDimensions,
   pieces: cg.Pieces,
   orig: cg.Key,
-  dest: cg.Key
+  dest: cg.Key,
 ): cg.PiecesDiff {
   const boardWidth = bd.width;
   const boardArray = createMancalaBoardArrayFromPieces(pieces, bd);

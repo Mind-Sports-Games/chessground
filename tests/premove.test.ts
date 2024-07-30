@@ -15,7 +15,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -34,7 +34,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -53,7 +53,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -72,7 +72,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -91,7 +91,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -132,7 +132,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -151,7 +151,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -170,7 +170,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -209,7 +209,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -231,7 +231,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -251,7 +251,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -271,7 +271,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -291,7 +291,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });
@@ -311,7 +311,7 @@ describe('premove() test', () => {
       state.premovable.castle,
       state.dimensions,
       state.variant,
-      state.chess960
+      state.chess960,
     );
     expect(premoves).to.have.members(expected);
   });

@@ -87,7 +87,7 @@ export function start(s: State, e: cg.MouchEvent): void {
       ghost.className = `ghost ${piece.playerIndex} ${promoted}${piece.role} ${side}`;
       util.translateAbs(
         ghost,
-        util.posToTranslateAbs(bounds, s.dimensions, s.variant)(util.key2pos(orig), s.orientation)
+        util.posToTranslateAbs(bounds, s.dimensions, s.variant)(util.key2pos(orig), s.orientation),
       );
       util.setVisible(ghost, true);
     }

@@ -39,7 +39,7 @@ export default function predrop(
   pieces: cg.Pieces,
   piece: cg.Piece,
   bd: cg.BoardDimensions,
-  variant: cg.Variant
+  variant: cg.Variant,
 ): cg.Key[] {
   const playerIndex = piece.playerIndex;
   const role = piece.role;

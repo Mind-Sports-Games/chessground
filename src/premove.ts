@@ -549,7 +549,7 @@ export function premove(
   canCastle: boolean,
   bd: cg.BoardDimensions,
   variant: cg.Variant,
-  chess960: boolean
+  chess960: boolean,
 ): cg.Key[] {
   const piece = pieces.get(key)!;
   const role = piece.role;
