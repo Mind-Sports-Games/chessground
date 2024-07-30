@@ -58,3 +58,5 @@ function debounceRedraw(redrawNow: (skipSvg?: boolean) => void): () => void {
     });
   };
 }
+
+(window as any).Chessground = Chessground; // esbuild

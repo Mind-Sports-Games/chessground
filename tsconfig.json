@@ -10,9 +10,10 @@
     "noUnusedParameters": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
-    "moduleResolution": "Node16",
-    "lib": ["DOM", "ES2019"],
-    "module": "node16",
-    "target": "ES6"
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "target": "es2017",
+    "lib": ["DOM", "es2017"]
   }
 }
