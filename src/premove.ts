@@ -17,6 +17,7 @@ function pawn(playerIndex: cg.PlayerIndex): Mobility {
 }
 
 export const knight: Mobility = (x1, y1, x2, y2) => {
+  console.log('generated knight premoves from latest chessground');
   const xd = diff(x1, x2);
   const yd = diff(y1, y2);
   return (xd === 1 && yd === 2) || (xd === 2 && yd === 1);
