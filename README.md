@@ -112,8 +112,16 @@ Build the minified bundled dist files:
 pnpm dist
 ```
 
-Run tests
+run tests:
 
 ```sh
-pnpm test
+pnpm run test --watch
+pnpm run test fen --watch
+```
+
+Before committing:
+
+```sh
+pnpm run lint
+pnpm run format
 ```
