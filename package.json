@@ -4,7 +4,7 @@
   "description": "playstrategy.org chess ui, forked from lichess.org",
   "type": "module",
   "main": "dist/chessground.js",
-  "types": "chessground.d.ts",
+  "types": "dist/chessground.d.ts",
   "exports": {
     ".": "./dist/chessground.js",
     "./*": "./dist/*.js"
@@ -22,17 +22,21 @@
     "pnpm": "^9"
   },
   "dependencies": {
+    "@jest/globals": "29",
+    "@types/node": "20.12.2",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
-    "@types/node": "20.12.2",
     "esbuild": "^0.20.2",
     "eslint": "^8.57.0",
+    "jest": "29",
     "prettier": "^3.2.5",
+    "ts-jest": "29",
     "typescript": "^5.4"
   },
   "scripts": {
     "prepare": "$npm_execpath run compile",
     "compile": "tsc --sourceMap --declaration",
+    "test": "node node_modules/jest/bin/jest.js",
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
@@ -47,6 +51,23 @@
     "/assets/*.css",
     "/src/*.ts"
   ],
+  "jest": {
+    "globals": {
+      "window": {}
+    },
+    "testRegex": ".*\\.test\\.ts$",
+    "transform": {
+      "\\.ts$": [
+        "ts-jest",
+        {
+          "useESM": true
+        }
+      ]
+    },
+    "moduleNameMapper": {
+      "^(.*)\\.js$": "$1"
+    }
+  },
   "repository": "https://github.com/Mind-Sports-Games/chessground",
   "keywords": [
     "chess",

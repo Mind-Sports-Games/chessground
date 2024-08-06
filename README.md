@@ -94,14 +94,26 @@ Install build dependencies:
 pnpm install
 ```
 
-To build the node module:
+Update deps:
 
 ```sh
-pnpm compile --watch
+rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm install
 ```
 
-To build the dist files:
+Build the node module:
+
+```sh
+pnpm prepare --watch
+```
+
+Build the minified bundled dist files:
 
 ```sh
 pnpm dist
+```
+
+Run tests
+
+```sh
+pnpm test
 ```

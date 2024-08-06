@@ -1,14 +1,14 @@
-import { configure } from '../src/config';
-import { State, defaults } from '../src/state';
-import { premove } from '../src/premove';
-import { expect } from 'chai';
+import { describe, expect, it } from '@jest/globals';
+import { configure } from './config.js';
+import { State, defaults } from './state.js';
+import { premove } from './premove.js';
 
 describe('premove() test', () => {
   it('chess p1 king', () => {
     const state = defaults() as State;
     configure(state, { dimensions: { width: 8, height: 8 }, variant: 'chess', fen: '8/8/8/8/8/8/8/R3K2R w QK' });
     console.log(state.variant, state.pieces);
-    const expected = ['a1', 'c1', 'd1', 'd2', 'e2', 'f2', 'f1', 'g1', 'h1'];
+    const expected = ['a1', 'c1', 'd1', 'd2', 'e2', 'f1', 'f2', 'g1', 'h1'];
     const premoves = premove(
       state.pieces,
       'e1',
@@ -17,7 +17,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 });
 
@@ -27,7 +27,7 @@ describe('premove() test', () => {
     configure(state, { dimensions: { width: 8, height: 8 }, variant: 'chess', fen: '8/8/8/8/8/8/8/R3K2R w QK' });
 
     console.log(state.variant, state.pieces);
-    const expected = ['b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1', 'a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8'];
+    const expected = ['a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'a8', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1', 'h1'];
     const premoves = premove(
       state.pieces,
       'a1',
@@ -36,7 +36,8 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    console.log('premoves:' + premoves);
+    expect(premoves).toEqual(expected);
   });
 });
 
@@ -46,7 +47,7 @@ describe('premove() test', () => {
     configure(state, { dimensions: { width: 8, height: 8 }, variant: 'chess', fen: '8/8/8/8/8/8/8/2B1K3 w QK' });
 
     console.log(state.variant, state.pieces);
-    const expected = ['b2', 'a3', 'd2', 'e3', 'f4', 'g5', 'h6'];
+    const expected = ['a3', 'b2', 'd2', 'e3', 'f4', 'g5', 'h6'];
     const premoves = premove(
       state.pieces,
       'c1',
@@ -55,7 +56,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 });
 
@@ -74,7 +75,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 });
 
@@ -93,7 +94,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 });
 
@@ -134,7 +135,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 });
 
@@ -153,7 +154,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 });
 
@@ -172,7 +173,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 });
 
@@ -211,7 +212,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 });
 
@@ -233,7 +234,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 
   it('breakthroughTroyka pawns on the edge can not premove outside the board', () => {
@@ -253,7 +254,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 
   it('breakthroughTroyka pawns can premove to opponent pawn in front of them', () => {
@@ -273,7 +274,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 
   it('breakthroughTroyka pawns can not premove to friendly pawn in front of them', () => {
@@ -293,7 +294,7 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 
   it('breakthroughTroyka pawns can premove to friendly and opponent pawn in diagonal', () => {
@@ -313,6 +314,6 @@ describe('premove() test', () => {
       state.variant,
       state.chess960,
     );
-    expect(premoves).to.have.members(expected);
+    expect(premoves).toEqual(expected);
   });
 });

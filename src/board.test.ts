@@ -1,6 +1,6 @@
-import { getKeyAtDomPos, getSnappedKeyAtDomPos } from '../src/board';
-import { NumberPair, BoardDimensions } from '../src/types';
-import { expect } from 'chai';
+import { describe, expect, it } from '@jest/globals';
+import { getKeyAtDomPos, getSnappedKeyAtDomPos } from './board.js';
+import { NumberPair, BoardDimensions } from './types.js';
 
 describe('getSnappedKeyAtDomPos() test', () => {
   it('testing a8 squares p1', () => {
@@ -23,7 +23,7 @@ describe('getSnappedKeyAtDomPos() test', () => {
 
     const expected = 'a8';
     const snappedKey = getSnappedKeyAtDomPos('a8', bpos, orientation, bounds, bd);
-    expect(expected).to.equal(snappedKey);
+    expect(expected).toEqual(snappedKey);
   });
 });
 
@@ -48,7 +48,7 @@ describe('getSnappedKeyAtDomPos() test', () => {
 
     const expected = 'h1';
     const snappedKey = getSnappedKeyAtDomPos('h1', bpos, orientation, bounds, bd);
-    expect(expected).to.equal(snappedKey);
+    expect(expected).toEqual(snappedKey);
   });
 });
 
@@ -73,7 +73,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'a8';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -98,7 +98,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'a1';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -123,7 +123,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'h1';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -148,7 +148,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'h8';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -173,7 +173,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'h1';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -198,7 +198,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'h8';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -223,7 +223,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'a8';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -248,7 +248,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'a1';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -273,7 +273,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'a1';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -298,7 +298,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'h1';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -323,7 +323,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'h8';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -348,7 +348,7 @@ describe('getKeyAtDomPos() test', () => {
 
     const expected = 'a8';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd);
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });
 
@@ -373,7 +373,7 @@ describe('getKeyAtDomPos() backgammon test', () => {
 
     const expected = undefined;
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
   it('testing clicking right border from p1 view', () => {
     const bpos: NumberPair = [14.5, 0.5];
@@ -395,7 +395,7 @@ describe('getKeyAtDomPos() backgammon test', () => {
 
     const expected = undefined;
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
   it('testing clicking top border from p1 view', () => {
     const bpos: NumberPair = [0.5, 0.01];
@@ -417,7 +417,7 @@ describe('getKeyAtDomPos() backgammon test', () => {
 
     const expected = undefined;
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
   it('testing clicking bar from p1 view', () => {
     const bpos: NumberPair = [7.5, 1];
@@ -439,7 +439,7 @@ describe('getKeyAtDomPos() backgammon test', () => {
 
     const expected = undefined;
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
   it('testing clicking top left square from p1 view', () => {
     const bpos: NumberPair = [2.5, 0.5];
@@ -461,7 +461,7 @@ describe('getKeyAtDomPos() backgammon test', () => {
 
     const expected = 'b2';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
   it('testing clicking bottom left square from p1 view', () => {
     const bpos: NumberPair = [4.5, 1.5];
@@ -483,7 +483,7 @@ describe('getKeyAtDomPos() backgammon test', () => {
 
     const expected = 'd1';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
   it('testing clicking top right square from p1 view', () => {
     const bpos: NumberPair = [12.5, 0.5];
@@ -505,7 +505,7 @@ describe('getKeyAtDomPos() backgammon test', () => {
 
     const expected = 'k2';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
   it('testing clicking bottom right square from p1 view', () => {
     const bpos: NumberPair = [9.5, 1.5];
@@ -527,7 +527,7 @@ describe('getKeyAtDomPos() backgammon test', () => {
 
     const expected = 'h1';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
   it('testing clicking top right square from p1 view', () => {
     const bpos: NumberPair = [12.5, 0.5];
@@ -549,6 +549,6 @@ describe('getKeyAtDomPos() backgammon test', () => {
 
     const expected = 'k1';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
-    expect(expected).to.equal(key);
+    expect(expected).toEqual(key);
   });
 });

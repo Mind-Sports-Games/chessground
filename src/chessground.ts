@@ -1,7 +1,6 @@
 import { Api, start } from './api';
 import { Config, configure } from './config';
 import { HeadlessState, State, defaults } from './state';
-
 import { renderWrap } from './wrap';
 import * as events from './events';
 import { render, updateBounds } from './render';
