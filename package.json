@@ -4,7 +4,7 @@
   "description": "playstrategy.org chess ui, forked from lichess.org",
   "type": "module",
   "main": "dist/chessground.js",
-  "types": "dist/chessground.d.ts",
+  "types": "chessground.d.ts",
   "exports": {
     ".": "./dist/chessground.js",
     "./*": "./dist/*.js"
