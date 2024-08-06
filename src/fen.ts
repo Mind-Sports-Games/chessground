@@ -97,8 +97,8 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
                 ? 'p1'
                 : 'p2'
               : f.substring(f.length - 1) === role
-              ? 'p2'
-              : 'p1'
+                ? 'p2'
+                : 'p1'
           ) as cg.PlayerIndex;
           const piece = {
             role: `${role}${count}-piece`,
@@ -156,14 +156,14 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
               const roleLetter = mancalaFenVariants.includes(variant)
                 ? letter.toUpperCase()
                 : piece.playerIndex === 'p1'
-                ? letter.toUpperCase()
-                : letter;
+                  ? letter.toUpperCase()
+                  : letter;
               const count = piece.role.split('-')[0].substring(1);
               return count + roleLetter + (x === bd.width ? '' : ',');
             }
           } else return '1' + (!commaFenVariants.includes(variant) ? '' : ',');
         })
-        .join('')
+        .join(''),
     )
     .join('/');
   return !commaFenVariants.includes(variant)

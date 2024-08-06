@@ -68,7 +68,7 @@ function unbindable(
   el: EventTarget,
   eventName: string,
   callback: EventListener,
-  options?: AddEventListenerOptions
+  options?: AddEventListenerOptions,
 ): cg.Unbind {
   el.addEventListener(eventName, callback, options);
   return () => el.removeEventListener(eventName, callback, options);
@@ -90,7 +90,7 @@ function startDragOrDraw(s: State): MouchBind {
             s.turnPlayerIndex,
             s.myPlayerIndex,
             s.dom.bounds(),
-            s.variant
+            s.variant,
           )
         ) {
           reorderDice(s);
@@ -104,7 +104,7 @@ function startDragOrDraw(s: State): MouchBind {
             s.turnPlayerIndex,
             s.myPlayerIndex,
             s.dom.bounds(),
-            s.variant
+            s.variant,
           )
         ) {
           undoButtonPressed(s);

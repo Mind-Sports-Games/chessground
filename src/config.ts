@@ -177,8 +177,8 @@ export function configure(state: HeadlessState, config: Config): void {
       dests.filter(
         d =>
           !(d === 'a' + rank && dests.includes(('c' + rank) as cg.Key)) &&
-          !(d === 'h' + rank && dests.includes(('g' + rank) as cg.Key))
-      )
+          !(d === 'h' + rank && dests.includes(('g' + rank) as cg.Key)),
+      ),
     );
   }
 }

@@ -1,7 +1,7 @@
-import { BoardDimensions } from '../src/types';
-import { read, readPocket, write } from '../src/fen';
-import * as cg from '../src/types';
-import { expect } from 'chai';
+import { describe, expect, it } from '@jest/globals';
+import { BoardDimensions } from './types.js';
+import { read, readPocket, write } from './fen.js';
+import * as cg from './types.js';
 
 describe('fen.read() test', () => {
   it('testing flipello fen has 4 pieces', () => {
@@ -11,7 +11,7 @@ describe('fen.read() test', () => {
 
     const expected = 4;
     const pieces = read(fenString, bd, 'flipello');
-    expect(expected).to.equal(pieces.size);
+    expect(expected).toEqual(pieces.size);
   });
   it('testing flipello fen has two pieces each', () => {
     const fenString =
@@ -22,8 +22,8 @@ describe('fen.read() test', () => {
     const pieces = read(fenString, bd, 'flipello');
     const p1Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p1');
     const p2Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p2');
-    expect(expected).to.equal(p1Pieces.length);
-    expect(expected).to.equal(p2Pieces.length);
+    expect(expected).toEqual(p1Pieces.length);
+    expect(expected).toEqual(p2Pieces.length);
   });
 });
 
@@ -34,7 +34,7 @@ describe('fen.read() test', () => {
 
     const expected = 9;
     const pieces = read(fenString, bd, 'linesOfAction');
-    expect(expected).to.equal(pieces.size);
+    expect(expected).toEqual(pieces.size);
   });
   it('testing loa player peices from fen', () => {
     const fenString = '5LL1/8/8/8/8/l6l/l6l/4LLL1 w - - 0 1';
@@ -45,8 +45,8 @@ describe('fen.read() test', () => {
     const pieces = read(fenString, bd, 'linesOfAction');
     const p1Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p1');
     const p2Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p2');
-    expect(expectedP1).to.equal(p1Pieces.length);
-    expect(expectedP2).to.equal(p2Pieces.length);
+    expect(expectedP1).toEqual(p1Pieces.length);
+    expect(expectedP2).toEqual(p2Pieces.length);
   });
 });
 
@@ -57,7 +57,7 @@ describe('fen.read() test', () => {
 
     const expected = 32;
     const pieces = read(fenString, bd, 'chess');
-    expect(expected).to.equal(pieces.size);
+    expect(expected).toEqual(pieces.size);
   });
 });
 
@@ -68,7 +68,7 @@ describe('fen.read() test', () => {
 
     const expected = 35;
     const pieces = read(fenString, bd, 'shogi');
-    expect(expected).to.equal(pieces.size);
+    expect(expected).toEqual(pieces.size);
   });
 });
 
@@ -79,7 +79,7 @@ describe('fen.read() test', () => {
 
     const expected = 8;
     const pieces = read(fenString, bd, 'minishogi');
-    expect(expected).to.equal(pieces.size);
+    expect(expected).toEqual(pieces.size);
   });
   it('testing mini shogi player pieces from fen', () => {
     const fenString = '4k/2+S+Sp/1+b3/3+p1/K3R[GRBg] b - - 5 15';
@@ -90,8 +90,8 @@ describe('fen.read() test', () => {
     const pieces = read(fenString, bd, 'minishogi');
     const p1Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p1');
     const p2Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p2');
-    expect(expectedP1).to.equal(p1Pieces.length);
-    expect(expectedP2).to.equal(p2Pieces.length);
+    expect(expectedP1).toEqual(p1Pieces.length);
+    expect(expectedP2).toEqual(p2Pieces.length);
   });
 });
 
@@ -102,7 +102,7 @@ describe('fen.read() test', () => {
 
     const expected = 31;
     const pieces = read(fenString, bd, 'xiangqi');
-    expect(expected).to.equal(pieces.size);
+    expect(expected).toEqual(pieces.size);
   });
 });
 
@@ -113,7 +113,7 @@ describe('fen.read() test', () => {
 
     const expected = 21;
     const pieces = read(fenString, bd, 'minixiangqi');
-    expect(expected).to.equal(pieces.size);
+    expect(expected).toEqual(pieces.size);
   });
 });
 
@@ -124,7 +124,7 @@ describe('fen.read() test', () => {
 
     const expected = 12;
     const pieces = read(fenString, bd, 'oware');
-    expect(expected).to.equal(pieces.size);
+    expect(expected).toEqual(pieces.size);
   });
   it('testing oware player pieces from fen', () => {
     const fenString = '4S,4S,4S,4S,4S,4S/4S,4S,4S,4S,4S,4S 0 0 S 1';
@@ -135,8 +135,8 @@ describe('fen.read() test', () => {
     const pieces = read(fenString, bd, 'oware');
     const p1Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p1');
     const p2Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p2');
-    expect(expectedP1).to.equal(p1Pieces.length);
-    expect(expectedP2).to.equal(p2Pieces.length);
+    expect(expectedP1).toEqual(p1Pieces.length);
+    expect(expectedP2).toEqual(p2Pieces.length);
   });
   it('testing oware player pieces from fen with gaps (two 1s)', () => {
     const fenString = '1,6S,1,1S,5S,7S/7S,1S,3S,8S,2S,8S 0 0 S 50';
@@ -147,8 +147,8 @@ describe('fen.read() test', () => {
     const pieces = read(fenString, bd, 'oware');
     const p1Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p1');
     const p2Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p2');
-    expect(expectedP1).to.equal(p1Pieces.length);
-    expect(expectedP2).to.equal(p2Pieces.length);
+    expect(expectedP1).toEqual(p1Pieces.length);
+    expect(expectedP2).toEqual(p2Pieces.length);
   });
   it('testing oware player pieces from fen with gaps (one 2)', () => {
     const fenString = '2,6S,1S,5S,7S/7S,1S,3S,8S,2S,8S 0 0 S 50';
@@ -159,8 +159,8 @@ describe('fen.read() test', () => {
     const pieces = read(fenString, bd, 'oware');
     const p1Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p1');
     const p2Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p2');
-    expect(expectedP1).to.equal(p1Pieces.length);
-    expect(expectedP2).to.equal(p2Pieces.length);
+    expect(expectedP1).toEqual(p1Pieces.length);
+    expect(expectedP2).toEqual(p2Pieces.length);
   });
 });
 
@@ -172,7 +172,7 @@ describe('fen.write() test', () => {
     const expected = fenString.split(' ')[0];
     const pieces = read(fenString, bd, 'chess');
     const writtenFen = write(pieces, bd, 'chess');
-    expect(expected).to.equal(writtenFen);
+    expect(expected).toEqual(writtenFen);
   });
 });
 
@@ -184,7 +184,7 @@ describe('fen.write() test', () => {
     const expected = fenString.split(' ')[0];
     const pieces = read(fenString, bd, 'oware');
     const writtenFen = write(pieces, bd, 'oware');
-    expect(expected).to.equal(writtenFen);
+    expect(expected).toEqual(writtenFen);
   });
   it('testing oware read fen and then write match', () => {
     const fenString = '28S,2S,4S,1,4S,4S/27S,4S,4S,6S,1,4S 3 0 S 50';
@@ -193,7 +193,7 @@ describe('fen.write() test', () => {
     const expected = fenString.split(' ')[0];
     const pieces = read(fenString, bd, 'oware');
     const writtenFen = write(pieces, bd, 'oware');
-    expect(expected).to.equal(writtenFen);
+    expect(expected).toEqual(writtenFen);
   });
   it('testing oware read fen and then write match for gaps', () => {
     const fenString = '1,6S,1,1S,5S,7S/7S,1S,3S,8S,2S,8S 0 0 S 50';
@@ -202,7 +202,7 @@ describe('fen.write() test', () => {
     const expected = fenString.split(' ')[0];
     const pieces = read(fenString, bd, 'oware');
     const writtenFen = write(pieces, bd, 'oware');
-    expect(expected).to.equal(writtenFen);
+    expect(expected).toEqual(writtenFen);
   });
   it('testing oware read fen and then write match for gaps', () => {
     const fenString = '2,6S,1S,5S,7S/7S,1S,3S,8S,2S,8S 0 0 S 50';
@@ -211,7 +211,7 @@ describe('fen.write() test', () => {
     const expected = fenString.split(' ')[0];
     const pieces = read(fenString, bd, 'oware');
     const writtenFen = write(pieces, bd, 'oware');
-    expect(expected).to.equal(writtenFen);
+    expect(expected).toEqual(writtenFen);
   });
 });
 
@@ -225,7 +225,7 @@ describe('fen.write() test', () => {
     if (expected.indexOf('[') !== -1) expected = expected.slice(0, expected.indexOf('['));
     const pieces = read(fenString, bd, 'go19x19');
     const writtenFen = write(pieces, bd, 'go19x19');
-    expect(expected).to.equal(writtenFen);
+    expect(expected).toEqual(writtenFen);
   });
   it('testing go read fen and then write match for gaps', () => {
     const fenString =
@@ -236,7 +236,7 @@ describe('fen.write() test', () => {
     if (expected.indexOf('[') !== -1) expected = expected.slice(0, expected.indexOf('['));
     const pieces = read(fenString, bd, 'go19x19');
     const writtenFen = write(pieces, bd, 'go19x19');
-    expect(expected).to.equal(writtenFen);
+    expect(expected).toEqual(writtenFen);
   });
 });
 //todo Confirm structure of Backgammon fen...
@@ -247,11 +247,11 @@ describe('fen.read() test', () => {
 
     const expected = 8;
     const pieces = read(fenString, bd, 'backgammon');
-    expect(expected).to.equal(pieces.size);
+    expect(expected).toEqual(pieces.size);
     const p1Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p1');
     const p2Pieces = [...pieces.values()].filter((item: cg.Piece) => item.playerIndex === 'p2');
-    expect(4).to.equal(p1Pieces.length);
-    expect(4).to.equal(p2Pieces.length);
+    expect(4).toEqual(p1Pieces.length);
+    expect(4).toEqual(p2Pieces.length);
   });
 });
 describe('fen.write() test', () => {
@@ -263,20 +263,20 @@ describe('fen.write() test', () => {
     if (expected.indexOf('[') !== -1) expected = expected.slice(0, expected.indexOf('['));
     const pieces = read(fenString, bd, 'backgammon');
     const writtenFen = write(pieces, bd, 'backgammon');
-    expect(expected).to.equal(writtenFen);
+    expect(expected).toEqual(writtenFen);
   });
 });
 describe('fen.readPocket() test', () => {
   it('testing backgammon read a fen pocket', () => {
     const fenString = '5S,3,3s,1,5s,4,2S/5s,3,3S,1,5S,4,2s[2s,3S] w - - 1';
 
-    let expected = 2;
+    const expected = 2;
     const pocketPieces = readPocket(fenString, 'backgammon');
 
-    expect(expected).to.equal(pocketPieces.length);
-    expect('s2-piece').to.equal(pocketPieces[0].role);
-    expect('p2').to.equal(pocketPieces[0].playerIndex);
-    expect('s3-piece').to.equal(pocketPieces[1].role);
-    expect('p1').to.equal(pocketPieces[1].playerIndex);
+    expect(expected).toEqual(pocketPieces.length);
+    expect('s2-piece').toEqual(pocketPieces[0].role);
+    expect('p2').toEqual(pocketPieces[0].playerIndex);
+    expect('s3-piece').toEqual(pocketPieces[1].role);
+    expect('p1').toEqual(pocketPieces[1].playerIndex);
   });
 });

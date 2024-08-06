@@ -76,8 +76,8 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         container.appendChild(
           renderCoords(
             files.slice(0, s.dimensions.width).map(x => x.toUpperCase()),
-            'files' + ' p1'
-          )
+            'files' + ' p1',
+          ),
         );
         container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + ' p2'));
       } else {
@@ -87,8 +87,8 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
               .slice(0, s.dimensions.width)
               .map(x => x.toUpperCase())
               .reverse(),
-            'files' + ' p1'
-          )
+            'files' + ' p1',
+          ),
         );
         container.appendChild(renderCoords(files.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
       }
@@ -104,33 +104,45 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       if (s.orientation === 'p1') {
         if (s.turnPlayerIndex === 'p1') {
           container.appendChild(
-            renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p2')
+            renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p2'),
           );
           container.appendChild(
-            renderCoords(['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(), 'files' + ' p1')
+            renderCoords(
+              ['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(),
+              'files' + ' p1',
+            ),
           );
         } else {
           container.appendChild(
-            renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p1')
+            renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p1'),
           );
           container.appendChild(
-            renderCoords(['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(), 'files' + ' p2')
+            renderCoords(
+              ['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(),
+              'files' + ' p2',
+            ),
           );
         }
       } else {
         if (s.turnPlayerIndex === 'p1') {
           container.appendChild(
-            renderCoords(['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(), 'files' + ' p1')
+            renderCoords(
+              ['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(),
+              'files' + ' p1',
+            ),
           );
           container.appendChild(
-            renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p2')
+            renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p2'),
           );
         } else {
           container.appendChild(
-            renderCoords(['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(), 'files' + ' p2')
+            renderCoords(
+              ['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(),
+              'files' + ' p2',
+            ),
           );
           container.appendChild(
-            renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p1')
+            renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p1'),
           );
         }
       }
@@ -151,7 +163,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
               return 't';
             } else return piece.role.split('-')[0].substring(1);
           } else return '0';
-        })
+        }),
       );
 
       if (s.orientation === 'p1') {

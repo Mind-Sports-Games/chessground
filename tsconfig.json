@@ -1,24 +1,20 @@
 {
   "include": ["src/*.ts"],
-  "filesGlob": ["src/*.ts"],
   "exclude": [],
   "compilerOptions": {
-    "outDir": "./",
+    "esModuleInterop": true,
     "declaration": true,
-    "removeComments": true,
+    "outDir": "dist",
     "noEmitOnError": false,
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
     "noImplicitThis": true,
-    "strict": true,
-    "strictNullChecks": true,
-    "alwaysStrict": true,
-    "module": "commonjs",
-    "target": "ES2019",
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "lib": ["DOM", "ES2017", "ES2019"]
+    "noImplicitReturns": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "target": "es2017",
+    "lib": ["DOM", "es2017"]
   }
 }

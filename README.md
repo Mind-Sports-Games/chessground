@@ -58,7 +58,7 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 ## Installation
 
 ```sh
-npm install --save chessground
+pnpm install --save chessground
 ```
 
 ### Usage
@@ -91,21 +91,37 @@ More? Please make a pull request to include it here.
 Install build dependencies:
 
 ```sh
-yarn install
+pnpm install
 ```
 
-To build the node module:
+Update deps:
 
 ```sh
-yarn compile -- --watch
+rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm install
 ```
 
-To build the dist files:
+Build the node module:
 
 ```sh
-yarn dev -- --watch
+pnpm prepare --watch
 ```
 
+Build the minified bundled dist files:
+
 ```sh
-yarn prod -- --watch
+pnpm dist
+```
+
+run tests:
+
+```sh
+pnpm run test --watch
+pnpm run test fen --watch
+```
+
+Before committing:
+
+```sh
+pnpm run lint
+pnpm run format
 ```

@@ -21,9 +21,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: |
-          npm install
-          npm run lint
-          npm run compile
-          npm run test
-          npm run dev
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: |
+            - recursive: false
+      - run: pnpm run lint
+      - run: pnpm run check-format
+      - run: pnpm run test

@@ -1,4 +1,5 @@
-import * as cg from '../src/types';
+import { describe, expect, it } from '@jest/globals';
+import * as cg from './types.js';
 import {
   computeSquareCenter,
   key2pos,
@@ -8,8 +9,7 @@ import {
   calculatePieceGroup,
   calculateGoScores,
   calculateBackgammonScores,
-} from '../src/util';
-import { expect } from 'chai';
+} from './util.js';
 
 describe('computeSquareCenter() test', () => {
   it('testing a1 square p1', () => {
@@ -32,8 +32,8 @@ describe('computeSquareCenter() test', () => {
 
     const expected = [0.5, 7.5];
     const pos = computeSquareCenter(key, orientation, bounds, bd);
-    expect(expected[0]).to.equal(pos[0]);
-    expect(expected[1]).to.equal(pos[1]);
+    expect(expected[0]).toEqual(pos[0]);
+    expect(expected[1]).toEqual(pos[1]);
   });
 });
 
@@ -58,8 +58,8 @@ describe('computeSquareCenter() test', () => {
 
     const expected = [7.5, 0.5];
     const pos = computeSquareCenter(key, orientation, bounds, bd);
-    expect(expected[0]).to.equal(pos[0]);
-    expect(expected[1]).to.equal(pos[1]);
+    expect(expected[0]).toEqual(pos[0]);
+    expect(expected[1]).toEqual(pos[1]);
   });
 });
 
@@ -84,8 +84,8 @@ describe('computeSquareCenter() test', () => {
 
     const expected = [0.5, 0.5];
     const pos = computeSquareCenter(key, orientation, bounds, bd);
-    expect(expected[0]).to.equal(pos[0]);
-    expect(expected[1]).to.equal(pos[1]);
+    expect(expected[0]).toEqual(pos[0]);
+    expect(expected[1]).toEqual(pos[1]);
   });
 });
 
@@ -94,8 +94,8 @@ describe('key2pos() test', () => {
     const key = 'a1';
     const pos: cg.Pos = key2pos(key);
     const expected: cg.Pos = [1, 1];
-    expect(expected[0]).to.equal(pos[0]);
-    expect(expected[1]).to.equal(pos[1]);
+    expect(expected[0]).toEqual(pos[0]);
+    expect(expected[1]).toEqual(pos[1]);
   });
 });
 
@@ -104,8 +104,8 @@ describe('key2pos() test', () => {
     const key = 'a10';
     const pos: cg.Pos = key2pos(key);
     const expected: cg.Pos = [1, 10];
-    expect(expected[0]).to.equal(pos[0]);
-    expect(expected[1]).to.equal(pos[1]);
+    expect(expected[0]).toEqual(pos[0]);
+    expect(expected[1]).toEqual(pos[1]);
   });
 });
 
@@ -115,10 +115,10 @@ describe('adjacentKeys() test', () => {
     const bd = { height: 9, width: 9 };
     const adjacent = adjacentKeys(bd, key);
     const expected: cg.Key[] = ['e6', 'e4', 'f5', 'd5'];
-    expect(expected[0]).to.equal(adjacent[0]);
-    expect(expected[1]).to.equal(adjacent[1]);
-    expect(expected[2]).to.equal(adjacent[2]);
-    expect(expected[3]).to.equal(adjacent[3]);
+    expect(expected[0]).toEqual(adjacent[0]);
+    expect(expected[1]).toEqual(adjacent[1]);
+    expect(expected[2]).toEqual(adjacent[2]);
+    expect(expected[3]).toEqual(adjacent[3]);
   });
 });
 
@@ -128,8 +128,8 @@ describe('adjacentKeys() test', () => {
     const bd = { height: 9, width: 9 };
     const adjacent = adjacentKeys(bd, key);
     const expected: cg.Key[] = ['a2', 'b1'];
-    expect(expected[0]).to.equal(adjacent[0]);
-    expect(expected[1]).to.equal(adjacent[1]);
+    expect(expected[0]).toEqual(adjacent[0]);
+    expect(expected[1]).toEqual(adjacent[1]);
   });
 });
 
@@ -139,8 +139,8 @@ describe('adjacentKeys() test', () => {
     const bd = { height: 9, width: 9 };
     const adjacent = adjacentKeys(bd, key);
     const expected: cg.Key[] = ['i8', 'h9'];
-    expect(expected[0]).to.equal(adjacent[0]);
-    expect(expected[1]).to.equal(adjacent[1]);
+    expect(expected[0]).toEqual(adjacent[0]);
+    expect(expected[1]).toEqual(adjacent[1]);
   });
 });
 
@@ -150,10 +150,10 @@ describe('calculateAreas() test', () => {
     const bd = { height: 3, width: 3 };
     const areas = calculateAreas(emptySquares, bd);
     const expected: cg.Key[][] = [['a1', 'a2', 'b1', 'b2']];
-    expect(expected[0][0]).to.equal(areas[0][0]);
-    expect(expected[0][1]).to.equal(areas[0][1]);
-    expect(expected[0][2]).to.equal(areas[0][2]);
-    expect(expected[0][3]).to.equal(areas[0][3]);
+    expect(expected[0][0]).toEqual(areas[0][0]);
+    expect(expected[0][1]).toEqual(areas[0][1]);
+    expect(expected[0][2]).toEqual(areas[0][2]);
+    expect(expected[0][3]).toEqual(areas[0][3]);
   });
 });
 
@@ -163,11 +163,11 @@ describe('calculateAreas() test', () => {
     const bd = { height: 3, width: 3 };
     const areas = calculateAreas(emptySquares, bd);
     const expected: cg.Key[][] = [['c1', 'c2'], ['a3', 'b3'], ['a1']];
-    expect(expected[0][0]).to.equal(areas[0][0]);
-    expect(expected[0][1]).to.equal(areas[0][1]);
-    expect(expected[1][0]).to.equal(areas[1][0]);
-    expect(expected[1][1]).to.equal(areas[1][1]);
-    expect(expected[2][0]).to.equal(areas[2][0]);
+    expect(expected[0][0]).toEqual(areas[0][0]);
+    expect(expected[0][1]).toEqual(areas[0][1]);
+    expect(expected[1][0]).toEqual(areas[1][0]);
+    expect(expected[1][1]).toEqual(areas[1][1]);
+    expect(expected[2][0]).toEqual(areas[2][0]);
   });
 });
 
@@ -189,15 +189,15 @@ describe('calculatePlayeremptyAreas() test', () => {
     expected.set('c2', 'p1');
     expected.set('c1', 'p1');
     expected.set('a1', 'p1');
-    expect(expected.size).to.equal(areas.size);
-    expect(Array.from(expected.keys())[0]).to.equal(Array.from(areas.keys())[0]);
-    expect(Array.from(expected.keys())[1]).to.equal(Array.from(areas.keys())[1]);
-    expect(Array.from(expected.keys())[2]).to.equal(Array.from(areas.keys())[2]);
-    expect(Array.from(expected.keys())[3]).to.equal(Array.from(areas.keys())[3]);
-    expect(Array.from(expected.keys())[4]).to.equal(Array.from(areas.keys())[4]);
-    expect(Array.from(expected.keys())[5]).to.equal(Array.from(areas.keys())[5]);
-    expect(expected.get('a1')).to.equal('p1');
-    expect(expected.get('a3')).to.equal('p1');
+    expect(expected.size).toEqual(areas.size);
+    expect(Array.from(expected.keys())[0]).toEqual(Array.from(areas.keys())[0]);
+    expect(Array.from(expected.keys())[1]).toEqual(Array.from(areas.keys())[1]);
+    expect(Array.from(expected.keys())[2]).toEqual(Array.from(areas.keys())[2]);
+    expect(Array.from(expected.keys())[3]).toEqual(Array.from(areas.keys())[3]);
+    expect(Array.from(expected.keys())[4]).toEqual(Array.from(areas.keys())[4]);
+    expect(Array.from(expected.keys())[5]).toEqual(Array.from(areas.keys())[5]);
+    expect(expected.get('a1')).toEqual('p1');
+    expect(expected.get('a3')).toEqual('p1');
   });
 });
 
@@ -217,11 +217,11 @@ describe('calculatePlayeremptyAreas() test', () => {
     const expected = new Map<cg.Key, cg.PlayerIndex>();
     expected.set('c3', 'p2');
     expected.set('a1', 'p1');
-    expect(expected.size).to.equal(areas.size);
-    expect(Array.from(expected.keys())[0]).to.equal(Array.from(areas.keys())[0]);
-    expect(Array.from(expected.keys())[1]).to.equal(Array.from(areas.keys())[1]);
-    expect(expected.get('a1')).to.equal('p1');
-    expect(expected.get('c3')).to.equal('p2');
+    expect(expected.size).toEqual(areas.size);
+    expect(Array.from(expected.keys())[0]).toEqual(Array.from(areas.keys())[0]);
+    expect(Array.from(expected.keys())[1]).toEqual(Array.from(areas.keys())[1]);
+    expect(expected.get('a1')).toEqual('p1');
+    expect(expected.get('c3')).toEqual('p2');
   });
 });
 
@@ -245,15 +245,15 @@ describe('calculatePlayeremptyAreas() test', () => {
     expected.set('c3', 'p1');
     expected.set('c1', 'p1');
     expected.set('a1', 'p1');
-    expect(expected.size).to.equal(areas.size);
-    expect(Array.from(expected.keys())[0]).to.equal(Array.from(areas.keys())[0]);
-    expect(Array.from(expected.keys())[1]).to.equal(Array.from(areas.keys())[1]);
-    expect(Array.from(expected.keys())[2]).to.equal(Array.from(areas.keys())[2]);
-    expect(Array.from(expected.keys())[3]).to.equal(Array.from(areas.keys())[3]);
-    expect(expected.get('a1')).to.equal('p1');
-    expect(expected.get('c3')).to.equal('p1');
-    expect(expected.get('c1')).to.equal('p1');
-    expect(expected.get('a3')).to.equal('p1');
+    expect(expected.size).toEqual(areas.size);
+    expect(Array.from(expected.keys())[0]).toEqual(Array.from(areas.keys())[0]);
+    expect(Array.from(expected.keys())[1]).toEqual(Array.from(areas.keys())[1]);
+    expect(Array.from(expected.keys())[2]).toEqual(Array.from(areas.keys())[2]);
+    expect(Array.from(expected.keys())[3]).toEqual(Array.from(areas.keys())[3]);
+    expect(expected.get('a1')).toEqual('p1');
+    expect(expected.get('c3')).toEqual('p1');
+    expect(expected.get('c1')).toEqual('p1');
+    expect(expected.get('a3')).toEqual('p1');
   });
 });
 
@@ -274,9 +274,9 @@ describe('calculatePlayeremptyAreas() test', () => {
     const areas = calculatePlayerEmptyAreas(pieces, bd, deadStones);
     const expected = new Map<cg.Key, cg.PlayerIndex>();
     expected.set('a1', 'p1');
-    expect(expected.size).to.equal(areas.size);
-    expect(Array.from(expected.keys())[0]).to.equal(Array.from(areas.keys())[0]);
-    expect(expected.get('a1')).to.equal('p1');
+    expect(expected.size).toEqual(areas.size);
+    expect(Array.from(expected.keys())[0]).toEqual(Array.from(areas.keys())[0]);
+    expect(expected.get('a1')).toEqual('p1');
   });
 });
 
@@ -294,9 +294,9 @@ describe('calculatePieceGroup() test', () => {
     const pieceGroup = calculatePieceGroup('a3', pieces, bd);
     const expected: cg.Key[] = ['a3', 'b3'];
 
-    expect(expected.length).to.equal(pieceGroup.length);
-    expect(Array.from(pieceGroup)[0]).to.equal(Array.from(expected)[0]);
-    expect(Array.from(pieceGroup)[1]).to.equal(Array.from(expected)[1]);
+    expect(expected.length).toEqual(pieceGroup.length);
+    expect(Array.from(pieceGroup)[0]).toEqual(Array.from(expected)[0]);
+    expect(Array.from(pieceGroup)[1]).toEqual(Array.from(expected)[1]);
   });
 });
 
@@ -320,11 +320,11 @@ describe('calculatePieceGroup() test', () => {
     const pieceGroup = calculatePieceGroup('b3', pieces, bd);
     const expected: cg.Key[] = ['b3', 'b4', 'a3', 'c4'];
 
-    expect(expected.length).to.equal(pieceGroup.length);
-    expect(Array.from(pieceGroup)[0]).to.equal(Array.from(expected)[0]);
-    expect(Array.from(pieceGroup)[1]).to.equal(Array.from(expected)[1]);
-    expect(Array.from(pieceGroup)[2]).to.equal(Array.from(expected)[2]);
-    expect(Array.from(pieceGroup)[3]).to.equal(Array.from(expected)[3]);
+    expect(expected.length).toEqual(pieceGroup.length);
+    expect(Array.from(pieceGroup)[0]).toEqual(Array.from(expected)[0]);
+    expect(Array.from(pieceGroup)[1]).toEqual(Array.from(expected)[1]);
+    expect(Array.from(pieceGroup)[2]).toEqual(Array.from(expected)[2]);
+    expect(Array.from(pieceGroup)[3]).toEqual(Array.from(expected)[3]);
   });
 });
 
@@ -346,8 +346,8 @@ describe('calculateGoScores() test', () => {
     const goScores = calculateGoScores(deadStones, pieces, bd);
     const expected = { p1: 9, p2: 0 };
 
-    expect(expected.p1).to.equal(goScores.p1);
-    expect(expected.p2).to.equal(goScores.p2);
+    expect(expected.p1).toEqual(goScores.p1);
+    expect(expected.p2).toEqual(goScores.p2);
   });
 });
 
@@ -369,8 +369,8 @@ describe('calculateGoScores() test', () => {
     const goScores = calculateGoScores(deadStones, pieces, bd);
     const expected = { p1: 3, p2: 1 };
 
-    expect(expected.p1).to.equal(goScores.p1);
-    expect(expected.p2).to.equal(goScores.p2);
+    expect(expected.p1).toEqual(goScores.p1);
+    expect(expected.p2).toEqual(goScores.p2);
   });
 });
 
@@ -399,8 +399,8 @@ describe('calculateGoScores() test', () => {
     const goScores = calculateGoScores(deadStones, pieces, bd);
     const expected = { p1: 3, p2: 12 };
 
-    expect(expected.p1).to.equal(goScores.p1);
-    expect(expected.p2).to.equal(goScores.p2);
+    expect(expected.p1).toEqual(goScores.p1);
+    expect(expected.p2).toEqual(goScores.p2);
   });
 });
 
@@ -428,8 +428,8 @@ describe('calculateBackgammonScores() test', () => {
     const backgammonScores = calculateBackgammonScores(pieces, pocketPieces, bd);
     const expected = { p1: 167, p2: 167 };
 
-    expect(expected.p1).to.equal(backgammonScores.p1);
-    expect(expected.p2).to.equal(backgammonScores.p2);
+    expect(expected.p1).toEqual(backgammonScores.p1);
+    expect(expected.p2).toEqual(backgammonScores.p2);
   });
 });
 
@@ -460,7 +460,7 @@ describe('calculateBackgammonScores() test', () => {
     const backgammonScores = calculateBackgammonScores(pieces, pocketPieces, bd);
     const expected = { p1: 227, p2: 169 };
 
-    expect(expected.p1).to.equal(backgammonScores.p1);
-    expect(expected.p2).to.equal(backgammonScores.p2);
+    expect(expected.p1).toEqual(backgammonScores.p1);
+    expect(expected.p2).toEqual(backgammonScores.p2);
   });
 });
