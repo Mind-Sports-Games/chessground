@@ -57,6 +57,7 @@ export type Variant =
   | 'nackgammon'
   | 'breakthroughtroyka'
   | 'minibreakthroughtroyka'
+  | 'abalone'
   | undefined;
 export type PlayerIndex = (typeof playerIndexs)[number];
 export type Letter = (typeof letters)[number];
