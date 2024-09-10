@@ -170,7 +170,7 @@ export const posToTranslateRel = (
     pos,
     orientation,
     100,
-    v === 'togyzkumalak' ? 150 : v === 'backgammon' || v === 'nackgammon' ? 116 : 100,
+    v === 'togyzkumalak' || v === 'bestemshe' ? 150 : v === 'backgammon' || v === 'nackgammon' ? 116 : 100,
     bt,
   );
 

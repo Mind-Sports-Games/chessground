@@ -92,7 +92,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         );
         container.appendChild(renderCoords(files.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
       }
-    } else if (s.variant === 'togyzkumalak') {
+    } else if (s.variant === 'togyzkumalak' || s.variant === 'bestemshe') {
       if (s.orientation === 'p1') {
         container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width), 'files' + ' p1'));
         container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width), 'files' + ' p2'));
@@ -154,7 +154,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
 
   if (s.boardScores) {
     const bd = s.dimensions;
-    if (s.variant === 'togyzkumalak') {
+    if (s.variant === 'togyzkumalak' || s.variant === 'bestemshe') {
       const boardScores = invNRanks.slice(-bd.height).map(y =>
         NRanks.slice(0, bd.width).map(x => {
           const piece = s.pieces.get(pos2key([x, y]));

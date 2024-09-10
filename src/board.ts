@@ -183,13 +183,14 @@ function updatePocketPieces(
 export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   const origPiece = state.pieces.get(orig),
     destPiece = state.pieces.get(dest);
-  if ((orig === dest && state.variant !== 'togyzkumalak') || !origPiece) return false;
+  if ((orig === dest && state.variant !== 'togyzkumalak' && state.variant !== 'bestemshe') || !origPiece) return false;
   const captured = isCapture(state.variant, destPiece, origPiece);
   if (dest === state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captured);
 
   switch (state.variant) {
     case 'togyzkumalak':
+    case 'bestemshe':
       setPieces(state, togyzkumalakUpdatePiecesFromMove(state.dimensions, state.pieces, orig, dest));
       break;
     case 'oware':
@@ -217,7 +218,8 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
 
 function isCapture(variant: cg.Variant, destPiece: cg.Piece | undefined, origPiece: cg.Piece): cg.Piece | undefined {
   switch (variant) {
-    case 'togyzkumalak': {
+    case 'togyzkumalak':
+    case 'bestemshe': {
       //TODO account for wrapping around board (simimlar to oware capture)
       const count = destPiece && Number(destPiece.role.split('-')[0].substring(1));
       return destPiece && destPiece.playerIndex !== origPiece.playerIndex && count && (count === 2 || count % 2 === 1)
@@ -464,7 +466,7 @@ function isMovable(state: HeadlessState, orig: cg.Key): boolean {
 
 export function canMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   return (
-    (orig !== dest || state.variant === 'togyzkumalak') &&
+    (orig !== dest || state.variant === 'togyzkumalak' || state.variant === 'bestemshe') &&
     isMovable(state, orig) &&
     (state.movable.free || !!state.movable.dests?.get(orig)?.includes(dest))
   );
