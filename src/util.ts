@@ -170,7 +170,7 @@ export const posToTranslateRel = (
     pos,
     orientation,
     100,
-    v === 'togyzkumalak' ? 150 : v === 'backgammon' || v === 'nackgammon' ? 116 : 100,
+    v === 'togyzkumalak' || v === 'bestemshe' ? 150 : v === 'backgammon' || v === 'nackgammon' ? 116 : 100,
     bt,
   );
 
@@ -481,6 +481,7 @@ export function togyzkumalakUpdatePiecesFromMove(
   pieces: cg.Pieces,
   orig: cg.Key,
   dest: cg.Key,
+  usesTuzdik: boolean,
 ): cg.PiecesDiff {
   const boardWidth = bd.width;
   const boardArray = createMancalaBoardArrayFromPieces(pieces, bd);
@@ -517,6 +518,7 @@ export function togyzkumalakUpdatePiecesFromMove(
 
   //is tuzdik created
   const createdTuzdik =
+    usesTuzdik &&
     existingTuzdik.length !== 2 &&
     finalBoardArray[destBoardIndex] === 3 &&
     dest[1] !== orig[1] &&

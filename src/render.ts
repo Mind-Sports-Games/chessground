@@ -360,6 +360,7 @@ function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {
 function variantSpecificHighlightClass(variant: cg.Variant, k: cg.Key, orientation: cg.Orientation): string {
   switch (variant) {
     case 'togyzkumalak':
+    case 'bestemshe':
       return k[1] === '1' ? ' p1' : ' p2';
     case 'nackgammon':
     case 'backgammon':
