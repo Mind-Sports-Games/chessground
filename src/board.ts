@@ -191,7 +191,7 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
   switch (state.variant) {
     case 'togyzkumalak':
     case 'bestemshe':
-      setPieces(state, togyzkumalakUpdatePiecesFromMove(state.dimensions, state.pieces, orig, dest));
+      setPieces(state, togyzkumalakUpdatePiecesFromMove(state.dimensions, state.pieces, orig, dest, state.variant === 'togyzkumalak'));
       break;
     case 'oware':
       setPieces(state, owareUpdatePiecesFromMove(state.dimensions, state.pieces, orig, dest));
