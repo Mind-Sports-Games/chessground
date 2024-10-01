@@ -16,7 +16,7 @@
       ]
     }
   },
-  "packageManager": "pnpm@9.1.0",
+  "packageManager": "pnpm@9.11.0",
   "engines": {
     "node": ">=20",
     "pnpm": "^9"
@@ -31,7 +31,7 @@
     "jest": "29",
     "prettier": "^3.2.5",
     "ts-jest": "29",
-    "typescript": "^5.4"
+    "typescript": "^5.6.2"
   },
   "scripts": {
     "prepare": "$npm_execpath run compile",
