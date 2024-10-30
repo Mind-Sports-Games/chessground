@@ -566,9 +566,15 @@ export function playPremove(state: HeadlessState): boolean {
       if (result !== true) metadata.captured = result;
       callUserFunction(state.movable.events.after, orig, dest, metadata);
       success = true;
+      unsetPremove(state);
+    }
+  } else {
+    if (canPremove(state, orig, dest)) {
+      success = true;
+    } else {
+      unsetPremove(state);
     }
   }
-  unsetPremove(state);
   return success;
 }
 
