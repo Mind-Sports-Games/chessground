@@ -113,7 +113,10 @@ function startDragOrDraw(s: State): MouchBind {
         }
         if (
           s.dropmode.active &&
-          (undefined === squareOccupied(s, e) || s.variant === 'backgammon' || s.variant === 'nackgammon')
+          (undefined === squareOccupied(s, e) ||
+            s.variant === 'backgammon' ||
+            s.variant === 'hyper' ||
+            s.variant === 'nackgammon')
         ) {
           // this case covers normal drop when it is our turn or pre-drop on empty scare
           drop(s, e);
