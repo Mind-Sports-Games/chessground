@@ -88,6 +88,9 @@ More? Please make a pull request to include it here.
 
 ## Development
 
+Commands are listed in package.json.
+In case you want to see the possibilities from the console, run `pnpm run`
+
 Install build dependencies:
 
 ```sh
@@ -106,7 +109,7 @@ Build the node module:
 pnpm prepare --watch
 ```
 
-Build the minified bundled dist files:
+Build the minified bundled dist files: (NOTE: from lila you will likely then need to restart the build as it does not watch for changes on the minified file):
 
 ```sh
 pnpm dist
