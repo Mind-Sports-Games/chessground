@@ -1150,10 +1150,7 @@ export function premove(
       break;
 
     case 'abalone':
-      mobility = abaloneMarble(
-        pieces,
-        playerIndex
-      );
+      mobility = abaloneMarble(pieces, playerIndex);
       break;
 
     // Variants using standard pieces and additional fairy pieces like S-chess, Capablanca, etc.

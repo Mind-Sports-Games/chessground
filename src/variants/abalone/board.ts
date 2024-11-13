@@ -6,11 +6,11 @@ import { distanceSq } from '../../util';
 import { allPos, computeSquareCenter, key2pos, pos2key } from './util';
 
 export const getKeyAtDomPos = (
-    pos: cg.NumberPair,
-    orientation: cg.Orientation,
-    bounds: ClientRect,
-    bd: cg.BoardDimensions
-  ): cg.Key | undefined => {
+  pos: cg.NumberPair,
+  orientation: cg.Orientation,
+  bounds: ClientRect,
+  bd: cg.BoardDimensions,
+): cg.Key | undefined => {
   let file = Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
   const rank = Math.ceil(bd.height - bd.height * ((pos[1] - bounds.top) / bounds.height));
 
@@ -18,7 +18,7 @@ export const getKeyAtDomPos = (
   pos = [file, rank];
   pos = T.mapToP1[orientation](pos, bd);
   return pos[0] > 0 && pos[0] < bd.width + 1 && pos[1] > 0 && pos[1] < bd.height + 1 ? pos2key(pos) : undefined;
-}
+};
 
 export const getSnappedKeyAtDomPos = (
   orig: cg.Key,
@@ -38,4 +38,4 @@ export const getSnappedKeyAtDomPos = (
     [validSnapDistances[0], 0],
   );
   return pos2key(validSnapPos[closestSnapIndex]);
-}
+};

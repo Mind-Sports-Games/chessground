@@ -1,29 +1,9 @@
 import * as cg from '../../types';
 import * as T from '../../transformations';
 
-const abaloneFiles = [
-    'a',
-    'b',
-    'c',
-    'd',
-    'e',
-    'f',
-    'g',
-    'h',
-    'i',
-] as const;
+const abaloneFiles = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'] as const;
 
-const abaloneRanks = [
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-] as const;
+const abaloneRanks = ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as const;
 
 export const pos2key = (pos: cg.Pos): cg.Key => {
   let posx = pos[0];
@@ -55,83 +35,80 @@ export const pos2key = (pos: cg.Pos): cg.Key => {
     posx = pos[0] + 1;
   }
 
-  const key = (abaloneFiles[posx] + abaloneRanks[pos[1] - 1]) as cg.Key
-    // console.log("pos2key", pos, key);
-    return key;
-}
-
-
+  const key = (abaloneFiles[posx] + abaloneRanks[pos[1] - 1]) as cg.Key;
+  // console.log("pos2key", pos, key);
+  return key;
+};
 
 export const key2pos = (k: cg.Key): cg.Pos => {
   // console.log("key2pos", k);
   return [k.charCodeAt(0) - 96, parseInt(k.slice(1))] as cg.Pos;
 
   // @TODO VFR: rework this potentially - was used by mini boards to display them correctly - not sure yet if it's supposed to be used
-    // const shift = parseInt(k.slice(1));
-    // const diff = (shift - 1) * 0.5;
-    // if (parseInt(k.slice(1)) < 5) {
-    //     return [k.charCodeAt(0)
-    //         - 96 + 2 - (diff),
-    //         parseInt(k.slice(1))] as cg.Pos;
-    // }
-    // return [k.charCodeAt(0) - 96 - (diff-5) - 3, parseInt(k.slice(1))] as cg.Pos;
-}
+  // const shift = parseInt(k.slice(1));
+  // const diff = (shift - 1) * 0.5;
+  // if (parseInt(k.slice(1)) < 5) {
+  //     return [k.charCodeAt(0)
+  //         - 96 + 2 - (diff),
+  //         parseInt(k.slice(1))] as cg.Pos;
+  // }
+  // return [k.charCodeAt(0) - 96 - (diff-5) - 3, parseInt(k.slice(1))] as cg.Pos;
+};
 
-const shift = [2,1.5,1,0.5,0,-0.5,-1,-1.5,-2]
+const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];
 
 // @TODO VFR: translateBase should probably be in transformations.ts
 // @TODO VFR: probably need to adapt the code here still anyway
 const translateBase: Record<cg.Orientation, cg.TranslateBase> = {
-    p1: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [
-      (pos[0] - 1 + shift[pos[1] - 1]) * xScale,
-      (bt.height - pos[1]) * yScale,
-    ],
-    p2: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [
-      (bt.width - pos[0] - shift[pos[1] - 1]) * xScale,
-      (pos[1] - 1) * yScale,
-    ],
-    right: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[1] - 1) * xScale, (pos[0] - 1) * yScale],
-    left: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [
-      (bt.width - pos[0]) * xScale,
-      (pos[1] - 1) * yScale,
-    ],
-    p1vflip: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[0] - 1) * xScale, (pos[1] - 1) * yScale],
-}
-
+  p1: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [
+    (pos[0] - 1 + shift[pos[1] - 1]) * xScale,
+    (bt.height - pos[1]) * yScale,
+  ],
+  p2: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [
+    (bt.width - pos[0] - shift[pos[1] - 1]) * xScale,
+    (pos[1] - 1) * yScale,
+  ],
+  right: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[1] - 1) * xScale, (pos[0] - 1) * yScale],
+  left: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [
+    (bt.width - pos[0]) * xScale,
+    (pos[1] - 1) * yScale,
+  ],
+  p1vflip: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[0] - 1) * xScale, (pos[1] - 1) * yScale],
+};
 
 export const posToTranslateAbs = (
-    pos: cg.Pos,
-    orientation: cg.Orientation,
-    xFactor: number,
-    yFactor: number,
-    bt: cg.BoardDimensions,
-  ): cg.NumberPair => {
-    return translateBase[orientation](pos, xFactor, yFactor, bt);
-  };
+  pos: cg.Pos,
+  orientation: cg.Orientation,
+  xFactor: number,
+  yFactor: number,
+  bt: cg.BoardDimensions,
+): cg.NumberPair => {
+  return translateBase[orientation](pos, xFactor, yFactor, bt);
+};
 
 function files(n: number) {
-    return abaloneFiles.slice(0, n);
+  return abaloneFiles.slice(0, n);
 }
 
 function ranks(n: number) {
-    return abaloneRanks.slice(0, n);
+  return abaloneRanks.slice(0, n);
 }
 
 export function allKeys(bd: cg.BoardDimensions = { width: 9, height: 9 }) {
-    return Array.prototype.concat(...files(bd.width).map(c => ranks(bd.height).map(r => c + r)));
+  return Array.prototype.concat(...files(bd.width).map(c => ranks(bd.height).map(r => c + r)));
 }
 
 export const allPos = (bd: cg.BoardDimensions): cg.Pos[] => allKeys(bd).map(key2pos);
 
 export function computeSquareCenter(
-    key: cg.Key,
-    orientation: cg.Orientation,
-    bounds: ClientRect,
-    bd: cg.BoardDimensions,
-  ): cg.NumberPair {
-    const pos = T.mapToP1Inverse[orientation](key2pos(key), bd);
-    return [
-      bounds.left + (bounds.width * (pos[0] - 1 + 0.5)) / bd.width,
-      bounds.top + (bounds.height * (bd.height - (pos[1] - 1 + 0.5))) / bd.height,
-    ];
-  }
+  key: cg.Key,
+  orientation: cg.Orientation,
+  bounds: ClientRect,
+  bd: cg.BoardDimensions,
+): cg.NumberPair {
+  const pos = T.mapToP1Inverse[orientation](key2pos(key), bd);
+  return [
+    bounds.left + (bounds.width * (pos[0] - 1 + 0.5)) / bd.width,
+    bounds.top + (bounds.height * (bd.height - (pos[1] - 1 + 0.5))) / bd.height,
+  ];
+}

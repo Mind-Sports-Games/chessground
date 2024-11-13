@@ -3,10 +3,7 @@ import { unselect, cancelMove, getKeyAtDomPos, getSnappedKeyAtDomPos } from './b
 import { eventPosition, isRightButton } from './util';
 import * as cg from './types';
 
-import {
-  start as abaloneStart,
-  processDraw as abaloneProcessDraw
-} from './variants/abalone/draw';
+import { start as abaloneStart, processDraw as abaloneProcessDraw } from './variants/abalone/draw';
 
 export interface DrawShape {
   orig: cg.Key;
@@ -67,7 +64,7 @@ export interface DrawCurrent {
 const brushes = ['green', 'red', 'blue', 'yellow'];
 
 export function start(state: State, e: cg.MouchEvent): void {
-  if(state.variant === "abalone") {
+  if (state.variant === 'abalone') {
     return abaloneStart(state, e);
   }
   // support one finger touch only
@@ -89,7 +86,7 @@ export function start(state: State, e: cg.MouchEvent): void {
 }
 
 export function processDraw(state: State): void {
-  if(state.variant === "abalone") {
+  if (state.variant === 'abalone') {
     return abaloneProcessDraw(state);
   }
   requestAnimationFrame(() => {

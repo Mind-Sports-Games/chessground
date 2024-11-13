@@ -4,10 +4,7 @@ import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifi
 import * as cg from './types';
 import * as T from './transformations';
 
-import {
-  renderPiece as abaloneRenderPiece,
-  renderShape as abaloneRenderShape
-} from './variants/abalone/svg';
+import { renderPiece as abaloneRenderPiece, renderShape as abaloneRenderShape } from './variants/abalone/svg';
 
 export function createElement(tagName: string): SVGElement {
   return document.createElementNS('http://www.w3.org/2000/svg', tagName);
@@ -190,7 +187,7 @@ function renderShape(
   arrowDests: ArrowDests,
   bounds: ClientRect,
 ): SVGElement {
-  if (state.variant === "abalone") {
+  if (state.variant === 'abalone') {
     return abaloneRenderShape(state, { shape, current, hash }, brushes, arrowDests, bounds);
   }
   let el: SVGElement;
@@ -305,13 +302,8 @@ function renderPiece(
   myPlayerIndex: cg.PlayerIndex,
   variant: cg.Variant,
 ): SVGElement {
-  if (variant === "abalone") {
-    return abaloneRenderPiece(baseUrl,
-    pos,
-    piece,
-    bounds,
-    bd,
-    myPlayerIndex);
+  if (variant === 'abalone') {
+    return abaloneRenderPiece(baseUrl, pos, piece, bounds, bd, myPlayerIndex);
   }
   const o = pos2px(pos, bounds, bd),
     width = (bounds.width / bd.width) * (piece.scale || 1),
