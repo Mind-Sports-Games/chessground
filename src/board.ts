@@ -24,6 +24,8 @@ import predrop from './predrop';
 import * as cg from './types';
 import * as T from './transformations';
 
+import { getKeyAtDomPos as abaloneGetKeyAtDomPos } from './variants/abalone/board';
+
 export function setOrientation(state: HeadlessState, o: cg.Orientation): void {
   state.orientation = o;
   state.animation.current = state.draggable.current = state.selected = undefined;
@@ -181,6 +183,7 @@ function updatePocketPieces(
   state.pocketPieces = newPocketPieces;
 }
 
+// @TODO VFR: add Abalone moves
 export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   const origPiece = state.pieces.get(orig),
     destPiece = state.pieces.get(dest);
@@ -632,6 +635,9 @@ export function getKeyAtDomPos(
   bd: cg.BoardDimensions,
   variant: cg.Variant = 'chess',
 ): cg.Key | undefined {
+  if (variant === 'abalone') {
+    return abaloneGetKeyAtDomPos(pos, orientation, bounds, bd);
+  }
   const bgBorder = 1 / 15;
   const file =
     variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon'
