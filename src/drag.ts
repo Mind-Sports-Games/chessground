@@ -7,6 +7,8 @@ import { anim } from './anim';
 import predrop from './predrop';
 import * as T from './transformations';
 
+import { processDrag as abaloneProcessDrag } from './variants/abalone/drag';
+
 export interface DragCurrent {
   orig: cg.Key; // orig key of dragging piece
   origPos: cg.Pos;
@@ -150,6 +152,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
 
 function processDrag(s: State): void {
   requestAnimationFrame(() => {
+    if (s.variant === 'abalone') return abaloneProcessDrag(s);
     const cur = s.draggable.current;
     if (!cur) return;
     // cancel animations while dragging

@@ -40,19 +40,21 @@ export const pos2key = (pos: cg.Pos): cg.Key => {
   return key;
 };
 
+// @TODO VFR PART1: rework this potentially - was used by mini boards to display them correctly - not sure yet if it's supposed to be used
 export const key2pos = (k: cg.Key): cg.Pos => {
-  // console.log("key2pos", k);
   return [k.charCodeAt(0) - 96, parseInt(k.slice(1))] as cg.Pos;
+}
 
-  // @TODO VFR: rework this potentially - was used by mini boards to display them correctly - not sure yet if it's supposed to be used
-  // const shift = parseInt(k.slice(1));
-  // const diff = (shift - 1) * 0.5;
-  // if (parseInt(k.slice(1)) < 5) {
-  //     return [k.charCodeAt(0)
-  //         - 96 + 2 - (diff),
-  //         parseInt(k.slice(1))] as cg.Pos;
-  // }
-  // return [k.charCodeAt(0) - 96 - (diff-5) - 3, parseInt(k.slice(1))] as cg.Pos;
+export const key2posAlt = (k: cg.Key): cg.Pos => {
+// @TODO VFR PART2: rework this potentially - was used by mini boards to display them correctly - not sure yet if it's supposed to be used
+  const shift = parseInt(k.slice(1));
+  const diff = (shift - 1) * 0.5;
+  if (parseInt(k.slice(1)) < 5) {
+      return [k.charCodeAt(0)
+          - 96 + 2 - (diff),
+          parseInt(k.slice(1))] as cg.Pos;
+  }
+  return [k.charCodeAt(0) - 96 - (diff-5) - 3, parseInt(k.slice(1))] as cg.Pos;
 };
 
 const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];
@@ -86,6 +88,10 @@ export const posToTranslateAbs = (
   return translateBase[orientation](pos, xFactor, yFactor, bt);
 };
 
+export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
+  el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
+};
+
 function files(n: number) {
   return abaloneFiles.slice(0, n);
 }
@@ -108,7 +114,7 @@ export function computeSquareCenter(
 ): cg.NumberPair {
   const pos = T.mapToP1Inverse[orientation](key2pos(key), bd);
   return [
-    bounds.left + (bounds.width * (pos[0] - 1 + 0.5)) / bd.width,
+    bounds.left + (bounds.width * (pos[0] + shift[pos[1] - 1] - 1 + 0.5)) / bd.width,
     bounds.top + (bounds.height * (bd.height - (pos[1] - 1 + 0.5))) / bd.height,
   ];
 }
