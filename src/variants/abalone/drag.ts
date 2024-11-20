@@ -17,7 +17,6 @@ export function processDrag(s: State): void {
         if (cur.started) {
           // support lazy elements
           if (typeof cur.element === 'function') {
-            console.log("LAZY => function");
             const found = cur.element();
             if (!found) return;
             found.cgDragging = true;

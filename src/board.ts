@@ -628,6 +628,7 @@ export function stop(state: HeadlessState): void {
   cancelMove(state);
 }
 
+// triggered when we click on the svg area (a piece, a square or just an area outside the hexagon can be below the cursor)
 export function getKeyAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
@@ -735,6 +736,7 @@ export function p1Pov(s: HeadlessState): boolean {
   return s.myPlayerIndex === 'p1';
 }
 
+// at least triggered when we use right click to draw arrows or highlight a square
 export function getSnappedKeyAtDomPos(
   orig: cg.Key,
   pos: cg.NumberPair,

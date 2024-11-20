@@ -36,7 +36,6 @@ export const pos2key = (pos: cg.Pos): cg.Key => {
   }
 
   const key = (abaloneFiles[posx] + abaloneRanks[pos[1] - 1]) as cg.Key;
-  // console.log("pos2key", pos, key);
   return key;
 };
 
@@ -87,6 +86,14 @@ export const posToTranslateAbs = (
 ): cg.NumberPair => {
   return translateBase[orientation](pos, xFactor, yFactor, bt);
 };
+
+export const posToTranslateRel = (
+  pos: cg.Pos,
+  orientation: cg.Orientation,
+  bt: cg.BoardDimensions,
+): cg.NumberPair => {
+  return translateBase[orientation](pos, 100, 100, bt);
+}
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;

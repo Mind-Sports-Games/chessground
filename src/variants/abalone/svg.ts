@@ -16,7 +16,7 @@ import * as cg from '../../types';
 
 import { key2pos } from './util';
 
-// pos2px is probably used to re-position elements correctly at the center of their square - an override is probably not needed
+// pos2px is used to convert a position from the grid (board coordinates) to a position in pixels
 const pos2px = (pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.NumberPair => {
   return [
     ((pos[0] * 4 + pos[0] - 0.5) * bounds.width) / bd.width,

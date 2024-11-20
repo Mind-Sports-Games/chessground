@@ -18,7 +18,7 @@ import {
 
 import { key2pos } from './util';
 
-// @TODO VFR: this code is an ugly copy paste, refactor etc
+// @TODO VFR: this code is an ugly copy paste, refactor etc.
 export const render = (s: State): void => {
   const orientation = s.orientation,
     asP1: boolean = p1Pov(s),
@@ -184,11 +184,6 @@ export const render = (s: State): void => {
         boardEl.appendChild(pieceNode);
       }
     }
-    // @TODO VFR: I added this "translate(x)" but it's probably useless. to remove.
-    translate(
-      createEl('piece', pieceNameOf(p, s.myPlayerIndex, s.orientation, s.variant, k)) as cg.PieceNode,
-      posToTranslate(key2pos(k), orientation, s.dimensions, s.variant),
-    );
   }
 
   // walk over all pocketPieces and set nodes
