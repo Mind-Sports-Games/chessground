@@ -1,9 +1,10 @@
 import * as cg from './types';
 import * as T from './transformations';
 
-import { posToTranslateAbs as abalonePosToTranslateAbs,
-  posToTranslateRel as abalonePosToTranslateRel
- } from './variants/abalone/util';
+import {
+  posToTranslateAbs as abalonePosToTranslateAbs,
+  posToTranslateRel as abalonePosToTranslateRel,
+} from './variants/abalone/util';
 
 export const playerIndexs: cg.PlayerIndex[] = ['p1', 'p2'];
 export const invRanks: readonly cg.Rank[] = [...cg.ranks19].reverse();
@@ -189,7 +190,7 @@ export const posToTranslateRel = (
   bt: cg.BoardDimensions,
   v: cg.Variant,
 ): cg.NumberPair => {
-  if(v === 'abalone') {
+  if (v === 'abalone') {
     return abalonePosToTranslateRel(pos, orientation, bt);
   }
   return posToTranslateBase(
@@ -203,8 +204,7 @@ export const posToTranslateRel = (
         : 100,
     bt,
   );
-}
-
+};
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;

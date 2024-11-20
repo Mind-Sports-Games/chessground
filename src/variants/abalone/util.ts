@@ -42,18 +42,16 @@ export const pos2key = (pos: cg.Pos): cg.Key => {
 // @TODO VFR PART1: rework this potentially - was used by mini boards to display them correctly - not sure yet if it's supposed to be used
 export const key2pos = (k: cg.Key): cg.Pos => {
   return [k.charCodeAt(0) - 96, parseInt(k.slice(1))] as cg.Pos;
-}
+};
 
 export const key2posAlt = (k: cg.Key): cg.Pos => {
-// @TODO VFR PART2: rework this potentially - was used by mini boards to display them correctly - not sure yet if it's supposed to be used
+  // @TODO VFR PART2: rework this potentially - was used by mini boards to display them correctly - not sure yet if it's supposed to be used
   const shift = parseInt(k.slice(1));
   const diff = (shift - 1) * 0.5;
   if (parseInt(k.slice(1)) < 5) {
-      return [k.charCodeAt(0)
-          - 96 + 2 - (diff),
-          parseInt(k.slice(1))] as cg.Pos;
+    return [k.charCodeAt(0) - 96 + 2 - diff, parseInt(k.slice(1))] as cg.Pos;
   }
-  return [k.charCodeAt(0) - 96 - (diff-5) - 3, parseInt(k.slice(1))] as cg.Pos;
+  return [k.charCodeAt(0) - 96 - (diff - 5) - 3, parseInt(k.slice(1))] as cg.Pos;
 };
 
 const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];
@@ -87,13 +85,9 @@ export const posToTranslateAbs = (
   return translateBase[orientation](pos, xFactor, yFactor, bt);
 };
 
-export const posToTranslateRel = (
-  pos: cg.Pos,
-  orientation: cg.Orientation,
-  bt: cg.BoardDimensions,
-): cg.NumberPair => {
+export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation, bt: cg.BoardDimensions): cg.NumberPair => {
   return translateBase[orientation](pos, 100, 100, bt);
-}
+};
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
