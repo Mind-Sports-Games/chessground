@@ -30,7 +30,7 @@ export function setOrientation(state: HeadlessState, o: cg.Orientation): void {
 }
 
 export function toggleOrientation(state: HeadlessState): void {
-  if (state.variant === 'backgammon' || state.variant === 'nackgammon') {
+  if (state.variant === 'backgammon' || state.variant === 'hyper' || state.variant === 'nackgammon') {
     setOrientation(state, oppositeOrientationBG(state.orientation));
   } else setOrientation(state, oppositeOrientation(state.orientation));
 }
@@ -130,6 +130,7 @@ function setDropVariantState(state: HeadlessState, piece: cg.Piece, key: cg.Key)
       break;
     }
     case 'nackgammon':
+    case 'hyper':
     case 'backgammon': {
       const destPiece = state.pieces.get(key);
       const capture = destPiece ? destPiece.playerIndex !== piece.playerIndex : false;
@@ -200,6 +201,7 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
       setPieces(state, owareUpdatePiecesFromMove(state.dimensions, state.pieces, orig, dest));
       break;
     case 'nackgammon':
+    case 'hyper':
     case 'backgammon':
       if (captured) {
         updatePocketPieces(state, opposite(origPiece.playerIndex), false, true);
@@ -238,7 +240,10 @@ function isCapture(variant: cg.Variant, destPiece: cg.Piece | undefined, origPie
 }
 
 export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key, force?: boolean): boolean {
-  if (state.pieces.has(key) && !(state.variant === 'backgammon' || state.variant === 'nackgammon')) {
+  if (
+    state.pieces.has(key) &&
+    !(state.variant === 'backgammon' || state.variant === 'hyper' || state.variant === 'nackgammon')
+  ) {
     if (force) state.pieces.delete(key);
     else return false;
   }
@@ -250,7 +255,7 @@ export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key,
   callUserFunction(state.events.change);
   state.movable.dests = undefined;
   state.dropmode.dropDests = undefined;
-  if (!(state.variant === 'backgammon' || state.variant === 'nackgammon')) {
+  if (!(state.variant === 'backgammon' || state.variant === 'hyper' || state.variant === 'nackgammon')) {
     //end turn action is used for backgammon games
     state.turnPlayerIndex = opposite(state.turnPlayerIndex);
   }
@@ -263,7 +268,7 @@ function baseUserMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piec
     state.movable.dests = undefined;
     state.dropmode.dropDests = undefined;
     state.liftable.liftDests = undefined;
-    if (!(state.variant === 'backgammon' || state.variant === 'nackgammon')) {
+    if (!(state.variant === 'backgammon' || state.variant === 'hyper' || state.variant === 'nackgammon')) {
       //end turn manually for backgammon games
       state.turnPlayerIndex = opposite(state.turnPlayerIndex);
     }
@@ -275,7 +280,7 @@ function baseUserMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piec
 export function baseLift(state: HeadlessState, dest: cg.Key): boolean {
   const piece = state.pieces.get(dest);
   if (piece) {
-    if (state.variant === 'backgammon' || state.variant === 'nackgammon') {
+    if (state.variant === 'backgammon' || state.variant === 'hyper' || state.variant === 'nackgammon') {
       const count = piece.role.split('-')[0].substring(1);
       const letter = piece.role.charAt(0);
       if (count === '1') {
@@ -479,7 +484,11 @@ function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces.get(orig);
   return (
     !!piece &&
-    (orig === dest || !state.pieces.has(dest) || state.variant === 'backgammon' || state.variant === 'nackgammon') &&
+    (orig === dest ||
+      !state.pieces.has(dest) ||
+      state.variant === 'backgammon' ||
+      state.variant === 'hyper' ||
+      state.variant === 'nackgammon') &&
     (state.movable.playerIndex === 'both' ||
       (state.movable.playerIndex === piece.playerIndex && state.turnPlayerIndex === piece.playerIndex)) &&
     !!(
@@ -625,7 +634,7 @@ export function getKeyAtDomPos(
 ): cg.Key | undefined {
   const bgBorder = 1 / 15;
   const file =
-    variant === 'backgammon' || variant === 'nackgammon'
+    variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon'
       ? (pos[0] - bounds.left) / bounds.width < 1 / 15 ||
         (pos[0] - bounds.left) / bounds.width >= 14 / 15 ||
         ((pos[0] - bounds.left) / bounds.width >= 7 / 15 && (pos[0] - bounds.left) / bounds.width <= 8 / 15)
@@ -637,7 +646,7 @@ export function getKeyAtDomPos(
             )
       : Math.ceil(bd.width * ((pos[0] - bounds.left) / bounds.width));
   const rank =
-    variant === 'backgammon' || variant === 'nackgammon'
+    variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon'
       ? (pos[1] - bounds.top) / bounds.height <= 1 / 15 ||
         (pos[1] - bounds.top) / bounds.height >= 14 / 15 ||
         ((pos[1] - bounds.top) / bounds.height >= 6 / 15 && (pos[1] - bounds.top) / bounds.height <= 9 / 15)
@@ -665,7 +674,7 @@ export function areMyDiceAtDomPos(
       : (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15;
   const correctHeight =
     (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
-  return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
+  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctWidth && correctHeight;
 }
 
 export function isButtonAtDomPos(
@@ -683,7 +692,7 @@ export function isButtonAtDomPos(
       : (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15;
   const correctHeight =
     (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
-  return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
+  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctWidth && correctHeight;
 }
 
 export function isPocketAtDomPos(
@@ -698,7 +707,7 @@ export function isPocketAtDomPos(
     (orientation === 'p1' && turnPlayerIndex === 'p1') || (orientation === 'p1vflip' && turnPlayerIndex === 'p2')
       ? (pos[1] - bounds.top) / bounds.height > 2 / 15 && (pos[1] - bounds.top) / bounds.height < 7.4 / 15
       : (pos[1] - bounds.top) / bounds.height > 7.6 / 15 && (pos[1] - bounds.top) / bounds.height < 13 / 15;
-  return (variant === 'backgammon' || variant === 'nackgammon') && correctWidth && correctHeight;
+  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctWidth && correctHeight;
 }
 
 export function reorderDice(state: HeadlessState): void {

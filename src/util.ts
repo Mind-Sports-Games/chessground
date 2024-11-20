@@ -155,7 +155,9 @@ export const posToTranslateAbs = (
   bt: cg.BoardDimensions,
   variant: cg.Variant,
 ): ((pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair) => {
-  const xFactor = (bounds.width / bt.width) * (variant === 'backgammon' || variant === 'nackgammon' ? 0.8 : 1),
+  const xFactor =
+      (bounds.width / bt.width) *
+      (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon' ? 0.8 : 1),
     yFactor = bounds.height / bt.height;
   return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor, bt);
 };
@@ -170,7 +172,11 @@ export const posToTranslateRel = (
     pos,
     orientation,
     100,
-    v === 'togyzkumalak' || v === 'bestemshe' ? 150 : v === 'backgammon' || v === 'nackgammon' ? 116 : 100,
+    v === 'togyzkumalak' || v === 'bestemshe'
+      ? 150
+      : v === 'backgammon' || v === 'hyper' || v === 'nackgammon'
+        ? 116
+        : 100,
     bt,
   );
 

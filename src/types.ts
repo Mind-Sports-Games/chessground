@@ -53,6 +53,7 @@ export type Variant =
   | 'go13x13'
   | 'go19x19'
   | 'backgammon'
+  | 'hyper'
   | 'nackgammon'
   | 'breakthroughtroyka'
   | 'minibreakthroughtroyka'

@@ -144,6 +144,7 @@ export default function predrop(
       break;
 
     case 'nackgammon':
+    case 'hyper':
     case 'backgammon':
       mobility = noSquares; // dont allow predrop for backgammon
       break;
