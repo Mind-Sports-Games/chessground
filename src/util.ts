@@ -167,7 +167,6 @@ const posToTranslateBase = (
   return T.translateBase[orientation](pos, xFactor, yFactor, bt);
 };
 
-// @TODO VFR investigations : check if needed for Abalone
 export const posToTranslateAbs = (
   bounds: ClientRect,
   bt: cg.BoardDimensions,
@@ -183,7 +182,6 @@ export const posToTranslateAbs = (
   return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor, bt);
 };
 
-// @TODO VFR investigations : check if needed for Abalone
 export const posToTranslateRel = (
   pos: cg.Pos,
   orientation: cg.Orientation,

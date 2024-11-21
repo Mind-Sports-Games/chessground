@@ -39,13 +39,11 @@ export const pos2key = (pos: cg.Pos): cg.Key => {
   return key;
 };
 
-// @TODO VFR PART1: rework this potentially - was used by mini boards to display them correctly - not sure yet if it's supposed to be used
 export const key2pos = (k: cg.Key): cg.Pos => {
   return [k.charCodeAt(0) - 96, parseInt(k.slice(1))] as cg.Pos;
 };
 
 export const key2posAlt = (k: cg.Key): cg.Pos => {
-  // @TODO VFR PART2: rework this potentially - was used by mini boards to display them correctly - not sure yet if it's supposed to be used
   const shift = parseInt(k.slice(1));
   const diff = (shift - 1) * 0.5;
   if (parseInt(k.slice(1)) < 5) {
