@@ -1,5 +1,7 @@
 import * as cg from '../../types';
 import * as T from '../../transformations';
+import { candidateLineDirs, deducePotentialSideDirs, move, getDirectionString, isMoveInLine } from './directions';
+import type { DiagonalDirectionString } from './directions';
 
 const abaloneFiles = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'] as const;
 
@@ -117,3 +119,80 @@ export function computeSquareCenter(
     bounds.top + (bounds.height * (bd.height - (pos[1] - 1 + 0.5))) / bd.height,
   ];
 }
+
+export const abaloneUpdatePiecesFromMove = (
+  pieces: cg.Pieces,
+  orig: cg.Key,
+  dest: cg.Key,
+): [cg.PiecesDiff, boolean] => {
+  const directionString = getDirectionString(orig, dest);
+  if (!directionString) return [pieces, false];
+  const isAMoveInLine = isMoveInLine(orig, dest, directionString);
+  const diff: cg.PiecesDiff = new Map(pieces);
+
+  if (isAMoveInLine) {
+    diff.set(dest, pieces.get(orig));
+    diff.set(orig, undefined);
+    if (!pieces.get(dest)) {
+      // line move
+      return [diff, false];
+    }
+    // push move
+    const landingSquare1 = move(dest, directionString);
+    if (landingSquare1 === undefined) return [diff, true]; // xxo\ xxxo\
+    if (!pieces.get(landingSquare1)) {
+      // xxo. xxxo.
+      diff.set(landingSquare1, pieces.get(dest));
+      return [diff, false];
+    }
+
+    const landingSquare2 = move(landingSquare1, directionString);
+    if (landingSquare2 === undefined) return [diff, true]; // xxxoo\
+    if (!pieces.get(landingSquare2)) {
+      // xxxoo.
+      diff.set(landingSquare2, pieces.get(dest));
+      return [diff, false];
+    }
+  }
+
+  // side move
+  const overAllDirection = directionString as DiagonalDirectionString;
+  for (const lineDir of candidateLineDirs(overAllDirection as DiagonalDirectionString)) {
+    const sideDirs = deducePotentialSideDirs(directionString as DiagonalDirectionString, lineDir);
+    const secondPos = move(orig, lineDir);
+    if (secondPos === undefined) continue;
+    for (const sideDir of sideDirs) {
+      const side2ndPos = move(secondPos, sideDir);
+      if (side2ndPos) {
+        const side1stPos = move(orig, sideDir);
+        if (side1stPos === undefined) continue;
+        if (side1stPos && pieces.get(secondPos)) {
+          if (side2ndPos === dest) {
+            diff.set(side1stPos, pieces.get(orig));
+            diff.set(orig, undefined);
+            diff.set(dest, pieces.get(secondPos));
+            diff.set(secondPos, undefined);
+            return [diff, false];
+          } else {
+            // 3 marbles are moving
+            const thirdPos = move(secondPos, lineDir);
+            if (thirdPos === undefined) continue;
+            const side3rdPos = move(thirdPos, sideDir);
+            if (side3rdPos === undefined) continue;
+            if (pieces.get(thirdPos) && side3rdPos === dest) {
+              diff.set(side1stPos, pieces.get(orig));
+              diff.set(orig, undefined);
+              diff.set(side2ndPos, pieces.get(secondPos));
+              diff.set(secondPos, undefined);
+              diff.set(side3rdPos, pieces.get(thirdPos));
+              diff.set(thirdPos, undefined);
+              return [diff, false];
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return [diff, false];
+};

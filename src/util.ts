@@ -593,9 +593,6 @@ export function togyzkumalakUpdatePiecesFromMove(
   return updatedPieces;
 }
 
-// @TODO VFR: update pieces for Abalone (could allow moving in local from analysis page ??)
-// create here a function "updateAbalonePieceMap(pieces: cg.Pieces, bd: cg.BoardDimensions??): cg.PiecesDiff" or similar
-
 function createMancalaBoardArrayFromPieces(pieces: cg.Pieces, bd: cg.BoardDimensions): number[] {
   function countAtKey(key: cg.Key): number {
     const piece = pieces.get(key);

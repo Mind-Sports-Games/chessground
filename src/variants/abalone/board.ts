@@ -2,7 +2,6 @@ import * as cg from '../../types';
 import * as T from '../../transformations';
 import { knight, queen } from '../../premove';
 import { distanceSq } from '../../util';
-
 import { allPos, computeSquareCenter, key2posAlt, pos2key } from './util';
 
 export const getKeyAtDomPos = (
