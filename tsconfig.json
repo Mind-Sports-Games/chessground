@@ -1,20 +1,19 @@
 {
-  "include": ["src/*.ts"],
-  "exclude": [],
+  "include": ["src"],
   "compilerOptions": {
-    "esModuleInterop": true,
     "declaration": true,
-    "outDir": "dist",
-    "noEmitOnError": false,
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
+    "esModuleInterop": true,
+    "lib": ["DOM", "es2017"],
     "module": "esnext",
     "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "dist",
     "resolveJsonModule": true,
-    "target": "es2017",
-    "lib": ["DOM", "es2017"]
+    "strict": true,
+    "target": "es2017"
   }
 }

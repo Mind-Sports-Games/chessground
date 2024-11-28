@@ -23,6 +23,8 @@ import { premove, queen, knight } from './premove';
 import predrop from './predrop';
 import * as cg from './types';
 import * as T from './transformations';
+import { getKeyAtDomPos as abaloneGetKeyAtDomPos } from './variants/abalone/board';
+import { abaloneUpdatePiecesFromMove } from './variants/abalone/util';
 
 export function setOrientation(state: HeadlessState, o: cg.Orientation): void {
   state.orientation = o;
@@ -181,11 +183,17 @@ function updatePocketPieces(
   state.pocketPieces = newPocketPieces;
 }
 
+// returns false in case the move could not be processed
 export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   const origPiece = state.pieces.get(orig),
     destPiece = state.pieces.get(dest);
   if ((orig === dest && state.variant !== 'togyzkumalak' && state.variant !== 'bestemshe') || !origPiece) return false;
-  const captured = isCapture(state.variant, destPiece, origPiece);
+  let abalonePieces: cg.PiecesDiff = state.pieces, // because captures are computed in abaloneUpdatePiecesFromMove, it is better to store the updated pieces and the capture before the switch responsible of setPieces
+    abaloneCapture: boolean = false;
+  if (state.variant === 'abalone') {
+    [abalonePieces, abaloneCapture] = abaloneUpdatePiecesFromMove(state.pieces, orig, dest);
+  }
+  const captured = isCapture(state.variant, destPiece, origPiece) || abaloneCapture;
   if (dest === state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captured);
 
@@ -207,6 +215,9 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
         updatePocketPieces(state, opposite(origPiece.playerIndex), false, true);
       }
       setPieces(state, backgammonUpdatePiecesFromMove(state.pieces, orig, dest));
+      break;
+    case 'abalone':
+      setPieces(state, abalonePieces);
       break;
     default:
       if (!tryAutoCastle(state, orig, dest)) {
@@ -234,6 +245,8 @@ function isCapture(variant: cg.Variant, destPiece: cg.Piece | undefined, origPie
     case 'oware':
       //TODO this is more complicated to calculate... (but its only used for sound in lila atm)
       return destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
+    case 'abalone':
+      return undefined; // we compute it from abaloneUpdatePiecesFromMove instead
     default:
       return destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
   }
@@ -625,6 +638,7 @@ export function stop(state: HeadlessState): void {
   cancelMove(state);
 }
 
+// triggered when we click on the svg area (a piece, a square or even an area outside the board drawn can be below the cursor)
 export function getKeyAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
@@ -632,6 +646,9 @@ export function getKeyAtDomPos(
   bd: cg.BoardDimensions,
   variant: cg.Variant = 'chess',
 ): cg.Key | undefined {
+  if (variant === 'abalone') {
+    return abaloneGetKeyAtDomPos(pos, orientation, bounds, bd);
+  }
   const bgBorder = 1 / 15;
   const file =
     variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon'
@@ -729,6 +746,7 @@ export function p1Pov(s: HeadlessState): boolean {
   return s.myPlayerIndex === 'p1';
 }
 
+// at least triggered when we use right click to draw arrows or highlight a square
 export function getSnappedKeyAtDomPos(
   orig: cg.Key,
   pos: cg.NumberPair,

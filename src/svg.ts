@@ -8,7 +8,7 @@ export function createElement(tagName: string): SVGElement {
   return document.createElementNS('http://www.w3.org/2000/svg', tagName);
 }
 
-interface Shape {
+export interface Shape {
   shape: DrawShape;
   current: boolean;
   hash: Hash;
@@ -16,7 +16,7 @@ interface Shape {
 
 type CustomBrushes = Map<string, DrawBrush>; // by hash
 
-type ArrowDests = Map<cg.Key, number>; // how many arrows land on a square
+export type ArrowDests = Map<cg.Key, number>; // how many arrows land on a square
 
 type Hash = string;
 
@@ -340,11 +340,11 @@ export function setAttributes(el: SVGElement, attrs: { [key: string]: any }): SV
   return el;
 }
 
-function orient(pos: cg.Pos, orientation: cg.Orientation, bd: cg.BoardDimensions): cg.Pos {
+export function orient(pos: cg.Pos, orientation: cg.Orientation, bd: cg.BoardDimensions): cg.Pos {
   return T.mapToP1Inverse[orientation](pos, bd);
 }
 
-function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
+export function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
   return {
     color: base.color,
     opacity: Math.round(base.opacity * 10) / 10,
@@ -353,20 +353,20 @@ function makeCustomBrush(base: DrawBrush, modifiers: DrawModifiers): DrawBrush {
   };
 }
 
-function circleWidth(bounds: ClientRect, bd: cg.BoardDimensions): [number, number] {
+export function circleWidth(bounds: ClientRect, bd: cg.BoardDimensions): [number, number] {
   const base = bounds.width / (bd.width * 64);
   return [3 * base, 4 * base];
 }
 
-function lineWidth(brush: DrawBrush, current: boolean, bounds: ClientRect, bd: cg.BoardDimensions): number {
+export function lineWidth(brush: DrawBrush, current: boolean, bounds: ClientRect, bd: cg.BoardDimensions): number {
   return (((brush.lineWidth || 10) * (current ? 0.85 : 1)) / (bd.width * 64)) * bounds.width;
 }
 
-function opacity(brush: DrawBrush, current: boolean): number {
+export function opacity(brush: DrawBrush, current: boolean): number {
   return (brush.opacity || 1) * (current ? 0.9 : 1);
 }
 
-function arrowMargin(bounds: ClientRect, shorten: boolean, bd: cg.BoardDimensions): number {
+export function arrowMargin(bounds: ClientRect, shorten: boolean, bd: cg.BoardDimensions): number {
   return ((shorten ? 20 : 10) / (bd.width * 64)) * bounds.width;
 }
 
@@ -419,6 +419,7 @@ function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece): string {
     case 'go9x9':
     case 'go13x13':
     case 'go19x19':
+    case 'abalone':
       return (piece.playerIndex === 'p1' ? 'b' : 'w') + piece.role[0].toUpperCase();
     case 'oware':
     case 'togyzkumalak':

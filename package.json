@@ -3,17 +3,24 @@
   "version": "7.11.1-pstrat3.3",
   "description": "playstrategy.org chess ui, forked from lichess.org",
   "type": "module",
+  "module": "dist/chessground.js",
   "main": "dist/chessground.js",
   "types": "chessground.d.ts",
-  "exports": {
-    ".": "./dist/chessground.js",
-    "./*": "./dist/*.js"
-  },
   "typesVersions": {
     "*": {
       "*": [
-        "dist/*"
+        "dist/types/*"
       ]
+    }
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/chessground.js",
+      "types": "./dist/types/chessground.d.ts"
+    },
+    "./*": {
+      "import": "./dist/*.js",
+      "types": "./dist/types/*.d.ts"
     }
   },
   "packageManager": "pnpm@9.1.0",
@@ -35,7 +42,7 @@
   },
   "scripts": {
     "prepare": "$npm_execpath run compile",
-    "compile": "tsc --sourceMap --declaration",
+    "compile": "tsc --declarationDir dist/types --sourceMap",
     "test": "node node_modules/jest/bin/jest.js",
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
@@ -45,11 +52,9 @@
     "postinstall": "$npm_execpath run bundle"
   },
   "files": [
-    "/dist/*.js",
-    "/dist/*.d.ts",
-    "/dist/*.js.map",
-    "/assets/*.css",
-    "/src/*.ts"
+    "/src",
+    "/dist",
+    "/assets/*.css"
   ],
   "jest": {
     "globals": {

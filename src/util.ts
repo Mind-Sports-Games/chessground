@@ -1,6 +1,11 @@
 import * as cg from './types';
 import * as T from './transformations';
 
+import {
+  posToTranslateAbs as abalonePosToTranslateAbs,
+  posToTranslateRel as abalonePosToTranslateRel,
+} from './variants/abalone/util';
+
 export const playerIndexs: cg.PlayerIndex[] = ['p1', 'p2'];
 export const invRanks: readonly cg.Rank[] = [...cg.ranks19].reverse();
 export const NRanks: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
@@ -17,6 +22,18 @@ function ranks(n: number) {
 export function allKeys(bd: cg.BoardDimensions = { width: 8, height: 8 }) {
   return Array.prototype.concat(...files(bd.width).map(c => ranks(bd.height).map(r => c + r)));
 }
+
+// @TODO VFR: example of how pos2key could be rewritten
+// export const pos2key = (variant: cg.Variant, pos: cg.Pos): cg.Key => {
+//   switch(variant) {
+//     case "abalone": {
+//       return (cg.files[pos[0] - 1] + cg.ranks19[pos[1] - 1]) as cg.Key;
+//     }
+//     default: {
+//       return (cg.files[pos[0] - 1] + cg.ranks19[pos[1] - 1]) as cg.Key;
+//     }
+//   }
+// }
 
 export function pos2key(pos: cg.Pos): cg.Key {
   return (cg.files[pos[0] - 1] + cg.ranks19[pos[1] - 1]) as cg.Key;
@@ -159,6 +176,9 @@ export const posToTranslateAbs = (
       (bounds.width / bt.width) *
       (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon' ? 0.8 : 1),
     yFactor = bounds.height / bt.height;
+  if (variant === 'abalone') {
+    return (pos, orientation) => abalonePosToTranslateAbs(pos, orientation, xFactor, yFactor, bt);
+  }
   return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor, bt);
 };
 
@@ -167,8 +187,11 @@ export const posToTranslateRel = (
   orientation: cg.Orientation,
   bt: cg.BoardDimensions,
   v: cg.Variant,
-): cg.NumberPair =>
-  posToTranslateBase(
+): cg.NumberPair => {
+  if (v === 'abalone') {
+    return abalonePosToTranslateRel(pos, orientation, bt);
+  }
+  return posToTranslateBase(
     pos,
     orientation,
     100,
@@ -179,6 +202,7 @@ export const posToTranslateRel = (
         : 100,
     bt,
   );
+};
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
@@ -214,6 +238,7 @@ export const createEl = (tagName: string, className?: string): HTMLElement => {
   return el;
 };
 
+// @TODO VFR investigations: could be interesting to see if it can be used to move Abalone squares ??
 export function computeSquareCenter(
   key: cg.Key,
   orientation: cg.Orientation,

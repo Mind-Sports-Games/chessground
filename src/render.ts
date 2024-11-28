@@ -14,12 +14,19 @@ import { DragCurrent } from './drag';
 import * as cg from './types';
 import * as T from './transformations';
 
-type PieceName = string; // `$playerIndex $role`
-type SquareClasses = Map<cg.Key, string>;
+import { render as renderAbalone } from './variants/abalone/render';
+
+export type PieceName = string; // `$playerIndex $role`
+export type SquareClasses = Map<cg.Key, string>;
 
 // ported from https://github.com/veloce/lichobile/blob/master/src/js/chessground/view.js
 // in case of bugs, blame @veloce
 export function render(s: State): void {
+  if (s.variant === 'abalone') {
+    renderAbalone(s);
+    return;
+  }
+
   const orientation = s.orientation,
     asP1: boolean = p1Pov(s),
     posToTranslate = s.dom.relative ? posToTranslateRel : posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant),
@@ -215,25 +222,25 @@ export function updateBounds(s: State): void {
   }
 }
 
-function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {
+export function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {
   return el.tagName === 'PIECE';
 }
-function isSquareNode(el: cg.PieceNode | cg.SquareNode): el is cg.SquareNode {
+export function isSquareNode(el: cg.PieceNode | cg.SquareNode): el is cg.SquareNode {
   return el.tagName === 'SQUARE';
 }
 
-function removeNodes(s: State, nodes: HTMLElement[]): void {
+export function removeNodes(s: State, nodes: HTMLElement[]): void {
   for (const node of nodes) s.dom.elements.board.removeChild(node);
 }
 
-function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asP1: boolean, bd: cg.BoardDimensions): string {
+export function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asP1: boolean, bd: cg.BoardDimensions): string {
   pos = T.mapToP1[orientation](pos, bd);
   let z = 2 + (pos[1] - 1) * bd.height + (bd.width - pos[0]);
   if (asP1) z = 67 - z;
   return z + '';
 }
 
-function pieceNameOf(
+export function pieceNameOf(
   piece: cg.Piece,
   myPlayerIndex: cg.PlayerIndex,
   orientation: cg.Orientation,
@@ -260,7 +267,7 @@ function backgammonPosClass(k: cg.Key, orientation: cg.Orientation): string {
   return ` ${topOrBottom} ${leftOrRight}`;
 }
 
-function computeSquareClasses(s: State): SquareClasses {
+export function computeSquareClasses(s: State): SquareClasses {
   const squares: SquareClasses = new Map();
   if (s.lastMove && s.highlight.lastMove) {
     let first = true;
@@ -354,7 +361,7 @@ function addSquare(squares: SquareClasses, key: cg.Key, klass: string): void {
   else squares.set(key, klass);
 }
 
-function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {
+export function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {
   const arr = map.get(key);
   if (arr) arr.push(value);
   else map.set(key, [value]);
