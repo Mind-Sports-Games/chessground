@@ -92,16 +92,19 @@ Commands are listed in package.json.
 In case you want to see the possibilities from the console, run `pnpm run`
 
 ### Install build dependencies:s
+
 ```sh
 pnpm install
 ```
 
 ### Update deps:
+
 ```sh
 rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm install
 ```
 
 ### Build the node module:
+
 ```sh
 pnpm prepare --watch
 ```
@@ -121,8 +124,11 @@ pnpm run format
 ```
 
 ### Watch chessground changes from another project:
+
 In other project:
+
 - declare the link towards chessground (from project's `package.json`)
+
 ```json
   "dependencies": {
     ...
@@ -130,13 +136,18 @@ In other project:
     ...
   }
 ```
+
 In chessground:
-- create `.env.local` file based on .env.local.default 
+
+- create `.env.local` file based on .env.local.default
 - link back:
+
 ```sh
     pnpm run link
 ```
+
 - trigger compilation and generate minified file:
+
 ```sh
   pnpm run local-dist
 ```
