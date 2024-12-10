@@ -1,5 +1,4 @@
 import * as cps from 'node:child_process';
-import * as ps from 'node:process';
 
 const red = '\x1b[31m%s\x1b[0m';
 const green = '\x1b[32m%s\x1b[0m';
