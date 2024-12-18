@@ -1,16 +1,34 @@
-import * as cg from '../../types';
+import type * as cg from '../../types';
+
+import type { DirectionString } from './types';
 
 export enum DiagonalDirectionString {
-  UpLeft = 'UpLeft',
-  UpRight = 'UpRight',
-  DownRight = 'DownRight',
-  DownLeft = 'DownLeft',
+  UpLeft = 'NW',
+  UpRight = 'NE',
+  DownRight = 'SE',
+  DownLeft = 'SW',
 }
-enum HorizontalDirectionString {
-  Left = 'Left',
-  Right = 'Right',
+export enum HorizontalDirectionString {
+  Left = 'W',
+  Right = 'E',
 }
-type DirectionString = DiagonalDirectionString | HorizontalDirectionString;
+
+export const inverseDirection = (direction: DirectionString): DirectionString => {
+  switch (direction) {
+    case DiagonalDirectionString.UpLeft:
+      return DiagonalDirectionString.DownRight;
+    case DiagonalDirectionString.UpRight:
+      return DiagonalDirectionString.DownLeft;
+    case DiagonalDirectionString.DownRight:
+      return DiagonalDirectionString.UpLeft;
+    case DiagonalDirectionString.DownLeft:
+      return DiagonalDirectionString.UpRight;
+    case HorizontalDirectionString.Left:
+      return HorizontalDirectionString.Right;
+    case HorizontalDirectionString.Right:
+      return HorizontalDirectionString.Left;
+  }
+};
 
 export const move = (key: cg.Key, direction: DirectionString): cg.Key | undefined => {
   const transformedKey = directionMappings[direction](key);
@@ -128,38 +146,14 @@ const traverseUntil = (pos: cg.Key, stop: (pos: cg.Key) => boolean, direction: D
 };
 
 const isValidKey = (key: cg.Key): boolean => {
-  if (key.length !== 2) return false; // e.g. 'e10'
-
-  const num = Number(key[1]);
-  const charCode = key[0].charCodeAt(0);
-
-  if (num < 1 || num > 9) return false;
-  if (charCode < 97 || charCode > 105) return false; // a-i
-
-  const specificChecks: { [char: string]: [number, number] } = {
-    a: [1, 5],
-    b: [1, 6],
-    c: [1, 7],
-    d: [1, 8],
-    f: [2, 9],
-    g: [3, 9],
-    h: [4, 9],
-    i: [5, 9],
-  };
-
-  const range = specificChecks[key[0]];
-  if (range && (num < range[0] || num > range[1])) return false;
-
-  return true;
+  return /^(a[1-5]|b[1-6]|c[1-7]|d[1-8]|e[1-9]|f[2-9]|g[3-9]|h[4-9]|i[5-9])$/.test(key);
 };
 
 const directionMappings: { [key in DirectionString]: (key: cg.Key) => cg.Key } = {
-  UpLeft: (key: cg.Key) => (String.fromCharCode(key[0].charCodeAt(0)) + (parseInt(key[1]) + 1).toString()) as cg.Key,
-  UpRight: (key: cg.Key) =>
-    (String.fromCharCode(key[0].charCodeAt(0) + 1) + (parseInt(key[1]) + 1).toString()) as cg.Key,
-  DownLeft: (key: cg.Key) =>
-    (String.fromCharCode(key[0].charCodeAt(0) - 1) + (parseInt(key[1]) - 1).toString()) as cg.Key,
-  DownRight: (key: cg.Key) => (String.fromCharCode(key[0].charCodeAt(0)) + (parseInt(key[1]) - 1).toString()) as cg.Key,
-  Left: (key: cg.Key) => (String.fromCharCode(key[0].charCodeAt(0) - 1) + key[1]) as cg.Key,
-  Right: (key: cg.Key) => (String.fromCharCode(key[0].charCodeAt(0) + 1) + key[1]) as cg.Key,
+  NW: (key: cg.Key) => (String.fromCharCode(key[0].charCodeAt(0)) + (parseInt(key[1]) + 1).toString()) as cg.Key,
+  NE: (key: cg.Key) => (String.fromCharCode(key[0].charCodeAt(0) + 1) + (parseInt(key[1]) + 1).toString()) as cg.Key,
+  SW: (key: cg.Key) => (String.fromCharCode(key[0].charCodeAt(0) - 1) + (parseInt(key[1]) - 1).toString()) as cg.Key,
+  SE: (key: cg.Key) => (String.fromCharCode(key[0].charCodeAt(0)) + (parseInt(key[1]) - 1).toString()) as cg.Key,
+  W: (key: cg.Key) => (String.fromCharCode(key[0].charCodeAt(0) - 1) + key[1]) as cg.Key,
+  E: (key: cg.Key) => (String.fromCharCode(key[0].charCodeAt(0) + 1) + key[1]) as cg.Key,
 };

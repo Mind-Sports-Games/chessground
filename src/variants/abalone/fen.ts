@@ -1,6 +1,6 @@
 import { roles } from '../../fen';
-import * as cg from '../../types';
 import { pos2key } from '../../util';
+import type * as cg from '../../types';
 
 export const read = (fen: cg.FEN, dimensions: cg.BoardDimensions): cg.Pieces => {
   const pieces: cg.Pieces = new Map();

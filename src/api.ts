@@ -144,11 +144,11 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     move(orig, dest): void {
-      anim(state => board.baseMove(state, orig, dest), state);
+      anim(state => state.baseMove(state, orig, dest), state);
     },
 
     moveNoAnim(orig, dest): void {
-      board.baseMove(state, orig, dest);
+      state.baseMove(state, orig, dest);
       state.dom.redraw();
     },
 

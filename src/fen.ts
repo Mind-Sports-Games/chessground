@@ -26,7 +26,6 @@ export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Va
   let promoted = false;
   let num = 0;
 
-  // @TODO: try to refactor using Higher Order Functions with a default square board
   if (!commaFenVariants.includes(variant)) {
     let skipNext = false;
     for (let i = 0; i < fen.length; i++) {

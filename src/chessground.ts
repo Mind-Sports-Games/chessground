@@ -3,7 +3,7 @@ import { Config, configure } from './config';
 import { HeadlessState, State, defaults } from './state';
 import { renderWrap } from './wrap';
 import * as events from './events';
-import { render, updateBounds } from './render';
+import { updateBounds } from './render';
 import * as svg from './svg';
 import * as util from './util';
 
@@ -18,7 +18,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       elements = renderWrap(element, maybeState, relative),
       bounds = util.memo(() => elements.board.getBoundingClientRect()),
       redrawNow = (skipSvg?: boolean): void => {
-        render(state);
+        maybeState.render(state);
         if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg, elements.customSvg!);
       },
       boundsUpdated = (): void => {

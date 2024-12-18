@@ -1,8 +1,10 @@
+import * as cg from './types';
 import { HeadlessState } from './state';
 import { setSelected, setGoScore } from './board';
 import { read as fenRead, readPocket as fenReadPocket } from './fen';
 import { DrawShape, DrawBrush } from './draw';
-import * as cg from './types';
+
+import { configure as abaloneConfigure } from './variants/abalone/config';
 
 export interface Config {
   fen?: cg.FEN; // chess position in Forsyth notation
@@ -180,6 +182,11 @@ export function configure(state: HeadlessState, config: Config): void {
           !(d === 'h' + rank && dests.includes(('g' + rank) as cg.Key)),
       ),
     );
+  }
+
+  // configure variants
+  if (state.variant === 'abalone') {
+    abaloneConfigure(state);
   }
 }
 

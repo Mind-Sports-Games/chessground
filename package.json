@@ -49,6 +49,9 @@
     "check-format": "prettier --check .",
     "bundle": "esbuild src/chessground.ts --bundle --format=esm --outfile=dist/chessground.min.js --minify",
     "dist": "$npm_execpath run compile && $npm_execpath run bundle",
+    "link": "node --env-file=.env.local ./build.js --link",
+    "local-bundle": "node --env-file=.env.local ./build.js --bundle",
+    "local-dist": "$npm_execpath run compile && $npm_execpath run local-bundle",
     "postinstall": "$npm_execpath run bundle"
   },
   "files": [

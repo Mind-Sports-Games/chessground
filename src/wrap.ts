@@ -147,9 +147,13 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         }
       }
     } else if (s.variant === 'abalone') {
-      // @TODO VFR: probably can use the default else below - check
-      container.appendChild(renderCoords(['1', '2', '3', '4', '5', '6', '7', '8', '9'], 'ranks' + orientClass));
-      container.appendChild(renderCoords(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'], 'files' + orientClass));
+      if (s.orientation === 'p1') {
+        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width), 'ranks' + orientClass));
+        container.appendChild(renderCoords(files.slice(0, s.dimensions.width).reverse(), 'files' + orientClass));
+      } else {
+        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'ranks' + orientClass));
+        container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
+      }
     } else {
       container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
       container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
@@ -179,10 +183,6 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       }
     } else if (s.variant === 'backgammon' || s.variant === 'hyper' || s.variant === 'nackgammon') {
       const boardScores = calculateBackgammonScores(s.pieces, s.pocketPieces, s.dimensions);
-      container.appendChild(renderBoardScores(boardScores.p1.toString(), 'p1'));
-      container.appendChild(renderBoardScores(boardScores.p2.toString(), 'p2'));
-    } else if (s.variant === 'abalone') {
-      const boardScores = calculateBackgammonScores(s.pieces, s.pocketPieces, s.dimensions); // @TODO VFR: ADAPT
       container.appendChild(renderBoardScores(boardScores.p1.toString(), 'p1'));
       container.appendChild(renderBoardScores(boardScores.p2.toString(), 'p2'));
     } else {

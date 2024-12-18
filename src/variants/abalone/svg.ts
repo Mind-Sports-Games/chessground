@@ -1,3 +1,4 @@
+import type * as cg from '../../types';
 import { DrawShapePiece, DrawBrush, DrawBrushes } from '../../draw';
 import { State } from '../../state';
 import {
@@ -12,9 +13,10 @@ import {
   orient,
   setAttributes,
 } from '../../svg';
-import * as cg from '../../types';
 
 import { key2pos } from './util';
+
+// @TODO: using HOF would probably fix the arrows etc. Currently not working.
 
 // pos2px is used to convert a position from the grid (board coordinates) to a position in pixels
 const pos2px = (pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.NumberPair => {

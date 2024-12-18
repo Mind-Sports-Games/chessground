@@ -1,7 +1,9 @@
 import * as fen from './fen';
 import { AnimCurrent } from './anim';
+import { baseMove } from './board';
 import { DragCurrent } from './drag';
 import { Drawable } from './draw';
+import { render } from './render';
 import { timer } from './util';
 import * as cg from './types';
 
@@ -136,6 +138,8 @@ export interface HeadlessState {
   notation: cg.Notation;
   onlyDropsVariant: boolean;
   singleClickMoveVariant: boolean;
+  baseMove: (state: HeadlessState, orig: cg.Key, dest: cg.Key) => cg.Piece | boolean;
+  render: (state: State) => void;
 }
 
 export interface State extends HeadlessState {
@@ -248,5 +252,7 @@ export function defaults(): HeadlessState {
     notation: cg.Notation.DEFAULT,
     onlyDropsVariant: false,
     singleClickMoveVariant: false,
+    baseMove,
+    render,
   };
 }

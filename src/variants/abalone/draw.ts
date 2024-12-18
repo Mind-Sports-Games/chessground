@@ -1,9 +1,12 @@
+import type * as cg from '../../types';
 import { cancelMove, unselect } from '../../board';
 import { eventBrush } from '../../draw';
 import { State } from '../../state';
 import { eventPosition } from '../../util';
+
 import { getKeyAtDomPos, getSnappedKeyAtDomPos } from './board';
-import * as cg from '../../types';
+
+// @TODO: using HOF would allow not repeating the same code here. This code is generic, not Abalone specific. We just invoke getKeyAtDomPos and getSnappedKeyAtDomPos
 
 export const start = (state: State, e: cg.MouchEvent): void => {
   // support one finger touch only
@@ -12,7 +15,7 @@ export const start = (state: State, e: cg.MouchEvent): void => {
   e.preventDefault();
   e.ctrlKey ? unselect(state) : cancelMove(state);
   const pos = eventPosition(e)!,
-    orig = getKeyAtDomPos(pos, state.orientation, state.dom.bounds(), state.dimensions);
+    orig = getKeyAtDomPos(pos, state.orientation, state.dom.bounds());
   if (!orig) return;
   state.drawable.current = {
     orig,
@@ -28,7 +31,7 @@ export const processDraw = (state: State): void => {
   requestAnimationFrame(() => {
     const cur = state.drawable.current;
     if (cur) {
-      const keyAtDomPos = getKeyAtDomPos(cur.pos, state.orientation, state.dom.bounds(), state.dimensions);
+      const keyAtDomPos = getKeyAtDomPos(cur.pos, state.orientation, state.dom.bounds());
       if (!keyAtDomPos) {
         cur.snapToValidMove = false;
       }

@@ -14,19 +14,12 @@ import { DragCurrent } from './drag';
 import * as cg from './types';
 import * as T from './transformations';
 
-import { render as renderAbalone } from './variants/abalone/render';
-
 export type PieceName = string; // `$playerIndex $role`
 export type SquareClasses = Map<cg.Key, string>;
 
 // ported from https://github.com/veloce/lichobile/blob/master/src/js/chessground/view.js
 // in case of bugs, blame @veloce
 export function render(s: State): void {
-  if (s.variant === 'abalone') {
-    renderAbalone(s);
-    return;
-  }
-
   const orientation = s.orientation,
     asP1: boolean = p1Pov(s),
     posToTranslate = s.dom.relative ? posToTranslateRel : posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant),

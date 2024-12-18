@@ -152,7 +152,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
 
 function processDrag(s: State): void {
   requestAnimationFrame(() => {
-    if (s.variant === 'abalone') return abaloneProcessDrag(s);
+    if (s.variant === 'abalone') return abaloneProcessDrag(s); // "working" WIP: have to use HOF
     const cur = s.draggable.current;
     if (!cur) return;
     // cancel animations while dragging
