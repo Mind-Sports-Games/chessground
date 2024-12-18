@@ -9,6 +9,5 @@ export const configure = (state: HeadlessState): void => {
   state.render = render;
 
   // these below could just have been overriden by a config object
-  state.coordinates = true; // same as default
   state.animation.enabled = false;
 };

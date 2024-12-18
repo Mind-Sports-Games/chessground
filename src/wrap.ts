@@ -148,11 +148,27 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       }
     } else if (s.variant === 'abalone') {
       if (s.orientation === 'p1') {
-        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width), 'ranks' + orientClass));
-        container.appendChild(renderCoords(files.slice(0, s.dimensions.width).reverse(), 'files' + orientClass));
+        container.appendChild(renderCoords(ranks.slice(0, 5), 'files' + orientClass + ' rank-1'));
+        container.appendChild(renderCoords(['6'], 'files' + orientClass + ' rank-2'));
+        container.appendChild(renderCoords(['7'], 'files' + orientClass + ' rank-3'));
+        container.appendChild(renderCoords(['8'], 'files' + orientClass + ' rank-4'));
+        container.appendChild(renderCoords(['9'], 'files' + orientClass + ' rank-5'));
+        container.appendChild(renderCoords(['e'], 'ranks' + orientClass + ' file-1'));
+        container.appendChild(renderCoords(['d', 'f'], 'ranks' + orientClass + ' file-2'));
+        container.appendChild(renderCoords(['c', 'g'], 'ranks' + orientClass + ' file-3'));
+        container.appendChild(renderCoords(['b', '', 'h'], 'ranks' + orientClass + ' file-4'));
+        container.appendChild(renderCoords(['a', '', '', '', 'i'], 'ranks' + orientClass + ' file-5'));
       } else {
-        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'ranks' + orientClass));
-        container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
+        container.appendChild(renderCoords(ranks.slice(0, 5), 'files' + orientClass + ' rank-1'));
+        container.appendChild(renderCoords(['6'], 'files' + orientClass + ' rank-2'));
+        container.appendChild(renderCoords(['7'], 'files' + orientClass + ' rank-3'));
+        container.appendChild(renderCoords(['8'], 'files' + orientClass + ' rank-4'));
+        container.appendChild(renderCoords(['9'], 'files' + orientClass + ' rank-5'));
+        container.appendChild(renderCoords(['e'], 'ranks' + orientClass + ' file-1'));
+        container.appendChild(renderCoords(['d', 'f'], 'ranks' + orientClass + ' file-2'));
+        container.appendChild(renderCoords(['c', 'g'], 'ranks' + orientClass + ' file-3'));
+        container.appendChild(renderCoords(['b', '', 'h'], 'ranks' + orientClass + ' file-4'));
+        container.appendChild(renderCoords(['a', '', '', '', 'i'], 'ranks' + orientClass + ' file-5'));
       }
     } else {
       container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
