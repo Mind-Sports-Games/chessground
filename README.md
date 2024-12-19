@@ -92,10 +92,14 @@ Commands are listed in package.json.
 In case you want to see the possibilities from the console, run `pnpm run`
 
 <<<<<<< HEAD
+
 ### Install build dependencies:
+
 =======
+
 ### Install build dependencies:s
->>>>>>> origin/master
+
+> > > > > > > origin/master
 
 ```sh
 pnpm install
