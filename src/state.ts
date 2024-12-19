@@ -142,8 +142,17 @@ export interface HeadlessState {
   singleClickMoveVariant: boolean;
   baseMove: (state: HeadlessState, orig: cg.Key, dest: cg.Key) => cg.Piece | boolean;
   render: (state: State) => void;
-  posToTranslateRelative: (pos: cg.Pos, orientation: cg.Orientation, bt: cg.BoardDimensions, v: cg.Variant) => cg.NumberPair;
-  posToTranslateAbsolute: (bounds: ClientRect, bt: cg.BoardDimensions, variant: cg.Variant) => (pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair;
+  posToTranslateRelative: (
+    pos: cg.Pos,
+    orientation: cg.Orientation,
+    bt: cg.BoardDimensions,
+    v: cg.Variant,
+  ) => cg.NumberPair;
+  posToTranslateAbsolute: (
+    bounds: ClientRect,
+    bt: cg.BoardDimensions,
+    variant: cg.Variant,
+  ) => (pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair;
   pos2px: (pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions) => cg.NumberPair;
   key2pos: (k: cg.Key) => cg.Pos;
 }
@@ -263,6 +272,6 @@ export function defaults(): HeadlessState {
     posToTranslateRelative: posToTranslateRel,
     posToTranslateAbsolute: posToTranslateAbs,
     pos2px,
-    key2pos
+    key2pos,
   };
 }

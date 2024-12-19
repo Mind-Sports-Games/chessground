@@ -164,7 +164,12 @@ export const posToTranslateAbs = (
   return translateBase[orientation](pos, xFactor, yFactor, { width: 9, height: 9 });
 };
 
-export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation, _bt: cg.BoardDimensions, _v: cg.Variant): cg.NumberPair => {
+export const posToTranslateRel = (
+  pos: cg.Pos,
+  orientation: cg.Orientation,
+  _bt: cg.BoardDimensions,
+  _v: cg.Variant,
+): cg.NumberPair => {
   return translateBase[orientation](pos, 100, 100, { width: 9, height: 9 });
 };
 
@@ -197,7 +202,7 @@ export const posToTranslateBase2 = (bounds: ClientRect, pos: cg.Pos, orientation
 export const posToTranslateAbs2 = (): ((
   bounds: ClientRect,
   pos: cg.Pos,
-  orientation: cg.Orientation
+  orientation: cg.Orientation,
 ) => cg.NumberPair) => {
   return (bounds, pos, orientation) => posToTranslateBase2(bounds, pos, orientation);
 };

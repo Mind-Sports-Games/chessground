@@ -32,7 +32,7 @@ export function processDrag(s: State): void {
         const translation = posToTranslateAbs(s.dom.bounds(), s.dimensions, 'chess')(cur.origPos, s.orientation); // because of translateAbs, it has to remain invoked from util.
         translation[0] += cur.pos[0] + cur.dec[0];
         translation[1] += cur.pos[1] + cur.dec[1];
-        translateAbs(cur.element, translation);  // "working" WIP: have to use HOF
+        translateAbs(cur.element, translation); // "working" WIP: have to use HOF
       }
     }
     processDrag(s);

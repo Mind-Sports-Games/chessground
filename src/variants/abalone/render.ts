@@ -14,7 +14,9 @@ import { computeMoveVectorPostMove } from './engine';
 export const render = (s: State): void => {
   const orientation = s.orientation,
     asP1: boolean = p1Pov(s),
-    posToTranslate = s.dom.relative ? s.posToTranslateRelative : s.posToTranslateAbsolute(s.dom.bounds(), s.dimensions, s.variant),
+    posToTranslate = s.dom.relative
+      ? s.posToTranslateRelative
+      : s.posToTranslateAbsolute(s.dom.bounds(), s.dimensions, s.variant),
     translate = s.dom.relative ? translateRel : translateAbs,
     boardEl: HTMLElement = s.dom.elements.board,
     pieces: cg.Pieces = s.pieces,

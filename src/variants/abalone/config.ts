@@ -6,8 +6,9 @@ import { render } from './render';
 import { pos2px } from './svg';
 import { key2pos, posToTranslateAbs2 as posToTranslateAbs2Original, posToTranslateRel } from './util';
 
-const posToTranslateAbs2 = (bounds: ClientRect, _bt: cg.BoardDimensions, _variant: cg.Variant) => 
-  (pos: cg.Pos, orientation: "p1" | "p2" | "left" | "right" | "p1vflip") => 
+const posToTranslateAbs2 =
+  (bounds: ClientRect, _bt: cg.BoardDimensions, _variant: cg.Variant) =>
+  (pos: cg.Pos, orientation: 'p1' | 'p2' | 'left' | 'right' | 'p1vflip') =>
     posToTranslateAbs2Original()(bounds, pos, orientation);
 
 export const configure = (state: HeadlessState): void => {
