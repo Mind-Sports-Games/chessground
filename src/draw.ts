@@ -134,7 +134,7 @@ export function clear(state: State): void {
   }
 }
 
-export function eventBrush(e: cg.MouchEvent): string {
+function eventBrush(e: cg.MouchEvent): string {
   const modA = (e.shiftKey || e.ctrlKey) && isRightButton(e);
   const modB = e.altKey || e.metaKey || e.getModifierState?.('AltGraph');
   return brushes[(modA ? 1 : 0) + (modB ? 2 : 0)];

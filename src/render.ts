@@ -227,7 +227,7 @@ export function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asP1: boolea
   return z + '';
 }
 
-export function pieceNameOf(
+function pieceNameOf(
   piece: cg.Piece,
   myPlayerIndex: cg.PlayerIndex,
   orientation: cg.Orientation,
@@ -254,7 +254,7 @@ function backgammonPosClass(k: cg.Key, orientation: cg.Orientation): string {
   return ` ${topOrBottom} ${leftOrRight}`;
 }
 
-export function computeSquareClasses(s: State): SquareClasses {
+function computeSquareClasses(s: State): SquareClasses {
   const squares: SquareClasses = new Map();
   if (s.lastMove && s.highlight.lastMove) {
     let first = true;

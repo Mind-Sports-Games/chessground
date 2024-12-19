@@ -1,5 +1,4 @@
 import type * as cg from '../../types';
-import * as T from '../../transformations';
 import { SquareDimensions, TranslateBase } from './types';
 
 export const abaloneFiles = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'] as const;
@@ -96,20 +95,6 @@ export const key2posAlt = (k: cg.Key): cg.Pos => {
 // shift is used by analysis page and miniboards
 const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];
 
-export function computeSquareCenter(
-  key: cg.Key,
-  orientation: cg.Orientation,
-  bounds: ClientRect,
-  bd: cg.BoardDimensions,
-): cg.NumberPair {
-  const pos = T.mapToP1Inverse[orientation](key2posAlt(key), bd);
-
-  return [
-    (pos[0] + shift[pos[1] - 1] - 1) * 100,
-    bounds.top + (bounds.height * (2 * bd.height - (pos[1] + 0.5))) / bd.height,
-  ];
-}
-
 // translateBase defines where the translation of a piece should be placed on the board.
 // It is used to render the piece at the correct place.
 const translateBase: Record<cg.Orientation, cg.TranslateBase> = {
@@ -153,15 +138,6 @@ const translateBase: Record<cg.Orientation, cg.TranslateBase> = {
     (pos[1] - 1) * yScale,
   ],
   p1vflip: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[0] - 1) * xScale, (pos[1] - 1) * yScale],
-};
-
-export const posToTranslateAbs = (
-  pos: cg.Pos,
-  orientation: cg.Orientation,
-  xFactor: number,
-  yFactor: number,
-): cg.NumberPair => {
-  return translateBase[orientation](pos, xFactor, yFactor, { width: 9, height: 9 });
 };
 
 export const posToTranslateRel = (
@@ -256,9 +232,6 @@ const translateBase2: Record<cg.Orientation, TranslateBase> = {
   right: (pos: cg.Pos, bounds: ClientRect) => [(pos[1] - 1) * bounds.x, (pos[0] - 1) * bounds.x],
   left: (pos: cg.Pos, bounds: ClientRect) => [(pos[1] - 1) * bounds.x, (pos[0] - 1) * bounds.x],
   p1vflip: (pos: cg.Pos, bounds: ClientRect) => [(pos[1] - 1) * bounds.x, (pos[0] - 1) * bounds.x],
-};
-export const posToTranslateRel2 = (_bounds: ClientRect, pos: cg.Pos, orientation: cg.Orientation): cg.NumberPair => {
-  return translateBase[orientation](pos, 100, 100, { width: 9, height: 9 });
 };
 
 export const getSquareDimensions = (bounds: ClientRect): SquareDimensions => ({

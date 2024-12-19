@@ -1,8 +1,6 @@
 import type * as cg from '../../types';
-import { knight, queen } from '../../premove';
-import { distanceSq } from '../../util';
 
-import { allPos, computeSquareCenter, getCoordinates, getSquareDimensions, key2posAlt, pos2key } from './util';
+import { getCoordinates, getSquareDimensions } from './util';
 
 /*
   from a position in pixels, returns the key of the square
@@ -149,24 +147,4 @@ export const getKeyAtDomPos = (
   }
 
   return undefined;
-};
-
-export const getSnappedKeyAtDomPos = (
-  orig: cg.Key,
-  pos: cg.NumberPair,
-  orientation: cg.Orientation,
-  bounds: ClientRect,
-  bd: cg.BoardDimensions,
-): cg.Key | undefined => {
-  const origPos = key2posAlt(orig);
-  const validSnapPos = allPos(bd).filter(pos2 => {
-    return queen(origPos[0], origPos[1], pos2[0], pos2[1]) || knight(origPos[0], origPos[1], pos2[0], pos2[1]);
-  });
-  const validSnapCenters = validSnapPos.map(pos2 => computeSquareCenter(pos2key(pos2), orientation, bounds, bd));
-  const validSnapDistances = validSnapCenters.map(pos2 => distanceSq(pos, pos2));
-  const [, closestSnapIndex] = validSnapDistances.reduce(
-    (a, b, index) => (a[0] < b ? a : [b, index]),
-    [validSnapDistances[0], 0],
-  );
-  return pos2key(validSnapPos[closestSnapIndex]);
 };

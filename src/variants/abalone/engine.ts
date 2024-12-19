@@ -14,6 +14,7 @@ import {
 } from './directions';
 import type { MoveImpact, MoveVector } from './types';
 
+// compute the impact of a move on the board before it is made
 export const computeMoveImpact = (pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): MoveImpact | undefined => {
   const directionString = getDirectionString(orig, dest);
   if (!directionString) return undefined;
@@ -139,6 +140,7 @@ export const computeMoveImpact = (pieces: cg.Pieces, orig: cg.Key, dest: cg.Key)
   return undefined;
 };
 
+// compute a move vector after a move has been made
 export const computeMoveVectorPostMove = (pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): MoveVector | undefined => {
   const directionString = getDirectionString(dest, orig);
   if (!directionString) return undefined;
