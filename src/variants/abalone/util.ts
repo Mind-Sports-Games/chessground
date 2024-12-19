@@ -6,39 +6,39 @@ export const abaloneFiles = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'] as con
 const abaloneRanks = ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as const;
 
 export const pos2key = (pos: cg.Pos): cg.Key => {
-  let posx = pos[0];
-  if (pos[1] == 0) {
-    posx += 2;
-  }
-  if (pos[1] == 1) {
-    posx = pos[0] - 2;
-  }
-  if (pos[1] == 2) {
-    posx = pos[0] - 2; // -2.5
-  }
-  if (pos[1] == 3) {
-    posx = pos[0] - 1;
-  }
-  if (pos[1] == 4) {
-    posx = pos[0] - 1; // -1.5
-  }
-  if (pos[1] == 5) {
-    posx = pos[0]; // - 1
-  }
-  if (pos[1] == 6) {
-    posx = pos[0]; // -0.5
-  }
-  if (pos[1] == 7) {
-    posx = pos[0]; // 0
-  }
-  if (pos[1] == 8) {
-    posx = pos[0]; // 0.5
-  }
-  if (pos[1] == 9) {
-    posx = pos[0] + 1;
-  }
+  // let posx = pos[0];
+  // if (pos[1] == 0) {
+  //   posx += 2;
+  // }
+  // if (pos[1] == 1) {
+  //   posx = pos[0] - 2;
+  // }
+  // if (pos[1] == 2) {
+  //   posx = pos[0] - 2; // -2.5
+  // }
+  // if (pos[1] == 3) {
+  //   posx = pos[0] - 1;
+  // }
+  // if (pos[1] == 4) {
+  //   posx = pos[0] - 1; // -1.5
+  // }
+  // if (pos[1] == 5) {
+  //   posx = pos[0]; // - 1
+  // }
+  // if (pos[1] == 6) {
+  //   posx = pos[0]; // -0.5
+  // }
+  // if (pos[1] == 7) {
+  //   posx = pos[0]; // 0
+  // }
+  // if (pos[1] == 8) {
+  //   posx = pos[0]; // 0.5
+  // }
+  // if (pos[1] == 9) {
+  //   posx = pos[0] + 1;
+  // }
 
-  posx = pos[0];
+  const posx = pos[0];
   let posy = pos[1];
 
   const key = (abaloneFiles[posx] + abaloneRanks[posy]) as cg.Key;
