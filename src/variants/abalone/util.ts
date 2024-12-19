@@ -97,48 +97,47 @@ const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];
 
 // translateBase defines where the translation of a piece should be placed on the board.
 // It is used to render the piece at the correct place.
-const translateBase: Record<cg.Orientation, cg.TranslateBase> = {
-  p1: (pos: cg.Pos, _xScale: number, _yScale: number, _bt: cg.BoardDimensions) => {
-    const squareWidth = 102.5;
-    const squareHeight = 88;
-    const bottomLeft = [295, 854];
-    const shift = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4];
+const createTranslateBase = (): Record<cg.Orientation, cg.TranslateBase> => {
+  const squareWidth = 102.5;
+  const squareHeight = 88;
+  const bottomLeft = [295, 854];
+  const shift = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4];
 
-    if (pos[1] < 6) {
+  return {
+    p1: (pos: cg.Pos, _xScale: number, _yScale: number, _bt: cg.BoardDimensions) => {
+      if (pos[1] < 6) {
+        return [
+          bottomLeft[0] + squareWidth * pos[0] - (shift[pos[1] - 1] + 1) * squareWidth,
+          bottomLeft[1] - (pos[1] - 1) * squareHeight,
+        ];
+      }
       return [
         bottomLeft[0] + squareWidth * pos[0] - (shift[pos[1] - 1] + 1) * squareWidth,
         bottomLeft[1] - (pos[1] - 1) * squareHeight,
       ];
-    }
-    return [
-      bottomLeft[0] + squareWidth * pos[0] - (shift[pos[1] - 1] + 1) * squareWidth,
-      bottomLeft[1] - (pos[1] - 1) * squareHeight,
-    ];
-  },
-  p2: (pos: cg.Pos, _xScale: number, _yScale: number, _bt: cg.BoardDimensions) => {
-    const squareWidth = 102.5;
-    const squareHeight = 88;
-    const bottomLeft = [295, 854];
-    const shift = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4];
-
-    if (pos[1] < 6) {
+    },
+    p2: (pos: cg.Pos, _xScale: number, _yScale: number, _bt: cg.BoardDimensions) => {
+      if (pos[1] < 6) {
+        return [
+          bottomLeft[0] + squareWidth * pos[0] - (shift[pos[1] - 1] + 1) * squareWidth,
+          bottomLeft[1] - (pos[1] - 1) * squareHeight,
+        ];
+      }
       return [
         bottomLeft[0] + squareWidth * pos[0] - (shift[pos[1] - 1] + 1) * squareWidth,
         bottomLeft[1] - (pos[1] - 1) * squareHeight,
       ];
-    }
-    return [
-      bottomLeft[0] + squareWidth * pos[0] - (shift[pos[1] - 1] + 1) * squareWidth,
-      bottomLeft[1] - (pos[1] - 1) * squareHeight,
-    ];
-  },
-  right: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[1] - 1) * xScale, (pos[0] - 1) * yScale],
-  left: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [
-    (bt.width - pos[0]) * xScale,
-    (pos[1] - 1) * yScale,
-  ],
-  p1vflip: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[0] - 1) * xScale, (pos[1] - 1) * yScale],
+    },
+    right: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[1] - 1) * xScale, (pos[0] - 1) * yScale],
+    left: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [
+      (bt.width - pos[0]) * xScale,
+      (pos[1] - 1) * yScale,
+    ],
+    p1vflip: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[0] - 1) * xScale, (pos[1] - 1) * yScale],
+  };
 };
+
+const translateBase = createTranslateBase();
 
 export const posToTranslateRel = (
   pos: cg.Pos,
