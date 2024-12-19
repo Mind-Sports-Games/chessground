@@ -4,9 +4,8 @@ import { baseMove } from './board';
 import { DragCurrent } from './drag';
 import { Drawable } from './draw';
 import { render } from './render';
-import { posToTranslateAbs, posToTranslateRel, timer } from './util';
+import { key2pos, posToTranslateAbs, posToTranslateRel, timer } from './util';
 import { pos2px } from './svg';
-import { key2pos } from './util';
 import * as cg from './types';
 
 export interface HeadlessState {
