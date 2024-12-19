@@ -7,14 +7,14 @@ import { AnimCurrent, AnimFadings, AnimVector, AnimVectors } from '../../anim';
 import { DragCurrent } from '../../drag';
 import { appendValue, isPieceNode, isSquareNode, posZIndex, removeNodes } from '../../render';
 
-import { key2pos, translateAbs, translateRel, posToTranslateAbs2, posToTranslateRel2 } from './util';
+import { translateAbs, translateRel } from './util';
 import { computeMoveVectorPostMove } from './engine';
 
 // @TODO: remove parts unrelated to Abalone
 export const render = (s: State): void => {
   const orientation = s.orientation,
     asP1: boolean = p1Pov(s),
-    posToTranslate = s.dom.relative ? posToTranslateRel2 : posToTranslateAbs2(),
+    posToTranslate = s.dom.relative ? s.posToTranslateRelative : s.posToTranslateAbsolute(s.dom.bounds(), s.dimensions, s.variant),
     translate = s.dom.relative ? translateRel : translateAbs,
     boardEl: HTMLElement = s.dom.elements.board,
     pieces: cg.Pieces = s.pieces,
@@ -52,7 +52,7 @@ export const render = (s: State): void => {
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
-        translate(el, posToTranslate(s.dom.bounds(), key2pos(k), orientation));
+        translate(el, posToTranslate(s.key2pos(k), orientation, s.dimensions, s.variant));
         el.cgDragging = false;
       }
       // remove fading class if it still remains
@@ -65,16 +65,16 @@ export const render = (s: State): void => {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
         if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation)) {
-          const pos = key2pos(k);
+          const pos = s.key2pos(k);
           pos[0] += anim[2];
           pos[1] += anim[3];
           el.classList.add('anim');
-          translate(el, posToTranslate(s.dom.bounds(), pos, orientation));
+          translate(el, posToTranslate(s.key2pos(k), orientation, s.dimensions, s.variant));
         } else if (el.cgAnimating) {
           el.cgAnimating = false;
           el.classList.remove('anim');
-          translate(el, posToTranslate(s.dom.bounds(), key2pos(k), orientation));
-          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asP1, s.dimensions);
+          translate(el, posToTranslate(s.key2pos(k), orientation, s.dimensions, s.variant));
+          if (s.addPieceZIndex) el.style.zIndex = posZIndex(s.key2pos(k), orientation, asP1, s.dimensions);
         }
         // same piece: flag as same
         if (elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation) && (!fading || !el.cgFading)) {
@@ -109,7 +109,7 @@ export const render = (s: State): void => {
     // if (!sameSquares.has(sk)) {
     sMvdset = movedSquares.get(className);
     sMvd = sMvdset && sMvdset.pop();
-    const translation = posToTranslate(s.dom.bounds(), key2pos(sk), orientation);
+    const translation = posToTranslate(s.key2pos(sk), orientation, s.dimensions, s.variant);
     if (sMvd) {
       sMvd.cgKey = sk;
       translate(sMvd, translation);
@@ -137,7 +137,7 @@ export const render = (s: State): void => {
           pMvd.classList.remove('fading');
           pMvd.cgFading = false;
         }
-        const pos = key2pos(k);
+        const pos = s.key2pos(k);
         if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, orientation, asP1, s.dimensions);
         if (anim) {
           pMvd.cgAnimating = true;
@@ -145,14 +145,14 @@ export const render = (s: State): void => {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        translate(pMvd, posToTranslate(s.dom.bounds(), pos, orientation));
+        translate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant));
       }
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
       else {
         const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation),
           pieceNode = createEl('piece', pieceName) as cg.PieceNode,
-          pos = key2pos(k); // used here to compute position
+          pos = s.key2pos(k); // used here to compute position
 
         pieceNode.cgPiece = pieceName;
         pieceNode.cgKey = k;
@@ -161,7 +161,7 @@ export const render = (s: State): void => {
           pos[0] += anim[2];
           pos[1] += anim[3];
         }
-        translate(pieceNode, posToTranslate(s.dom.bounds(), pos, orientation));
+        translate(pieceNode, posToTranslate(pos, orientation, s.dimensions, s.variant));
 
         if (s.addPieceZIndex) pieceNode.style.zIndex = posZIndex(pos, orientation, asP1, s.dimensions);
 

@@ -176,7 +176,7 @@ export const posToTranslateRel = (
 ): cg.NumberPair => {
   if (v === 'abalone') {
     // "working" WIP: have to use HOF
-    return abalonePosToTranslateRel(pos, orientation);
+    return abalonePosToTranslateRel(pos, orientation, bt, v);
   }
   return posToTranslateBase(
     pos,

@@ -2,7 +2,7 @@ import type * as cg from '../../types';
 import * as T from '../../transformations';
 import { SquareDimensions, TranslateBase } from './types';
 
-const abaloneFiles = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'] as const;
+export const abaloneFiles = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'] as const;
 
 const abaloneRanks = ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as const;
 
@@ -164,7 +164,7 @@ export const posToTranslateAbs = (
   return translateBase[orientation](pos, xFactor, yFactor, { width: 9, height: 9 });
 };
 
-export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation): cg.NumberPair => {
+export const posToTranslateRel = (pos: cg.Pos, orientation: cg.Orientation, _bt: cg.BoardDimensions, _v: cg.Variant): cg.NumberPair => {
   return translateBase[orientation](pos, 100, 100, { width: 9, height: 9 });
 };
 
@@ -184,7 +184,7 @@ function ranks(n: number) {
   return abaloneRanks.slice(0, n);
 }
 
-export function allKeys(bd: cg.BoardDimensions = { width: 9, height: 9 }) {
+function allKeys(bd: cg.BoardDimensions = { width: 9, height: 9 }) {
   return Array.prototype.concat(...files(bd.width).map(c => ranks(bd.height).map(r => c + r)));
 }
 
@@ -193,10 +193,11 @@ export const allPos = (bd: cg.BoardDimensions): cg.Pos[] => allKeys(bd).map(key2
 export const posToTranslateBase2 = (bounds: ClientRect, pos: cg.Pos, orientation: cg.Orientation): cg.NumberPair => {
   return translateBase2[orientation](pos, bounds);
 };
+
 export const posToTranslateAbs2 = (): ((
   bounds: ClientRect,
   pos: cg.Pos,
-  orientation: cg.Orientation,
+  orientation: cg.Orientation
 ) => cg.NumberPair) => {
   return (bounds, pos, orientation) => posToTranslateBase2(bounds, pos, orientation);
 };
@@ -276,4 +277,8 @@ const rotate180 = (file: string, rank: string): string => {
   const rotatedFile = files[files.length - 1 - files.indexOf(file)];
   const rotatedRank = ranks[ranks.length - 1 - ranks.indexOf(rank)];
   return rotatedFile + rotatedRank;
+};
+
+export const isValidKey = (key: cg.Key): boolean => {
+  return /^(a[1-5]|b[1-6]|c[1-7]|d[1-8]|e[1-9]|f[2-9]|g[3-9]|h[4-9]|i[5-9])$/.test(key);
 };

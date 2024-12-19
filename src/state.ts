@@ -4,7 +4,9 @@ import { baseMove } from './board';
 import { DragCurrent } from './drag';
 import { Drawable } from './draw';
 import { render } from './render';
-import { timer } from './util';
+import { posToTranslateAbs, posToTranslateRel, timer } from './util';
+import { pos2px } from './svg';
+import { key2pos } from './util';
 import * as cg from './types';
 
 export interface HeadlessState {
@@ -140,6 +142,10 @@ export interface HeadlessState {
   singleClickMoveVariant: boolean;
   baseMove: (state: HeadlessState, orig: cg.Key, dest: cg.Key) => cg.Piece | boolean;
   render: (state: State) => void;
+  posToTranslateRelative: (pos: cg.Pos, orientation: cg.Orientation, bt: cg.BoardDimensions, v: cg.Variant) => cg.NumberPair;
+  posToTranslateAbsolute: (bounds: ClientRect, bt: cg.BoardDimensions, variant: cg.Variant) => (pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair;
+  pos2px: (pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions) => cg.NumberPair;
+  key2pos: (k: cg.Key) => cg.Pos;
 }
 
 export interface State extends HeadlessState {
@@ -254,5 +260,9 @@ export function defaults(): HeadlessState {
     singleClickMoveVariant: false,
     baseMove,
     render,
+    posToTranslateRelative: posToTranslateRel,
+    posToTranslateAbsolute: posToTranslateAbs,
+    pos2px,
+    key2pos
   };
 }

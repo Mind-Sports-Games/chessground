@@ -1,6 +1,7 @@
 import type * as cg from '../../types';
 
 import type { DirectionString } from './types';
+import { isValidKey } from './util';
 
 export enum DiagonalDirectionString {
   UpLeft = 'NW',
@@ -143,10 +144,6 @@ const traverseUntil = (pos: cg.Key, stop: (pos: cg.Key) => boolean, direction: D
   } else {
     return [];
   }
-};
-
-const isValidKey = (key: cg.Key): boolean => {
-  return /^(a[1-5]|b[1-6]|c[1-7]|d[1-8]|e[1-9]|f[2-9]|g[3-9]|h[4-9]|i[5-9])$/.test(key);
 };
 
 const directionMappings: { [key in DirectionString]: (key: cg.Key) => cg.Key } = {

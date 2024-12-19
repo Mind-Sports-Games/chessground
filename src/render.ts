@@ -2,7 +2,6 @@ import { State } from './state';
 import {
   key2pos,
   createEl,
-  posToTranslateRel,
   posToTranslateAbs,
   translateRel,
   translateAbs,
@@ -22,7 +21,7 @@ export type SquareClasses = Map<cg.Key, string>;
 export function render(s: State): void {
   const orientation = s.orientation,
     asP1: boolean = p1Pov(s),
-    posToTranslate = s.dom.relative ? posToTranslateRel : posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant),
+    posToTranslate = s.dom.relative ? s.posToTranslateRelative : s.posToTranslateAbsolute(s.dom.bounds(), s.dimensions, s.variant),
     translate = s.dom.relative ? translateRel : translateAbs,
     boardEl: HTMLElement = s.dom.elements.board,
     pieces: cg.Pieces = s.pieces,

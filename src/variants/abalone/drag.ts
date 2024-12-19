@@ -29,10 +29,10 @@ export function processDrag(s: State): void {
         cur.pos = [cur.epos[0] - cur.rel[0], cur.epos[1] - cur.rel[1]];
 
         // move piece
-        const translation = posToTranslateAbs(s.dom.bounds(), s.dimensions, 'chess')(cur.origPos, s.orientation); // "working" WIP: have to use HOF
+        const translation = posToTranslateAbs(s.dom.bounds(), s.dimensions, 'chess')(cur.origPos, s.orientation); // because of translateAbs, it has to remain invoked from util.
         translation[0] += cur.pos[0] + cur.dec[0];
         translation[1] += cur.pos[1] + cur.dec[1];
-        translateAbs(cur.element, translation);
+        translateAbs(cur.element, translation);  // "working" WIP: have to use HOF
       }
     }
     processDrag(s);
