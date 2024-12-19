@@ -1,5 +1,4 @@
 import { State } from './state';
-import { key2pos } from './util';
 import { Drawable, DrawShape, DrawShapePiece, DrawBrush, DrawBrushes, DrawModifiers } from './draw';
 import * as cg from './types';
 import * as T from './transformations';
@@ -187,12 +186,13 @@ function renderShape(
 ): SVGElement {
   let el: SVGElement;
   if (shape.customSvg) {
-    const orig = orient(key2pos(shape.orig), state.orientation, state.dimensions);
+    const orig = orient(state.key2pos(shape.orig), state.orientation, state.dimensions);
     el = renderCustomSvg(shape.customSvg, orig, bounds, state.dimensions);
   } else if (shape.piece)
     el = renderPiece(
+      state,
       state.drawable.pieces.baseUrl,
-      orient(key2pos(shape.orig), state.orientation, state.dimensions),
+      orient(state.key2pos(shape.orig), state.orientation, state.dimensions),
       shape.piece,
       bounds,
       state.dimensions,
@@ -200,20 +200,21 @@ function renderShape(
       state.variant,
     );
   else {
-    const orig = orient(key2pos(shape.orig), state.orientation, state.dimensions);
+    const orig = orient(state.key2pos(shape.orig), state.orientation, state.dimensions);
     if (shape.orig && shape.dest) {
       let brush: DrawBrush = brushes[shape.brush!];
       if (shape.modifiers) brush = makeCustomBrush(brush, shape.modifiers);
       el = renderArrow(
+        state,
         brush,
         orig,
-        orient(key2pos(shape.dest), state.orientation, state.dimensions),
+        orient(state.key2pos(shape.dest), state.orientation, state.dimensions),
         current,
         (arrowDests.get(shape.dest) || 0) > 1,
         bounds,
         state.dimensions,
       );
-    } else el = renderCircle(brushes[shape.brush!], orig, current, bounds, state.dimensions);
+    } else el = renderCircle(state, brushes[shape.brush!], orig, current, bounds, state.dimensions);
   }
   el.setAttribute('cgHash', hash);
   return el;
@@ -238,13 +239,14 @@ function renderCustomSvg(customSvg: string, pos: cg.Pos, bounds: ClientRect, bd:
 }
 
 function renderCircle(
+  state: State,
   brush: DrawBrush,
   pos: cg.Pos,
   current: boolean,
   bounds: ClientRect,
   bd: cg.BoardDimensions,
 ): SVGElement {
-  const o = pos2px(pos, bounds, bd),
+  const o = state.pos2px(pos, bounds, bd),
     widths = circleWidth(bounds, bd),
     radius = (bounds.width + bounds.height) / (2 * (bd.height + bd.width));
   return setAttributes(createElement('circle'), {
@@ -259,6 +261,7 @@ function renderCircle(
 }
 
 function renderArrow(
+  state: State,
   brush: DrawBrush,
   orig: cg.Pos,
   dest: cg.Pos,
@@ -268,8 +271,8 @@ function renderArrow(
   bd: cg.BoardDimensions,
 ): SVGElement {
   const m = arrowMargin(bounds, shorten && !current, bd),
-    a = pos2px(orig, bounds, bd),
-    b = pos2px(dest, bounds, bd),
+    a = state.pos2px(orig, bounds, bd),
+    b = state.pos2px(dest, bounds, bd),
     dx = b[0] - a[0],
     dy = b[1] - a[1],
     angle = Math.atan2(dy, dx),
@@ -289,6 +292,7 @@ function renderArrow(
 }
 
 function renderPiece(
+  state: State,
   baseUrl: string,
   pos: cg.Pos,
   piece: DrawShapePiece,
@@ -297,7 +301,7 @@ function renderPiece(
   myPlayerIndex: cg.PlayerIndex,
   variant: cg.Variant,
 ): SVGElement {
-  const o = pos2px(pos, bounds, bd),
+  const o = state.pos2px(pos, bounds, bd),
     width = (bounds.width / bd.width) * (piece.scale || 1),
     height = (bounds.height / bd.height) * (piece.scale || 1),
     //name = piece.playerIndex[0] + piece.role[0].toUpperCase();
@@ -370,7 +374,7 @@ function arrowMargin(bounds: ClientRect, shorten: boolean, bd: cg.BoardDimension
   return ((shorten ? 20 : 10) / (bd.width * 64)) * bounds.width;
 }
 
-function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.NumberPair {
+export function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.NumberPair {
   return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
 
@@ -419,6 +423,7 @@ function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece): string {
     case 'go9x9':
     case 'go13x13':
     case 'go19x19':
+    case 'abalone':
       return (piece.playerIndex === 'p1' ? 'b' : 'w') + piece.role[0].toUpperCase();
     case 'oware':
     case 'togyzkumalak':

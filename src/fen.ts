@@ -1,11 +1,13 @@
 import { pos2key, NRanks, invNRanks } from './util';
 import * as cg from './types';
 
+import { read as abaloneRead } from './variants/abalone/fen';
+
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 const commaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'];
 const mancalaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak', 'bestemshe'];
 
-function roles(letter: string) {
+export function roles(letter: string) {
   return (letter.replace('+', 'p') + '-piece') as cg.Role;
 }
 
@@ -15,6 +17,7 @@ function letters(role: cg.Role) {
 }
 
 export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Variant): cg.Pieces {
+  if (variant === 'abalone') return abaloneRead(fen, dimensions);
   if (fen === 'start') fen = initial;
   if (fen.indexOf('[') !== -1) fen = fen.slice(0, fen.indexOf('['));
   const pieces: cg.Pieces = new Map();

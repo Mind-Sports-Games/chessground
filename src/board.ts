@@ -24,6 +24,8 @@ import predrop from './predrop';
 import * as cg from './types';
 import * as T from './transformations';
 
+import { getKeyAtDomPos as abaloneGetKeyAtDomPos } from './variants/abalone/board';
+
 export function setOrientation(state: HeadlessState, o: cg.Orientation): void {
   state.orientation = o;
   state.animation.current = state.draggable.current = state.selected = undefined;
@@ -181,6 +183,10 @@ function updatePocketPieces(
   state.pocketPieces = newPocketPieces;
 }
 
+/**
+ * called when a piece is moved from orig to dest
+ * @returns: false if the move is invalid, true if the move is valid but no capture happened, or the captured piece if a capture happened
+ */
 export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   const origPiece = state.pieces.get(orig),
     destPiece = state.pieces.get(dest);
@@ -234,6 +240,8 @@ function isCapture(variant: cg.Variant, destPiece: cg.Piece | undefined, origPie
     case 'oware':
       //TODO this is more complicated to calculate... (but its only used for sound in lila atm)
       return destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
+    case 'abalone':
+      return undefined; // we compute it from Abalone namespace using HOF
     default:
       return destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
   }
@@ -263,7 +271,7 @@ export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key,
 }
 
 function baseUserMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
-  const result = baseMove(state, orig, dest);
+  const result = state.baseMove(state, orig, dest);
   if (result) {
     state.movable.dests = undefined;
     state.dropmode.dropDests = undefined;
@@ -625,6 +633,8 @@ export function stop(state: HeadlessState): void {
   cancelMove(state);
 }
 
+// triggered when we click on the svg area (a piece, a square or even an area outside the board drawn can be below the cursor).
+// @return the key of the square that was clicked, or undefined if the click was outside the board.
 export function getKeyAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
@@ -632,6 +642,9 @@ export function getKeyAtDomPos(
   bd: cg.BoardDimensions,
   variant: cg.Variant = 'chess',
 ): cg.Key | undefined {
+  if (variant === 'abalone') {
+    return abaloneGetKeyAtDomPos(pos, orientation, bounds);
+  }
   const bgBorder = 1 / 15;
   const file =
     variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon'
@@ -729,6 +742,7 @@ export function p1Pov(s: HeadlessState): boolean {
   return s.myPlayerIndex === 'p1';
 }
 
+// at least triggered when we use right click to draw arrows or highlight a square
 export function getSnappedKeyAtDomPos(
   orig: cg.Key,
   pos: cg.NumberPair,

@@ -1,17 +1,17 @@
-import { State } from './state';
-import { key2pos, createEl, posToTranslateAbs, translateRel, translateAbs, calculatePlayerEmptyAreas } from './util';
-import { p1Pov } from './board';
-import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim';
-import { DragCurrent } from './drag';
-import * as cg from './types';
-import * as T from './transformations';
+import type * as cg from '../../types';
+import type { PieceName, SquareClasses } from '../../render';
+import { p1Pov } from '../../board';
+import { State } from '../../state';
+import { createEl } from '../../util';
+import { AnimCurrent, AnimFadings, AnimVector, AnimVectors } from '../../anim';
+import { DragCurrent } from '../../drag';
+import { appendValue, isPieceNode, isSquareNode, posZIndex, removeNodes } from '../../render';
 
-export type PieceName = string; // `$playerIndex $role`
-export type SquareClasses = Map<cg.Key, string>;
+import { translateAbs, translateRel } from './util';
+import { computeMoveVectorPostMove } from './engine';
 
-// ported from https://github.com/veloce/lichobile/blob/master/src/js/chessground/view.js
-// in case of bugs, blame @veloce
-export function render(s: State): void {
+// @TODO: remove parts unrelated to Abalone
+export const render = (s: State): void => {
   const orientation = s.orientation,
     asP1: boolean = p1Pov(s),
     posToTranslate = s.dom.relative
@@ -20,7 +20,6 @@ export function render(s: State): void {
     translate = s.dom.relative ? translateRel : translateAbs,
     boardEl: HTMLElement = s.dom.elements.board,
     pieces: cg.Pieces = s.pieces,
-    pocketPieces: cg.Piece[] = s.pocketPieces,
     curAnim: AnimCurrent | undefined = s.animation.current,
     anims: AnimVectors = curAnim ? curAnim.plan.anims : new Map(),
     fadings: AnimFadings = curAnim ? curAnim.plan.fadings : new Map(),
@@ -44,6 +43,7 @@ export function render(s: State): void {
 
   // walk over all board dom elements, apply animations and flag moved pieces
   el = boardEl.firstChild as cg.PieceNode | cg.SquareNode | undefined;
+
   while (el) {
     k = el.cgKey;
     if (isPieceNode(el)) {
@@ -54,7 +54,7 @@ export function render(s: State): void {
       // if piece not being dragged anymore, remove dragging style
       if (el.cgDragging && (!curDrag || curDrag.orig !== k)) {
         el.classList.remove('dragging');
-        translate(el, posToTranslate(key2pos(k), orientation, s.dimensions, s.variant));
+        translate(el, posToTranslate(s.key2pos(k), orientation, s.dimensions, s.variant));
         el.cgDragging = false;
       }
       // remove fading class if it still remains
@@ -66,32 +66,25 @@ export function render(s: State): void {
       if (pieceAtKey) {
         // continue animation if already animating and same piece
         // (otherwise it could animate a captured piece)
-        if (
-          anim &&
-          el.cgAnimating &&
-          elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation, s.variant, k)
-        ) {
-          const pos = key2pos(k);
+        if (anim && el.cgAnimating && elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation)) {
+          const pos = s.key2pos(k);
           pos[0] += anim[2];
           pos[1] += anim[3];
           el.classList.add('anim');
-          translate(el, posToTranslate(pos, orientation, s.dimensions, s.variant));
+          translate(el, posToTranslate(s.key2pos(k), orientation, s.dimensions, s.variant));
         } else if (el.cgAnimating) {
           el.cgAnimating = false;
           el.classList.remove('anim');
-          translate(el, posToTranslate(key2pos(k), orientation, s.dimensions, s.variant));
-          if (s.addPieceZIndex) el.style.zIndex = posZIndex(key2pos(k), orientation, asP1, s.dimensions);
+          translate(el, posToTranslate(s.key2pos(k), orientation, s.dimensions, s.variant));
+          if (s.addPieceZIndex) el.style.zIndex = posZIndex(s.key2pos(k), orientation, asP1, s.dimensions);
         }
         // same piece: flag as same
-        if (
-          elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation, s.variant, k) &&
-          (!fading || !el.cgFading)
-        ) {
+        if (elPieceName === pieceNameOf(pieceAtKey, s.myPlayerIndex, s.orientation) && (!fading || !el.cgFading)) {
           samePieces.add(k);
         }
         // different piece: flag as moved unless it is a fading piece
         else {
-          if (fading && elPieceName === pieceNameOf(fading, s.myPlayerIndex, s.orientation, s.variant, k)) {
+          if (fading && elPieceName === pieceNameOf(fading, s.myPlayerIndex, s.orientation)) {
             el.classList.add('fading');
             el.cgFading = true;
           } else {
@@ -115,20 +108,20 @@ export function render(s: State): void {
   // walk over all squares in current set, apply dom changes to moved squares
   // or append new squares
   for (const [sk, className] of squares) {
-    if (!sameSquares.has(sk)) {
-      sMvdset = movedSquares.get(className);
-      sMvd = sMvdset && sMvdset.pop();
-      const translation = posToTranslate(key2pos(sk), orientation, s.dimensions, s.variant);
-      if (sMvd) {
-        sMvd.cgKey = sk;
-        translate(sMvd, translation);
-      } else {
-        const squareNode = createEl('square', className) as cg.SquareNode;
-        squareNode.cgKey = sk;
-        translate(squareNode, translation);
-        boardEl.insertBefore(squareNode, boardEl.firstChild);
-      }
+    // if (!sameSquares.has(sk)) {
+    sMvdset = movedSquares.get(className);
+    sMvd = sMvdset && sMvdset.pop();
+    const translation = posToTranslate(s.key2pos(sk), orientation, s.dimensions, s.variant);
+    if (sMvd) {
+      sMvd.cgKey = sk;
+      translate(sMvd, translation);
+    } else {
+      const squareNode = createEl('square', className) as cg.SquareNode;
+      squareNode.cgKey = sk;
+      translate(squareNode, translation);
+      boardEl.insertBefore(squareNode, boardEl.firstChild);
     }
+    // }
   }
 
   // walk over all pieces in current set, apply dom changes to moved pieces
@@ -136,7 +129,7 @@ export function render(s: State): void {
   for (const [k, p] of pieces) {
     anim = anims.get(k);
     if (!samePieces.has(k)) {
-      pMvdset = movedPieces.get(pieceNameOf(p, s.myPlayerIndex, s.orientation, s.variant, k));
+      pMvdset = movedPieces.get(pieceNameOf(p, s.myPlayerIndex, s.orientation));
       pMvd = pMvdset && pMvdset.pop();
       // a same piece was moved
       if (pMvd) {
@@ -146,7 +139,7 @@ export function render(s: State): void {
           pMvd.classList.remove('fading');
           pMvd.cgFading = false;
         }
-        const pos = key2pos(k);
+        const pos = s.key2pos(k);
         if (s.addPieceZIndex) pMvd.style.zIndex = posZIndex(pos, orientation, asP1, s.dimensions);
         if (anim) {
           pMvd.cgAnimating = true;
@@ -159,9 +152,9 @@ export function render(s: State): void {
       // no piece in moved obj: insert the new piece
       // assumes the new piece is not being dragged
       else {
-        const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation, s.variant, k),
+        const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation),
           pieceNode = createEl('piece', pieceName) as cg.PieceNode,
-          pos = key2pos(k);
+          pos = s.key2pos(k); // used here to compute position
 
         pieceNode.cgPiece = pieceName;
         pieceNode.cgKey = k;
@@ -179,133 +172,77 @@ export function render(s: State): void {
     }
   }
 
-  // walk over all pocketPieces and set nodes
-  for (const p of pocketPieces) {
-    const classSpecificKey = p.playerIndex === 'p1' ? 'a1' : 'a2';
-    const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation, s.variant, classSpecificKey as cg.Key),
-      pieceNode = createEl('piece', 'pocket ' + pieceName) as cg.PieceNode;
-
-    pieceNode.cgPiece = pieceName;
-    pieceNode.cgKey = s.orientation === 'p1' ? 'a2' : 'a1'; // always have 0 transform (top left corner)
-
-    boardEl.appendChild(pieceNode);
-  }
-
   // remove any element that remains in the moved sets
   for (const nodes of movedPieces.values()) removeNodes(s, nodes);
-  for (const nodes of movedSquares.values()) removeNodes(s, nodes);
-}
+  for (const nodes of movedSquares.values()) removeNodes(s, nodes); // do not compute movedSquares ???
+};
 
-export function updateBounds(s: State): void {
-  if (s.dom.relative) return;
-  const orientation = s.orientation,
-    posToTranslate = posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant);
-  let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;
-  while (el) {
-    if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el)) {
-      translateAbs(el, posToTranslate(key2pos(el.cgKey), orientation));
-    }
-    el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
-  }
-}
-
-export function isPieceNode(el: cg.PieceNode | cg.SquareNode): el is cg.PieceNode {
-  return el.tagName === 'PIECE';
-}
-export function isSquareNode(el: cg.PieceNode | cg.SquareNode): el is cg.SquareNode {
-  return el.tagName === 'SQUARE';
-}
-
-export function removeNodes(s: State, nodes: HTMLElement[]): void {
-  for (const node of nodes) s.dom.elements.board.removeChild(node);
-}
-
-export function posZIndex(pos: cg.Pos, orientation: cg.Orientation, asP1: boolean, bd: cg.BoardDimensions): string {
-  pos = T.mapToP1[orientation](pos, bd);
-  let z = 2 + (pos[1] - 1) * bd.height + (bd.width - pos[0]);
-  if (asP1) z = 67 - z;
-  return z + '';
-}
-
-function pieceNameOf(
-  piece: cg.Piece,
-  myPlayerIndex: cg.PlayerIndex,
-  orientation: cg.Orientation,
-  variant: cg.Variant,
-  k: cg.Key,
-): string {
-  const promoted = piece.promoted ? 'promoted ' : '';
+function pieceNameOf(piece: cg.Piece, myPlayerIndex: cg.PlayerIndex, orientation: cg.Orientation): string {
   const side =
     (piece.playerIndex === myPlayerIndex && orientation === myPlayerIndex) ||
     (piece.playerIndex !== myPlayerIndex && orientation !== myPlayerIndex)
       ? 'ally'
       : 'enemy';
-  const posClass =
-    variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon'
-      ? backgammonPosClass(k, orientation)
-      : '';
-  return `${piece.playerIndex} ${promoted}${piece.role} ${side}${posClass}`;
+
+  return `${piece.playerIndex} ${piece.role} ${side}`;
 }
 
-function backgammonPosClass(k: cg.Key, orientation: cg.Orientation): string {
-  const pos = key2pos(k);
-  const leftOrRight = pos[0] <= 6 ? 'left' : 'right';
-  const topOrBottom = orientation === 'p1' ? (pos[1] <= 1 ? 'bottom' : 'top') : pos[1] <= 1 ? 'top' : 'bottom';
-  return ` ${topOrBottom} ${leftOrRight}`;
+function addSquare(squares: SquareClasses, key: cg.Key, klass: string): void {
+  const classes = squares.get(key);
+  if (classes) squares.set(key, `${classes} ${klass}`);
+  else squares.set(key, klass);
 }
 
-function computeSquareClasses(s: State): SquareClasses {
+// @TODO: clean this up to remove any notion non related to Abalone
+export function computeSquareClasses(s: State): SquareClasses {
   const squares: SquareClasses = new Map();
-  if (s.lastMove && s.highlight.lastMove) {
-    let first = true;
-    for (const k of s.lastMove) {
-      if (k !== 'a0') {
-        if (first) {
-          addSquare(squares, k, 'last-move from' + variantSpecificHighlightClass(s.variant, k, s.orientation));
-          first = false;
-        } else {
-          addSquare(squares, k, 'last-move to' + variantSpecificHighlightClass(s.variant, k, s.orientation));
-        }
-      } else {
-        first = false;
-      }
-    }
+
+  if (s.lastMove && s.lastMove.length === 2) {
+    const moveImpact = computeMoveVectorPostMove(s.pieces, s.lastMove[0], s.lastMove[1]);
+    const player = s.turnPlayerIndex;
+    moveImpact?.landingSquares.forEach(coordinates => {
+      addSquare(squares, coordinates, `last-move to ${player}${moveImpact.directionString}`);
+    });
   }
-  if (s.check && s.highlight.check) addSquare(squares, s.check, 'check');
+
+  if (s.lastMove && s.highlight.lastMove) {
+    // if (s.variants.abalone.lastMove) {
+    //   for (const k of s.variants.abalone.lastMove.piecesMoving) {
+    //     addSquare(squares, k, 'last-move from ww');
+    //   }
+    // }
+    // let first = true;
+    // for (const k of s.lastMove) {
+    //   if (k !== 'a0') {
+    //     if (first) {
+    //       console.log(s.variants);
+    //       addSquare(squares, k, 'last-move from ww'); // + variantSpecificHighlightClass(s.variant, k, s.orientation));
+    //       first = false;
+    //     } else {
+    //       addSquare(squares, k, 'last-move to ww'); // + variantSpecificHighlightClass(s.variant, k, s.orientation));
+    //     }
+    //   } else {
+    //     first = false;
+    //   }
+    // }
+  }
   if (s.selectOnly) {
     for (const key of s.selectedPieces.keys()) {
       addSquare(squares, key, 'selected');
     }
-    //area highlight for go games
-    if (s.variant && ['go9x9', 'go13x13', 'go19x19'].includes(s.variant)) {
-      const areas = calculatePlayerEmptyAreas(s.pieces, s.dimensions, s.selectedPieces);
-      for (const [s, p] of areas) {
-        addSquare(squares, s, 'area ' + p);
-      }
-    }
   }
   if (s.selected) {
-    addSquare(squares, s.selected, 'selected' + variantSpecificHighlightClass(s.variant, s.selected, s.orientation));
+    addSquare(squares, s.selected, 'selected');
     if (s.movable.showDests) {
       const dests = s.movable.dests?.get(s.selected);
       if (dests)
         for (const k of dests) {
-          addSquare(
-            squares,
-            k,
-            'move-dest' + (s.pieces.has(k) ? ' oc' : '') + variantSpecificHighlightClass(s.variant, k, s.orientation),
-          );
+          addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
         }
       const pDests = s.premovable.dests;
       if (pDests)
         for (const k of pDests) {
-          addSquare(
-            squares,
-            k,
-            'premove-dest' +
-              (s.pieces.has(k) ? ' oc' : '') +
-              variantSpecificHighlightClass(s.variant, k, s.orientation),
-          );
+          addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
         }
     }
   } else if (s.dropmode.active || s.draggable.current?.orig === 'a0') {
@@ -340,30 +277,4 @@ function computeSquareClasses(s: State): SquareClasses {
   if (o) for (const k of o.keys) addSquare(squares, k, 'exploding' + o.stage);
 
   return squares;
-}
-
-function addSquare(squares: SquareClasses, key: cg.Key, klass: string): void {
-  const classes = squares.get(key);
-  if (classes) squares.set(key, `${classes} ${klass}`);
-  else squares.set(key, klass);
-}
-
-export function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {
-  const arr = map.get(key);
-  if (arr) arr.push(value);
-  else map.set(key, [value]);
-}
-
-function variantSpecificHighlightClass(variant: cg.Variant, k: cg.Key, orientation: cg.Orientation): string {
-  switch (variant) {
-    case 'togyzkumalak':
-    case 'bestemshe':
-      return k[1] === '1' ? ' p1' : ' p2';
-    case 'nackgammon':
-    case 'hyper':
-    case 'backgammon':
-      return backgammonPosClass(k, orientation);
-    default:
-      return '';
-  }
 }

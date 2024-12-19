@@ -7,6 +7,8 @@ import { anim } from './anim';
 import predrop from './predrop';
 import * as T from './transformations';
 
+import { processDrag as abaloneProcessDrag } from './variants/abalone/drag';
+
 export interface DragCurrent {
   orig: cg.Key; // orig key of dragging piece
   origPos: cg.Pos;
@@ -150,6 +152,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
 
 function processDrag(s: State): void {
   requestAnimationFrame(() => {
+    if (s.variant === 'abalone') return abaloneProcessDrag(s); // "working" WIP: have to use HOF
     const cur = s.draggable.current;
     if (!cur) return;
     // cancel animations while dragging
@@ -172,7 +175,7 @@ function processDrag(s: State): void {
         cur.pos = [cur.epos[0] - cur.rel[0], cur.epos[1] - cur.rel[1]];
 
         // move piece
-        const translation = util.posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant)(cur.origPos, s.orientation);
+        const translation = util.posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant)(cur.origPos, s.orientation); // until translateAbs becomes a HOF, it has to remain invoked from util.
         translation[0] += cur.pos[0] + cur.dec[0];
         translation[1] += cur.pos[1] + cur.dec[1];
         util.translateAbs(cur.element, translation);

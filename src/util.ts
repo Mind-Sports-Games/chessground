@@ -1,6 +1,8 @@
 import * as cg from './types';
 import * as T from './transformations';
 
+import { posToTranslateRel as abalonePosToTranslateRel, posToTranslateBase2 } from './variants/abalone/util';
+
 export const playerIndexs: cg.PlayerIndex[] = ['p1', 'p2'];
 export const invRanks: readonly cg.Rank[] = [...cg.ranks19].reverse();
 export const NRanks: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
@@ -159,6 +161,10 @@ export const posToTranslateAbs = (
       (bounds.width / bt.width) *
       (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon' ? 0.8 : 1),
     yFactor = bounds.height / bt.height;
+  if (variant === 'abalone') {
+    // "working" WIP: have to use HOF
+    return (pos, orientation) => posToTranslateBase2(bounds, pos, orientation);
+  }
   return (pos, orientation) => posToTranslateBase(pos, orientation, xFactor, yFactor, bt);
 };
 
@@ -167,8 +173,12 @@ export const posToTranslateRel = (
   orientation: cg.Orientation,
   bt: cg.BoardDimensions,
   v: cg.Variant,
-): cg.NumberPair =>
-  posToTranslateBase(
+): cg.NumberPair => {
+  if (v === 'abalone') {
+    // "working" WIP: have to use HOF
+    return abalonePosToTranslateRel(pos, orientation, bt, v);
+  }
+  return posToTranslateBase(
     pos,
     orientation,
     100,
@@ -179,6 +189,7 @@ export const posToTranslateRel = (
         : 100,
     bt,
   );
+};
 
 export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;

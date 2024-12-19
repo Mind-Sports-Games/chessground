@@ -109,6 +109,12 @@ rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm install
 pnpm prepare --watch
 ```
 
+### Build the minified bundled dist files: (NOTE: from lila you will likely then need to restart the build as it does not watch for changes on the minified file):
+
+```sh
+pnpm dist
+```
+
 ### Run tests:
 
 ```sh
