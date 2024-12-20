@@ -108,20 +108,20 @@ export const render = (s: State): void => {
   // walk over all squares in current set, apply dom changes to moved squares
   // or append new squares
   for (const [sk, className] of squares) {
-    // if (!sameSquares.has(sk)) {
-    sMvdset = movedSquares.get(className);
-    sMvd = sMvdset && sMvdset.pop();
-    const translation = posToTranslate(s.key2pos(sk), orientation, s.dimensions, s.variant);
-    if (sMvd) {
-      sMvd.cgKey = sk;
-      translate(sMvd, translation);
-    } else {
-      const squareNode = createEl('square', className) as cg.SquareNode;
-      squareNode.cgKey = sk;
-      translate(squareNode, translation);
-      boardEl.insertBefore(squareNode, boardEl.firstChild);
+    if (!sameSquares.has(sk)) {
+      sMvdset = movedSquares.get(className);
+      sMvd = sMvdset && sMvdset.pop();
+      const translation = posToTranslate(s.key2pos(sk), orientation, s.dimensions, s.variant);
+      if (sMvd) {
+        sMvd.cgKey = sk;
+        translate(sMvd, translation);
+      } else {
+        const squareNode = createEl('square', className) as cg.SquareNode;
+        squareNode.cgKey = sk;
+        translate(squareNode, translation);
+        boardEl.insertBefore(squareNode, boardEl.firstChild);
+      }
     }
-    // }
   }
 
   // walk over all pieces in current set, apply dom changes to moved pieces
@@ -174,7 +174,7 @@ export const render = (s: State): void => {
 
   // remove any element that remains in the moved sets
   for (const nodes of movedPieces.values()) removeNodes(s, nodes);
-  for (const nodes of movedSquares.values()) removeNodes(s, nodes); // do not compute movedSquares ???
+  for (const nodes of movedSquares.values()) removeNodes(s, nodes);
 };
 
 function pieceNameOf(piece: cg.Piece, myPlayerIndex: cg.PlayerIndex, orientation: cg.Orientation): string {
@@ -197,7 +197,7 @@ function addSquare(squares: SquareClasses, key: cg.Key, klass: string): void {
 export function computeSquareClasses(s: State): SquareClasses {
   const squares: SquareClasses = new Map();
 
-  if (s.lastMove && s.lastMove.length === 2) {
+  if (s.lastMove && s.lastMove.length === 2 && s.highlight.lastMove) {
     const moveImpact = computeMoveVectorPostMove(s.pieces, s.lastMove[0], s.lastMove[1]);
     const player = s.turnPlayerIndex;
     moveImpact?.landingSquares.forEach(coordinates => {
@@ -205,32 +205,6 @@ export function computeSquareClasses(s: State): SquareClasses {
     });
   }
 
-  if (s.lastMove && s.highlight.lastMove) {
-    // if (s.variants.abalone.lastMove) {
-    //   for (const k of s.variants.abalone.lastMove.piecesMoving) {
-    //     addSquare(squares, k, 'last-move from ww');
-    //   }
-    // }
-    // let first = true;
-    // for (const k of s.lastMove) {
-    //   if (k !== 'a0') {
-    //     if (first) {
-    //       console.log(s.variants);
-    //       addSquare(squares, k, 'last-move from ww'); // + variantSpecificHighlightClass(s.variant, k, s.orientation));
-    //       first = false;
-    //     } else {
-    //       addSquare(squares, k, 'last-move to ww'); // + variantSpecificHighlightClass(s.variant, k, s.orientation));
-    //     }
-    //   } else {
-    //     first = false;
-    //   }
-    // }
-  }
-  if (s.selectOnly) {
-    for (const key of s.selectedPieces.keys()) {
-      addSquare(squares, key, 'selected');
-    }
-  }
   if (s.selected) {
     addSquare(squares, s.selected, 'selected');
     if (s.movable.showDests) {
