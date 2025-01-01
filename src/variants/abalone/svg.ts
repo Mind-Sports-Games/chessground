@@ -1,6 +1,6 @@
 import type * as cg from '../../types';
 
-import { abaloneFiles, getSquareDimensions, isValidKey } from './util';
+import { files, getSquareDimensions, isValidKey } from './util';
 
 // pos2px is used to convert a position from the grid (board coordinates) to a position in pixels
 export const pos2px = (pos: cg.Pos, bounds: ClientRect, _bd: cg.BoardDimensions): cg.NumberPair => {
@@ -11,7 +11,7 @@ export const pos2px = (pos: cg.Pos, bounds: ClientRect, _bd: cg.BoardDimensions)
   const computedHeight = height * 0.5 + squareDimensions.height * (5 - pos[1]);
   let computedWidth = width * 0.5 + squareDimensions.width * (pos[0] - 5);
 
-  if (!isValidKey((abaloneFiles[pos[0] - 1] + pos[1].toString()) as cg.Key)) {
+  if (!isValidKey((files[pos[0] - 1] + pos[1].toString()) as cg.Key)) {
     return [10, 10];
   }
 

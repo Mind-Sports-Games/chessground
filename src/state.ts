@@ -1,10 +1,10 @@
 import * as fen from './fen';
 import { AnimCurrent } from './anim';
-import { baseMove } from './board';
-import { DragCurrent } from './drag';
+import { baseMove, getKeyAtDomPos, getSnappedKeyAtDomPos } from './board';
+import { DragCurrent, processDrag } from './drag';
 import { Drawable } from './draw';
 import { render } from './render';
-import { key2pos, posToTranslateAbs, posToTranslateRel, timer } from './util';
+import { key2pos, posToTranslateAbs, posToTranslateRel, pos2key, timer } from './util';
 import { pos2px } from './svg';
 import * as cg from './types';
 
@@ -140,20 +140,36 @@ export interface HeadlessState {
   onlyDropsVariant: boolean;
   singleClickMoveVariant: boolean;
   baseMove: (state: HeadlessState, orig: cg.Key, dest: cg.Key) => cg.Piece | boolean;
-  render: (state: State) => void;
+  getKeyAtDomPos: (
+    pos: cg.NumberPair,
+    orientation: cg.Orientation,
+    bounds: ClientRect,
+    bd: cg.BoardDimensions,
+    variant: cg.Variant,
+  ) => cg.Key | undefined;
+  getSnappedKeyAtDomPos: (
+    orig: cg.Key,
+    pos: cg.NumberPair,
+    orientation: cg.Orientation,
+    bounds: ClientRect,
+    bd: cg.BoardDimensions,
+  ) => cg.Key | undefined;
+  key2pos: (k: cg.Key) => cg.Pos;
+  posToTranslateAbsolute: (
+    bounds: ClientRect,
+    bt: cg.BoardDimensions,
+    variant: cg.Variant,
+  ) => (pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair;
   posToTranslateRelative: (
     pos: cg.Pos,
     orientation: cg.Orientation,
     bt: cg.BoardDimensions,
     v: cg.Variant,
   ) => cg.NumberPair;
-  posToTranslateAbsolute: (
-    bounds: ClientRect,
-    bt: cg.BoardDimensions,
-    variant: cg.Variant,
-  ) => (pos: cg.Pos, orientation: cg.Orientation) => cg.NumberPair;
   pos2px: (pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions) => cg.NumberPair;
-  key2pos: (k: cg.Key) => cg.Pos;
+  pos2key: (pos: cg.Pos, dimensions: cg.BoardDimensions) => cg.Key;
+  processDrag: (s: State) => void;
+  render: (state: State) => void;
 }
 
 export interface State extends HeadlessState {
@@ -267,10 +283,14 @@ export function defaults(): HeadlessState {
     onlyDropsVariant: false,
     singleClickMoveVariant: false,
     baseMove,
-    render,
-    posToTranslateRelative: posToTranslateRel,
-    posToTranslateAbsolute: posToTranslateAbs,
-    pos2px,
+    getKeyAtDomPos,
+    getSnappedKeyAtDomPos,
     key2pos,
+    posToTranslateAbsolute: posToTranslateAbs,
+    posToTranslateRelative: posToTranslateRel,
+    pos2key,
+    pos2px,
+    processDrag,
+    render,
   };
 }

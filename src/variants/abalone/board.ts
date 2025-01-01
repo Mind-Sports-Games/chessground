@@ -148,3 +148,14 @@ export const getKeyAtDomPos = (
 
   return undefined;
 };
+
+// In Abalone we do not snap arrows to valid moves
+export function getSnappedKeyAtDomPos(
+  _orig: cg.Key,
+  pos: cg.NumberPair,
+  orientation: cg.Orientation,
+  bounds: ClientRect,
+  _bd: cg.BoardDimensions,
+): cg.Key | undefined {
+  return getKeyAtDomPos(pos, orientation, bounds);
+}
