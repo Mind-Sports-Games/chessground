@@ -1,5 +1,5 @@
 import { State } from './state';
-import { key2pos, createEl, posToTranslateAbs, translateRel, translateAbs, calculatePlayerEmptyAreas } from './util';
+import { key2pos, createEl, translateRel, translateAbs, calculatePlayerEmptyAreas } from './util';
 import { p1Pov } from './board';
 import { AnimCurrent, AnimVectors, AnimVector, AnimFadings } from './anim';
 import { DragCurrent } from './drag';
@@ -199,11 +199,11 @@ export function render(s: State): void {
 export function updateBounds(s: State): void {
   if (s.dom.relative) return;
   const orientation = s.orientation,
-    posToTranslate = posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant);
+    posToTranslate = s.posToTranslateAbsolute(s.dom.bounds(), s.dimensions, s.variant);
   let el = s.dom.elements.board.firstChild as cg.PieceNode | cg.SquareNode | undefined;
   while (el) {
     if ((isPieceNode(el) && !el.cgAnimating) || isSquareNode(el)) {
-      translateAbs(el, posToTranslate(key2pos(el.cgKey), orientation));
+      translateAbs(el, posToTranslate(s.key2pos(el.cgKey), orientation));
     }
     el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
   }

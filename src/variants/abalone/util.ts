@@ -1,48 +1,11 @@
 import type * as cg from '../../types';
 import { SquareDimensions, TranslateBase } from './types';
 
-export const abaloneFiles = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'] as const;
-
-const abaloneRanks = ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as const;
+export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'] as const;
+const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as const;
 
 export const pos2key = (pos: cg.Pos): cg.Key => {
-  // let posx = pos[0];
-  // if (pos[1] == 0) {
-  //   posx += 2;
-  // }
-  // if (pos[1] == 1) {
-  //   posx = pos[0] - 2;
-  // }
-  // if (pos[1] == 2) {
-  //   posx = pos[0] - 2; // -2.5
-  // }
-  // if (pos[1] == 3) {
-  //   posx = pos[0] - 1;
-  // }
-  // if (pos[1] == 4) {
-  //   posx = pos[0] - 1; // -1.5
-  // }
-  // if (pos[1] == 5) {
-  //   posx = pos[0]; // - 1
-  // }
-  // if (pos[1] == 6) {
-  //   posx = pos[0]; // -0.5
-  // }
-  // if (pos[1] == 7) {
-  //   posx = pos[0]; // 0
-  // }
-  // if (pos[1] == 8) {
-  //   posx = pos[0]; // 0.5
-  // }
-  // if (pos[1] == 9) {
-  //   posx = pos[0] + 1;
-  // }
-
-  const posx = pos[0];
-  let posy = pos[1];
-
-  const key = (abaloneFiles[posx] + abaloneRanks[posy]) as cg.Key;
-  return key;
+  return (files[pos[0]] + ranks[pos[1]]) as cg.Key;
 };
 
 export const key2pos = (k: cg.Key): cg.Pos => {
@@ -156,16 +119,16 @@ export const translateRel = (el: HTMLElement, percents: cg.NumberPair): void => 
   el.style.transform = `translate(${percents[0]}%,${percents[1]}%)`;
 };
 
-function files(n: number) {
-  return abaloneFiles.slice(0, n);
+function getFile(n: number) {
+  return files.slice(0, n);
 }
 
-function ranks(n: number) {
-  return abaloneRanks.slice(0, n);
+function getRank(n: number) {
+  return ranks.slice(0, n);
 }
 
 function allKeys(bd: cg.BoardDimensions = { width: 9, height: 9 }) {
-  return Array.prototype.concat(...files(bd.width).map(c => ranks(bd.height).map(r => c + r)));
+  return Array.prototype.concat(...getFile(bd.width).map(c => getRank(bd.height).map(r => c + r)));
 }
 
 export const allPos = (bd: cg.BoardDimensions): cg.Pos[] => allKeys(bd).map(key2posAlt);
@@ -181,7 +144,7 @@ export const posToTranslateAbs2 = (): ((
 ) => cg.NumberPair) => {
   return (bounds, pos, orientation) => posToTranslateBase2(bounds, pos, orientation);
 };
-const translateBase2: Record<cg.Orientation, TranslateBase> = {
+export const translateBase2: Record<cg.Orientation, TranslateBase> = {
   p1: (pos: cg.Pos, bounds: ClientRect) => {
     const height = bounds.height;
     const width = bounds.width;
@@ -238,11 +201,17 @@ export const getSquareDimensions = (bounds: ClientRect): SquareDimensions => ({
   height: bounds.height * 0.081,
 });
 
-export const getCoordinates = (x: number, y: number, orientation: cg.Orientation): cg.Key => {
-  const file = abaloneFiles[x] as cg.File;
-  const rank = abaloneRanks[y] as cg.Rank;
+export const getCoordinates = (x: number, y: number, orientation: cg.Orientation): cg.Key | undefined => {
+  const file = files[x] as cg.File;
+  const rank = ranks[y] as cg.Rank;
+
+  const key = (file + rank) as cg.Key;
+  if (!isValidKey(key)) {
+    return undefined;
+  }
+
   if (orientation === 'p1') {
-    return (file + rank) as cg.Key;
+    return key;
   }
 
   return rotate180(file, rank) as cg.Key;

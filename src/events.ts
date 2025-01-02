@@ -4,15 +4,7 @@ import * as draw from './draw';
 import { cancelDropMode, drop } from './drop';
 import { eventPosition, isRightButton, backgammonPosDiff } from './util';
 import * as cg from './types';
-import {
-  areMyDiceAtDomPos,
-  isButtonAtDomPos,
-  getKeyAtDomPos,
-  userMove,
-  userLift,
-  reorderDice,
-  undoButtonPressed,
-} from './board';
+import { areMyDiceAtDomPos, isButtonAtDomPos, userMove, userLift, reorderDice, undoButtonPressed } from './board';
 import { Piece } from './types';
 
 type MouchBind = (e: cg.MouchEvent) => void;
@@ -137,7 +129,7 @@ function startDragOrDraw(s: State): MouchBind {
           if (s.singleClickMoveVariant) {
             const bounds = s.dom.bounds(),
               position = eventPosition(e)!,
-              orig = getKeyAtDomPos(position, s.orientation, bounds, s.dimensions, s.variant);
+              orig = s.getKeyAtDomPos(position, s.orientation, bounds, s.dimensions, s.variant);
             if (!orig) return;
             const piece = s.pieces.get(orig);
             const isLiftDest =
@@ -188,7 +180,7 @@ function dragOrDraw(s: State, withDrag: StateMouchBind, withDraw: StateMouchBind
 
 function squareOccupied(s: State, e: cg.MouchEvent): Piece | undefined {
   const position = eventPosition(e);
-  const dest = position && getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
+  const dest = position && s.getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
   if (dest && s.pieces.get(dest)) return s.pieces.get(dest);
   return undefined;
 }

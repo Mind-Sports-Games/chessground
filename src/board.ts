@@ -24,8 +24,6 @@ import predrop from './predrop';
 import * as cg from './types';
 import * as T from './transformations';
 
-import { getKeyAtDomPos as abaloneGetKeyAtDomPos } from './variants/abalone/board';
-
 export function setOrientation(state: HeadlessState, o: cg.Orientation): void {
   state.orientation = o;
   state.animation.current = state.draggable.current = state.selected = undefined;
@@ -240,8 +238,6 @@ function isCapture(variant: cg.Variant, destPiece: cg.Piece | undefined, origPie
     case 'oware':
       //TODO this is more complicated to calculate... (but its only used for sound in lila atm)
       return destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
-    case 'abalone':
-      return undefined; // we compute it from Abalone namespace using HOF
     default:
       return destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
   }
@@ -642,9 +638,6 @@ export function getKeyAtDomPos(
   bd: cg.BoardDimensions,
   variant: cg.Variant = 'chess',
 ): cg.Key | undefined {
-  if (variant === 'abalone') {
-    return abaloneGetKeyAtDomPos(pos, orientation, bounds);
-  }
   const bgBorder = 1 / 15;
   const file =
     variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon'
@@ -742,7 +735,6 @@ export function p1Pov(s: HeadlessState): boolean {
   return s.myPlayerIndex === 'p1';
 }
 
-// at least triggered when we use right click to draw arrows or highlight a square
 export function getSnappedKeyAtDomPos(
   orig: cg.Key,
   pos: cg.NumberPair,

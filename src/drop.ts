@@ -37,7 +37,7 @@ export function drop(s: State, e: cg.MouchEvent): void {
     if (position && board.isPocketAtDomPos(position, s.orientation, s.turnPlayerIndex, s.dom.bounds(), s.variant)) {
       dropFromPocket(s, piece.role);
     } else {
-      const dest = position && board.getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
+      const dest = position && s.getKeyAtDomPos(position, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
       if (dest) board.dropNewPiece(s, 'a0', dest);
     }
   }

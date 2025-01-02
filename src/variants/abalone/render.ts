@@ -2,7 +2,7 @@ import type * as cg from '../../types';
 import type { PieceName, SquareClasses } from '../../render';
 import { p1Pov } from '../../board';
 import { State } from '../../state';
-import { createEl } from '../../util';
+import { createEl, opposite } from '../../util';
 import { AnimCurrent, AnimFadings, AnimVector, AnimVectors } from '../../anim';
 import { DragCurrent } from '../../drag';
 import { appendValue, isPieceNode, isSquareNode, posZIndex, removeNodes } from '../../render';
@@ -193,13 +193,14 @@ function addSquare(squares: SquareClasses, key: cg.Key, klass: string): void {
   else squares.set(key, klass);
 }
 
-// @TODO: clean this up to remove any notion non related to Abalone
 export function computeSquareClasses(s: State): SquareClasses {
   const squares: SquareClasses = new Map();
 
-  if (s.lastMove && s.lastMove.length === 2 && s.highlight.lastMove) {
+  if (s.lastMove && s.lastMove.length === 2) {
+    // s.highlight.lastMove is always false in profile page
     const moveImpact = computeMoveVectorPostMove(s.pieces, s.lastMove[0], s.lastMove[1]);
-    const player = s.turnPlayerIndex;
+    const lastMovePlayer = s.pieces.get(s.lastMove[1])?.playerIndex || s.myPlayerIndex;
+    const player = opposite(lastMovePlayer);
     moveImpact?.landingSquares.forEach(coordinates => {
       addSquare(squares, coordinates, `last-move to ${player}${moveImpact.directionString}`);
     });
@@ -219,36 +220,7 @@ export function computeSquareClasses(s: State): SquareClasses {
           addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
         }
     }
-  } else if (s.dropmode.active || s.draggable.current?.orig === 'a0') {
-    const piece = s.dropmode.active ? s.dropmode.piece : s.draggable.current?.piece;
-
-    if (piece) {
-      // TODO: there was a function called isPredroppable that was used in drag.ts or drop.ts or both.
-      //       Maybe use the same here to decide what to render instead of potentially making it possible both
-      //       kinds of highlighting to happen if something was not cleared up in the state.
-      //       In other place (pocket.ts) this condition is used ot decide similar question: ctrl.myplayerIndex === ctrl.turnPlayerIndex
-      if (s.dropmode.showDropDests) {
-        const dests = s.dropmode.dropDests?.get(piece.role);
-        if (dests)
-          for (const k of dests) {
-            addSquare(squares, k, 'move-dest');
-          }
-      }
-      if (s.predroppable.showDropDests) {
-        const pDests = s.predroppable.dropDests;
-        if (pDests)
-          for (const k of pDests) {
-            addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
-          }
-      }
-    }
   }
-  const premove = s.premovable.current;
-  if (premove) for (const k of premove) addSquare(squares, k, 'current-premove');
-  else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
-
-  const o = s.exploding;
-  if (o) for (const k of o.keys) addSquare(squares, k, 'exploding' + o.stage);
 
   return squares;
 }

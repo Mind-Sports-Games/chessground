@@ -7,8 +7,6 @@ import { anim } from './anim';
 import predrop from './predrop';
 import * as T from './transformations';
 
-import { processDrag as abaloneProcessDrag } from './variants/abalone/drag';
-
 export interface DragCurrent {
   orig: cg.Key; // orig key of dragging piece
   origPos: cg.Pos;
@@ -30,7 +28,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   if (e.touches && e.touches.length > 1) return; // support one finger touch only
   const bounds = s.dom.bounds(),
     position = util.eventPosition(e)!,
-    orig = board.getKeyAtDomPos(position, s.orientation, bounds, s.dimensions, s.variant);
+    orig = s.getKeyAtDomPos(position, s.orientation, bounds, s.dimensions, s.variant);
   if (!orig) return;
   const piece = s.pieces.get(orig);
   const previouslySelected = s.selected;
@@ -63,7 +61,7 @@ export function start(s: State, e: cg.MouchEvent): void {
     const squareBounds = computeSquareBounds(orig, bounds, s.dimensions, s.orientation);
     s.draggable.current = {
       orig,
-      origPos: util.key2pos(orig),
+      origPos: s.key2pos(orig),
       piece,
       rel: position,
       epos: position,
@@ -89,11 +87,11 @@ export function start(s: State, e: cg.MouchEvent): void {
       ghost.className = `ghost ${piece.playerIndex} ${promoted}${piece.role} ${side}`;
       util.translateAbs(
         ghost,
-        util.posToTranslateAbs(bounds, s.dimensions, s.variant)(util.key2pos(orig), s.orientation),
+        s.posToTranslateAbsolute(bounds, s.dimensions, s.variant)(s.key2pos(orig), s.orientation),
       );
       util.setVisible(ghost, true);
     }
-    processDrag(s);
+    s.processDrag(s);
   } else {
     if (hadPremove) board.unsetPremove(s);
     if (hadPredrop) board.unsetPredrop(s);
@@ -147,12 +145,11 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
     s.predroppable.dropDests = predrop(s.pieces, piece, s.dimensions, s.variant);
   }
 
-  processDrag(s);
+  s.processDrag(s);
 }
 
-function processDrag(s: State): void {
+export function processDrag(s: State): void {
   requestAnimationFrame(() => {
-    if (s.variant === 'abalone') return abaloneProcessDrag(s); // "working" WIP: have to use HOF
     const cur = s.draggable.current;
     if (!cur) return;
     // cancel animations while dragging
@@ -175,13 +172,17 @@ function processDrag(s: State): void {
         cur.pos = [cur.epos[0] - cur.rel[0], cur.epos[1] - cur.rel[1]];
 
         // move piece
-        const translation = util.posToTranslateAbs(s.dom.bounds(), s.dimensions, s.variant)(cur.origPos, s.orientation); // until translateAbs becomes a HOF, it has to remain invoked from util.
+        const translation = s.posToTranslateAbsolute(
+          s.dom.bounds(),
+          s.dimensions,
+          s.variant,
+        )(cur.origPos, s.orientation);
         translation[0] += cur.pos[0] + cur.dec[0];
         translation[1] += cur.pos[1] + cur.dec[1];
         util.translateAbs(cur.element, translation);
       }
     }
-    processDrag(s);
+    s.processDrag(s);
   });
 }
 
@@ -207,7 +208,7 @@ export function end(s: State, e: cg.MouchEvent): void {
   board.unsetPredrop(s);
   // touchend has no position; so use the last touchmove position instead
   const eventPos = util.eventPosition(e) || cur.epos;
-  const dest = board.getKeyAtDomPos(eventPos, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
+  const dest = s.getKeyAtDomPos(eventPos, s.orientation, s.dom.bounds(), s.dimensions, s.variant);
   if (dest && cur.started && cur.orig !== dest) {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
     else {
