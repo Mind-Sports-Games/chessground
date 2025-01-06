@@ -119,24 +119,23 @@ export const translateRel = (el: HTMLElement, percents: cg.NumberPair): void => 
   el.style.transform = `translate(${percents[0]}%,${percents[1]}%)`;
 };
 
-function getFile(n: number) {
+const getFile = (n: number) => {
   return files.slice(0, n);
-}
+};
 
-function getRank(n: number) {
+const getRank = (n: number) => {
   return ranks.slice(0, n);
-}
+};
 
-function allKeys(bd: cg.BoardDimensions = { width: 9, height: 9 }) {
+const allKeys = (bd: cg.BoardDimensions = { width: 9, height: 9 }): cg.Key[] => {
   return Array.prototype.concat(...getFile(bd.width).map(c => getRank(bd.height).map(r => c + r)));
-}
+};
 
 export const allPos = (bd: cg.BoardDimensions): cg.Pos[] => allKeys(bd).map(key2posAlt);
 
-export const posToTranslateBase2 = (bounds: ClientRect, pos: cg.Pos, orientation: cg.Orientation): cg.NumberPair => {
+const posToTranslateBase2 = (bounds: ClientRect, pos: cg.Pos, orientation: cg.Orientation): cg.NumberPair => {
   return translateBase2[orientation](pos, bounds);
 };
-
 export const posToTranslateAbs2 = (): ((
   bounds: ClientRect,
   pos: cg.Pos,
@@ -144,7 +143,7 @@ export const posToTranslateAbs2 = (): ((
 ) => cg.NumberPair) => {
   return (bounds, pos, orientation) => posToTranslateBase2(bounds, pos, orientation);
 };
-export const translateBase2: Record<cg.Orientation, TranslateBase> = {
+const translateBase2: Record<cg.Orientation, TranslateBase> = {
   p1: (pos: cg.Pos, bounds: ClientRect) => {
     const height = bounds.height;
     const width = bounds.width;

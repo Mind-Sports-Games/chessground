@@ -9,6 +9,7 @@ import { appendValue, isPieceNode, isSquareNode, posZIndex, removeNodes } from '
 
 import { translateAbs, translateRel } from './util';
 import { computeMoveVectorPostMove } from './engine';
+import { getDirectionString, isMoveInLine } from './directions';
 
 // @TODO: remove parts unrelated to Abalone
 export const render = (s: State): void => {
@@ -177,7 +178,7 @@ export const render = (s: State): void => {
   for (const nodes of movedSquares.values()) removeNodes(s, nodes);
 };
 
-function pieceNameOf(piece: cg.Piece, myPlayerIndex: cg.PlayerIndex, orientation: cg.Orientation): string {
+const pieceNameOf = (piece: cg.Piece, myPlayerIndex: cg.PlayerIndex, orientation: cg.Orientation): string => {
   const side =
     (piece.playerIndex === myPlayerIndex && orientation === myPlayerIndex) ||
     (piece.playerIndex !== myPlayerIndex && orientation !== myPlayerIndex)
@@ -185,15 +186,15 @@ function pieceNameOf(piece: cg.Piece, myPlayerIndex: cg.PlayerIndex, orientation
       : 'enemy';
 
   return `${piece.playerIndex} ${piece.role} ${side}`;
-}
+};
 
-function addSquare(squares: SquareClasses, key: cg.Key, klass: string): void {
+const addSquare = (squares: SquareClasses, key: cg.Key, klass: string): void => {
   const classes = squares.get(key);
   if (classes) squares.set(key, `${classes} ${klass}`);
   else squares.set(key, klass);
-}
+};
 
-export function computeSquareClasses(s: State): SquareClasses {
+export const computeSquareClasses = (s: State): SquareClasses => {
   const squares: SquareClasses = new Map();
 
   if (s.lastMove && s.lastMove.length === 2) {
@@ -207,12 +208,22 @@ export function computeSquareClasses(s: State): SquareClasses {
   }
 
   if (s.selected) {
-    addSquare(squares, s.selected, 'selected');
+    const orig = s.selected;
+    addSquare(squares, orig, 'selected');
     if (s.movable.showDests) {
-      const dests = s.movable.dests?.get(s.selected);
+      const dests = s.movable.dests?.get(orig);
       if (dests)
-        for (const k of dests) {
-          addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : ''));
+        for (const dest of dests) {
+          let classes = 'move-dest';
+          const directionString = getDirectionString(orig, dest);
+          if (!directionString) break;
+          if (isMoveInLine(orig, dest, directionString)) {
+            classes += ` inline`;
+          } else {
+            classes += ` aside`;
+          }
+          if (s.pieces.has(dest)) classes += ' oc';
+          addSquare(squares, dest, classes);
         }
       const pDests = s.premovable.dests;
       if (pDests)
@@ -221,6 +232,7 @@ export function computeSquareClasses(s: State): SquareClasses {
         }
     }
   }
+  if (s.movable.showDests) s.premovable.current?.forEach(k => addSquare(squares, k, 'current-premove'));
 
   return squares;
-}
+};

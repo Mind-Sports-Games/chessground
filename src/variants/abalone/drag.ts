@@ -4,7 +4,7 @@ import { distanceSq, samePiece } from '../../util';
 
 import { translateAbs } from './util';
 
-export function processDrag(s: State): void {
+export const processDrag = (s: State): void => {
   requestAnimationFrame(() => {
     const cur = s.draggable.current;
     if (!cur) return;
@@ -36,4 +36,4 @@ export function processDrag(s: State): void {
     }
     s.processDrag(s);
   });
-}
+};

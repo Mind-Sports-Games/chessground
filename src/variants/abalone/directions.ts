@@ -136,6 +136,25 @@ export const deducePotentialSideDirs = (
   }
 };
 
+export const listPotentialSideDirs = (lineDirection: DirectionString): DirectionString[] => {
+  switch (lineDirection) {
+    case HorizontalDirectionString.Right:
+      return [DiagonalDirectionString.UpRight, DiagonalDirectionString.DownRight];
+    case HorizontalDirectionString.Left:
+      return [DiagonalDirectionString.UpLeft, DiagonalDirectionString.DownLeft];
+    case DiagonalDirectionString.UpLeft:
+      return [HorizontalDirectionString.Left, DiagonalDirectionString.UpRight];
+    case DiagonalDirectionString.DownLeft:
+      return [HorizontalDirectionString.Left, DiagonalDirectionString.DownRight];
+    case DiagonalDirectionString.DownRight:
+      return [HorizontalDirectionString.Right, DiagonalDirectionString.DownLeft];
+    case DiagonalDirectionString.UpRight:
+      return [HorizontalDirectionString.Right, DiagonalDirectionString.UpLeft];
+    default:
+      return [];
+  }
+};
+
 const traverseUntil = (pos: cg.Key, stop: (pos: cg.Key) => boolean, direction: DirectionString): cg.Key[] => {
   const nextPos = move(pos, direction);
   if (nextPos) {

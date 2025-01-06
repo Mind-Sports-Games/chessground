@@ -1,9 +1,9 @@
 import type { HeadlessState } from '../../state';
 import type * as cg from '../../types';
 
-import { getKeyAtDomPos, getSnappedKeyAtDomPos } from './board';
+import { baseMove, getKeyAtDomPos, getSnappedKeyAtDomPos } from './board';
 import { processDrag } from './drag';
-import { baseMove } from './engine';
+import { premove } from './premove';
 import { render } from './render';
 import { pos2px } from './svg';
 import { key2pos, posToTranslateAbs2 as posToTranslateAbs2Original, posToTranslateRel, pos2key } from './util';
@@ -18,6 +18,7 @@ export const configure = (state: HeadlessState): void => {
   state.posToTranslateRelative = posToTranslateRel;
   state.pos2px = pos2px;
   state.pos2key = pos2key;
+  state.premove = premove;
   state.processDrag = processDrag;
   state.render = render;
 
