@@ -36,4 +36,4 @@ export const processDrag = (s: State): void => {
     }
     s.processDrag(s);
   });
-}
+};

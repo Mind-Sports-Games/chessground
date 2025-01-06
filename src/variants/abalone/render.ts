@@ -186,15 +186,15 @@ const pieceNameOf = (piece: cg.Piece, myPlayerIndex: cg.PlayerIndex, orientation
       : 'enemy';
 
   return `${piece.playerIndex} ${piece.role} ${side}`;
-}
+};
 
 const addSquare = (squares: SquareClasses, key: cg.Key, klass: string): void => {
   const classes = squares.get(key);
   if (classes) squares.set(key, `${classes} ${klass}`);
   else squares.set(key, klass);
-}
+};
 
-export const computeSquareClasses = (s: State): SquareClasses =>{
+export const computeSquareClasses = (s: State): SquareClasses => {
   const squares: SquareClasses = new Map();
 
   if (s.lastMove && s.lastMove.length === 2) {
@@ -232,8 +232,7 @@ export const computeSquareClasses = (s: State): SquareClasses =>{
         }
     }
   }
-  if(s.movable.showDests)
-    s.premovable.current?.forEach(k => addSquare(squares, k, 'current-premove'));
+  if (s.movable.showDests) s.premovable.current?.forEach(k => addSquare(squares, k, 'current-premove'));
 
   return squares;
-}
+};

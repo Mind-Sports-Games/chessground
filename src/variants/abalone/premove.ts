@@ -12,7 +12,7 @@ export const premove = (
   _chess960: boolean,
 ): cg.Key[] => {
   return validDestinations(pieces, key);
-}
+};
 
 export const validDestinations = (pieces: cg.Pieces, orig: cg.Key): cg.Key[] => {
   const dests: cg.Key[] = [];

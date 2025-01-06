@@ -162,7 +162,7 @@ export const getSnappedKeyAtDomPos = (
   _bd: cg.BoardDimensions,
 ): cg.Key | undefined => {
   return getKeyAtDomPos(pos, orientation, bounds);
-}
+};
 
 export const baseMove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean => {
   // Note: after you moved, you also receive the move from the API. But the piece is already gone, since you moved.
@@ -180,4 +180,4 @@ export const baseMove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
   state.check = undefined;
   callUserFunction(state.events.change);
   return moveImpact.capture || true;
-}
+};

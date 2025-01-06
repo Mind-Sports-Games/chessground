@@ -121,15 +121,15 @@ export const translateRel = (el: HTMLElement, percents: cg.NumberPair): void => 
 
 const getFile = (n: number) => {
   return files.slice(0, n);
-}
+};
 
 const getRank = (n: number) => {
   return ranks.slice(0, n);
-}
+};
 
 const allKeys = (bd: cg.BoardDimensions = { width: 9, height: 9 }): cg.Key[] => {
   return Array.prototype.concat(...getFile(bd.width).map(c => getRank(bd.height).map(r => c + r)));
-}
+};
 
 export const allPos = (bd: cg.BoardDimensions): cg.Pos[] => allKeys(bd).map(key2posAlt);
 
