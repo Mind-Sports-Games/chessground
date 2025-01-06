@@ -19,7 +19,7 @@ import {
   backgammonUpdatePiecesFromMove,
   calculateFlippingPieces,
 } from './util';
-import { premove, queen, knight } from './premove';
+import { queen, knight } from './premove';
 import predrop from './predrop';
 import * as cg from './types';
 import * as T from './transformations';
@@ -445,7 +445,7 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
 export function setSelected(state: HeadlessState, key: cg.Key): void {
   state.selected = key;
   if (isPremovable(state, key)) {
-    state.premovable.dests = premove(
+    state.premovable.dests = state.premove(
       state.pieces,
       key,
       state.premovable.castle,
@@ -530,7 +530,7 @@ function canPremove(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
     orig !== dest &&
     isPremovable(state, orig) &&
     containsX(
-      premove(state.pieces, orig, state.premovable.castle, state.dimensions, state.variant, state.chess960),
+      state.premove(state.pieces, orig, state.premovable.castle, state.dimensions, state.variant, state.chess960),
       dest,
     )
   );

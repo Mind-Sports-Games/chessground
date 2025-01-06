@@ -1,6 +1,3 @@
-import { setPieces, unselect } from '../../board';
-import { HeadlessState } from '../../state';
-import { callUserFunction } from '../../util';
 import type * as cg from '../../types';
 
 import {
@@ -190,21 +187,3 @@ export const computeMoveVectorPostMove = (pieces: cg.Pieces, orig: cg.Key, dest:
 
   return undefined;
 };
-
-export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
-  // Note: after you moved, you also receive the move from the API. But the piece is already gone, since you moved.
-  if (!state.pieces.get(orig)) return false;
-
-  const moveImpact = computeMoveImpact(state.pieces, orig, dest);
-  if (!moveImpact) return false;
-
-  if (dest === state.selected) unselect(state);
-  callUserFunction(state.events.move, orig, dest, moveImpact.capture);
-
-  setPieces(state, moveImpact.diff);
-
-  state.lastMove = [orig, dest];
-  state.check = undefined;
-  callUserFunction(state.events.change);
-  return moveImpact.capture || true;
-}

@@ -1,4 +1,8 @@
+import { setPieces, unselect } from '../../board';
+import type { HeadlessState } from '../../state';
 import type * as cg from '../../types';
+import { callUserFunction } from '../../util';
+import { computeMoveImpact } from './engine';
 
 import { getCoordinates, getSquareDimensions } from './util';
 
@@ -150,12 +154,30 @@ export const getKeyAtDomPos = (
 };
 
 // In Abalone we do not snap arrows to valid moves
-export function getSnappedKeyAtDomPos(
+export const getSnappedKeyAtDomPos = (
   _orig: cg.Key,
   pos: cg.NumberPair,
   orientation: cg.Orientation,
   bounds: ClientRect,
   _bd: cg.BoardDimensions,
-): cg.Key | undefined {
+): cg.Key | undefined => {
   return getKeyAtDomPos(pos, orientation, bounds);
+}
+
+export const baseMove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean => {
+  // Note: after you moved, you also receive the move from the API. But the piece is already gone, since you moved.
+  if (!state.pieces.get(orig)) return false;
+
+  const moveImpact = computeMoveImpact(state.pieces, orig, dest);
+  if (!moveImpact) return false;
+
+  if (dest === state.selected) unselect(state);
+  callUserFunction(state.events.move, orig, dest, moveImpact.capture);
+
+  setPieces(state, moveImpact.diff);
+
+  state.lastMove = [orig, dest];
+  state.check = undefined;
+  callUserFunction(state.events.change);
+  return moveImpact.capture || true;
 }

@@ -1,8 +1,6 @@
 import * as util from './util';
 import * as cg from './types';
 
-import { marble as abaloneMarble } from './variants/abalone/premove';
-
 export type Mobility = (x1: number, y1: number, x2: number, y2: number) => boolean;
 
 function diff(a: number, b: number): number {
@@ -1147,10 +1145,6 @@ export function premove(
     case 'breakthroughtroyka':
     case 'minibreakthroughtroyka':
       mobility = breakthroughPawn(pieces, playerIndex);
-      break;
-
-    case 'abalone':
-      mobility = abaloneMarble(pieces, playerIndex);
       break;
 
     // Variants using standard pieces and additional fairy pieces like S-chess, Capablanca, etc.

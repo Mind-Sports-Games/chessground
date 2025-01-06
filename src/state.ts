@@ -3,6 +3,7 @@ import { AnimCurrent } from './anim';
 import { baseMove, getKeyAtDomPos, getSnappedKeyAtDomPos } from './board';
 import { DragCurrent, processDrag } from './drag';
 import { Drawable } from './draw';
+import { premove } from './premove';
 import { render } from './render';
 import { key2pos, posToTranslateAbs, posToTranslateRel, pos2key, timer } from './util';
 import { pos2px } from './svg';
@@ -168,6 +169,14 @@ export interface HeadlessState {
   ) => cg.NumberPair;
   pos2px: (pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions) => cg.NumberPair;
   pos2key: (pos: cg.Pos, dimensions: cg.BoardDimensions) => cg.Key;
+  premove: (
+    pieces: cg.Pieces,
+    key: cg.Key,
+    canCastle: boolean,
+    bd: cg.BoardDimensions,
+    variant: cg.Variant,
+    chess960: boolean,
+  ) => cg.Key[];
   processDrag: (s: State) => void;
   render: (state: State) => void;
 }
@@ -290,6 +299,7 @@ export function defaults(): HeadlessState {
     posToTranslateRelative: posToTranslateRel,
     pos2key,
     pos2px,
+    premove,
     processDrag,
     render,
   };
