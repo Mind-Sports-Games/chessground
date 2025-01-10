@@ -24,6 +24,7 @@ export interface HeadlessState {
   coordinates: boolean; // include coords attributes
   boardScores: boolean; //include board-scores attributes
   dice: cg.Dice[]; // dice to display on the board
+  doublingCube?: cg.DoublingCube; // doubling cube to display on the board (backgammon)
   canUndo: boolean; // can user undo their last action (backgammon)
   showUndoButton: boolean; // render the undo button (backgammon)
   gameButtonsActive: boolean; // can user process game buttons (e.g. swap dice, undo)

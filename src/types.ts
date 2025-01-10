@@ -314,6 +314,11 @@ export interface SimpleGoScores {
   p2: number;
 }
 
+export interface DoublingCube {
+  owner: PlayerIndex | 'both';
+  value: number;
+}
+
 export interface Dice {
   value: number;
   isAvailable: boolean;

@@ -1,6 +1,17 @@
 import { HeadlessState } from './state';
 import { calculateBackgammonScores, setVisible, createEl, pos2key, NRanks, invNRanks } from './util';
-import { orientations, files, ranks, ranks19, shogiVariants, xiangqiVariants, Elements, Notation, Dice } from './types';
+import {
+  orientations,
+  files,
+  ranks,
+  ranks19,
+  shogiVariants,
+  xiangqiVariants,
+  Elements,
+  Notation,
+  Dice,
+  DoublingCube,
+} from './types';
 import { createElement as createSVG, setAttributes } from './svg';
 
 export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boolean): Elements {
@@ -206,6 +217,9 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     }
   }
 
+  if (s.variant === 'backgammon' || s.variant === 'hyper' || s.variant === 'nackgammon') {
+    if (s.doublingCube) container.appendChild(renderDoublingCube(s.doublingCube));
+  }
   if (s.dice.length > 0) {
     container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
     if (s.showUndoButton) {
@@ -263,6 +277,14 @@ function renderTogyBoardScores(elems: readonly string[], className: string): HTM
     }
     el.appendChild(f);
   }
+  return el;
+}
+
+function renderDoublingCube(dCube: DoublingCube): HTMLElement {
+  const el = createEl('cg-doubling-cube', dCube.owner);
+  const doubeCubeClass = ['zero', 'one', 'two', 'three', 'four', 'five', 'six'];
+  const cube = createEl('cube', doubeCubeClass[dCube.value]);
+  el.appendChild(cube);
   return el;
 }
 

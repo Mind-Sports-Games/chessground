@@ -17,6 +17,7 @@ export interface Config {
   coordinates?: boolean; // include coords attributes
   boardScores?: boolean; //include board-scores attributes
   dice?: cg.Dice[]; // dice to display on the board
+  doublingCube?: cg.DoublingCube; // doubling cube to display on the board
   canUndo?: boolean; // can user undo thier last action
   showUndoButton?: boolean; //show the undo button
   gameButtonsActive?: boolean; // can user process game buttons (e.g. swap dice, undo)
@@ -135,6 +136,7 @@ export function configure(state: HeadlessState, config: Config): void {
   if (config.dropmode?.dropDests) state.dropmode.dropDests = undefined;
   if (config.drawable?.autoShapes) state.drawable.autoShapes = [];
   if (config.dice) state.dice = [];
+  if (config.doublingCube) state.doublingCube = undefined;
 
   merge(state, config);
 
