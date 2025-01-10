@@ -168,20 +168,21 @@ export function configure(state: HeadlessState, config: Config): void {
   // no need for such short animations
   if (!state.animation.duration || state.animation.duration < 100) state.animation.enabled = false;
 
-  if (!state.movable.rookCastle && state.movable.dests && state.variant !== 'abalone') {
+  if (!state.movable.rookCastle && state.movable.dests) {
     const rank = state.movable.playerIndex === 'p1' ? 1 : 8,
       kingStartPos = ('e' + rank) as cg.Key,
       dests = state.movable.dests.get(kingStartPos),
       king = state.pieces.get(kingStartPos);
-    if (!dests || !king || king.role !== 'k-piece') return;
-    state.movable.dests.set(
-      kingStartPos,
-      dests.filter(
-        d =>
-          !(d === 'a' + rank && dests.includes(('c' + rank) as cg.Key)) &&
-          !(d === 'h' + rank && dests.includes(('g' + rank) as cg.Key)),
-      ),
-    );
+    if (dests && king && king.role === 'k-piece') {
+      state.movable.dests.set(
+        kingStartPos,
+        dests.filter(
+          d =>
+            !(d === 'a' + rank && dests.includes(('c' + rank) as cg.Key)) &&
+            !(d === 'h' + rank && dests.includes(('g' + rank) as cg.Key)),
+        ),
+      );
+    }
   }
 
   // configure variants
