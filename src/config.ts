@@ -173,15 +173,16 @@ export function configure(state: HeadlessState, config: Config): void {
       kingStartPos = ('e' + rank) as cg.Key,
       dests = state.movable.dests.get(kingStartPos),
       king = state.pieces.get(kingStartPos);
-    if (!dests || !king || king.role !== 'k-piece') return;
-    state.movable.dests.set(
-      kingStartPos,
-      dests.filter(
-        d =>
-          !(d === 'a' + rank && dests.includes(('c' + rank) as cg.Key)) &&
-          !(d === 'h' + rank && dests.includes(('g' + rank) as cg.Key)),
-      ),
-    );
+    if (dests && king && king.role === 'k-piece') {
+      state.movable.dests.set(
+        kingStartPos,
+        dests.filter(
+          d =>
+            !(d === 'a' + rank && dests.includes(('c' + rank) as cg.Key)) &&
+            !(d === 'h' + rank && dests.includes(('g' + rank) as cg.Key)),
+        ),
+      );
+    }
   }
 
   // configure variants
