@@ -319,6 +319,10 @@ export interface DoublingCube {
   value: number;
 }
 
+export type CubeAction = 'offer' | 'accept' | 'reject';
+
+export type Button = 'undo' | 'double' | 'roll' | 'take' | 'drop';
+
 export interface Dice {
   value: number;
   isAvailable: boolean;

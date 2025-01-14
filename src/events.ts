@@ -4,7 +4,18 @@ import * as draw from './draw';
 import { cancelDropMode, drop } from './drop';
 import { eventPosition, isRightButton, backgammonPosDiff } from './util';
 import * as cg from './types';
-import { areMyDiceAtDomPos, isButtonAtDomPos, userMove, userLift, reorderDice, undoButtonPressed } from './board';
+import {
+  areMyDiceAtDomPos,
+  isUndoButtonAtDomPos,
+  isDoubleButtonAtDomPos,
+  isRollButtonAtDomPos,
+  isDropButtonAtDomPos,
+  isTakeButtonAtDomPos,
+  userMove,
+  userLift,
+  reorderDice,
+  buttonPressed,
+} from './board';
 import { Piece } from './types';
 
 type MouchBind = (e: cg.MouchEvent) => void;
@@ -83,6 +94,7 @@ function startDragOrDraw(s: State): MouchBind {
             s.myPlayerIndex,
             s.dom.bounds(),
             s.variant,
+            s.cubeActions,
           )
         ) {
           reorderDice(s);
@@ -90,16 +102,77 @@ function startDragOrDraw(s: State): MouchBind {
           return;
         }
         if (
-          isButtonAtDomPos(
+          isUndoButtonAtDomPos(
             eventPosition(e)!,
             s.orientation,
             s.turnPlayerIndex,
             s.myPlayerIndex,
             s.dom.bounds(),
             s.variant,
+            s.cubeActions,
           )
         ) {
-          undoButtonPressed(s);
+          buttonPressed(s, 'undo');
+          stopProcessingClick(e);
+          return;
+        }
+        if (
+          isDoubleButtonAtDomPos(
+            eventPosition(e)!,
+            s.orientation,
+            s.turnPlayerIndex,
+            s.myPlayerIndex,
+            s.dom.bounds(),
+            s.variant,
+            s.cubeActions,
+          )
+        ) {
+          buttonPressed(s, 'double');
+          stopProcessingClick(e);
+          return;
+        }
+        if (
+          isRollButtonAtDomPos(
+            eventPosition(e)!,
+            s.orientation,
+            s.turnPlayerIndex,
+            s.myPlayerIndex,
+            s.dom.bounds(),
+            s.variant,
+            s.cubeActions,
+          )
+        ) {
+          buttonPressed(s, 'roll');
+          stopProcessingClick(e);
+          return;
+        }
+        if (
+          isDropButtonAtDomPos(
+            eventPosition(e)!,
+            s.orientation,
+            s.turnPlayerIndex,
+            s.myPlayerIndex,
+            s.dom.bounds(),
+            s.variant,
+            s.cubeActions,
+          )
+        ) {
+          buttonPressed(s, 'drop');
+          stopProcessingClick(e);
+          return;
+        }
+        if (
+          isTakeButtonAtDomPos(
+            eventPosition(e)!,
+            s.orientation,
+            s.turnPlayerIndex,
+            s.myPlayerIndex,
+            s.dom.bounds(),
+            s.variant,
+            s.cubeActions,
+          )
+        ) {
+          buttonPressed(s, 'take');
           stopProcessingClick(e);
           return;
         }

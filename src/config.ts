@@ -18,6 +18,7 @@ export interface Config {
   boardScores?: boolean; //include board-scores attributes
   dice?: cg.Dice[]; // dice to display on the board
   doublingCube?: cg.DoublingCube; // doubling cube to display on the board
+  cubeActions?: cg.CubeAction[]; // actions to display on the doubling cube related options
   canUndo?: boolean; // can user undo thier last action
   showUndoButton?: boolean; //show the undo button
   gameButtonsActive?: boolean; // can user process game buttons (e.g. swap dice, undo)
@@ -98,7 +99,7 @@ export interface Config {
     select?: (key: cg.Key) => void; // called when a square is selected
     insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
     selectDice?: (dice: cg.Dice[]) => void; //when the dice have been selected (to swap order)
-    undoButton?: () => void; //when the undo button hass been selected for backgammon
+    buttonClick?: (button: cg.Button) => void; //when a game button has been selected (backgammon only atm)
   };
   dropmode?: {
     active?: boolean;
@@ -137,6 +138,7 @@ export function configure(state: HeadlessState, config: Config): void {
   if (config.drawable?.autoShapes) state.drawable.autoShapes = [];
   if (config.dice) state.dice = [];
   if (config.doublingCube) state.doublingCube = undefined;
+  if (config.cubeActions) state.cubeActions = [];
 
   merge(state, config);
 

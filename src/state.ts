@@ -25,6 +25,7 @@ export interface HeadlessState {
   boardScores: boolean; //include board-scores attributes
   dice: cg.Dice[]; // dice to display on the board
   doublingCube?: cg.DoublingCube; // doubling cube to display on the board (backgammon)
+  cubeActions?: cg.CubeAction[]; // actions to display on the doubling cube related options (backgammon)
   canUndo: boolean; // can user undo their last action (backgammon)
   showUndoButton: boolean; // render the undo button (backgammon)
   gameButtonsActive: boolean; // can user process game buttons (e.g. swap dice, undo)
@@ -129,7 +130,7 @@ export interface HeadlessState {
     select?: (key: cg.Key) => void; // called when a square is selected
     insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
     selectDice?: (dice: cg.Dice[]) => void; //when the dice have been selected (to swap order)
-    undoButton?: () => void; //when the undo button hass been selected for backgammon
+    buttonClick?: (button: cg.Button) => void; //when a game button has been selected (backgammon only atm)
   };
   drawable: Drawable;
   exploding?: cg.Exploding;

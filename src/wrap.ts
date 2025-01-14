@@ -218,12 +218,24 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   }
 
   if (s.variant === 'backgammon' || s.variant === 'hyper' || s.variant === 'nackgammon') {
-    if (s.doublingCube) container.appendChild(renderDoublingCube(s.doublingCube));
+    if (s.doublingCube) {
+      container.appendChild(renderDoublingCube(s.doublingCube));
+      if (s.cubeActions) {
+        if (s.cubeActions.includes('offer'))
+          container.appendChild(renderCubeAction('double', s.turnPlayerIndex + ' left'));
+        if (s.cubeActions.includes('offer'))
+          container.appendChild(renderCubeAction('roll', s.turnPlayerIndex + ' right'));
+        if (s.cubeActions.includes('reject'))
+          container.appendChild(renderCubeAction('drop', s.turnPlayerIndex + ' left'));
+        if (s.cubeActions.includes('accept'))
+          container.appendChild(renderCubeAction('take', s.turnPlayerIndex + ' right'));
+      }
+    }
   }
   if (s.dice.length > 0) {
     container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
     if (s.showUndoButton) {
-      container.appendChild(renderUndoButton(s.canUndo, s.turnPlayerIndex));
+      container.appendChild(renderUndoButton(s.canUndo, s.turnPlayerIndex + ' left'));
     }
   }
 
@@ -303,6 +315,14 @@ function renderUndoButton(canUndo: boolean, className: string): HTMLElement {
   const el = createEl('cg-buttons', className);
   const d: HTMLElement = createEl('cg-button', 'undo ' + (canUndo ? 'available' : 'unavailable'));
   d.textContent = 'UNDO';
+  el.appendChild(d);
+  return el;
+}
+
+function renderCubeAction(cubeAction: string, className: string): HTMLElement {
+  const el = createEl('cg-buttons', className);
+  const d: HTMLElement = createEl('cg-button', cubeAction);
+  d.textContent = cubeAction.toUpperCase();
   el.appendChild(d);
   return el;
 }
