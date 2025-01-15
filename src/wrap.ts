@@ -231,6 +231,11 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
           container.appendChild(renderCubeAction('take', s.turnPlayerIndex + ' right'));
       }
     }
+    if (s.multiPointState) {
+      container.appendChild(renderMultiPointTarget(s.multiPointState.target));
+      container.appendChild(renderMultiPointPlayerScore(s.multiPointState.p1, 'p1'));
+      container.appendChild(renderMultiPointPlayerScore(s.multiPointState.p2, 'p2'));
+    }
   }
   if (s.dice.length > 0) {
     container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
@@ -289,6 +294,18 @@ function renderTogyBoardScores(elems: readonly string[], className: string): HTM
     }
     el.appendChild(f);
   }
+  return el;
+}
+
+function renderMultiPointPlayerScore(score: number, playerIndex: string): HTMLElement {
+  const el = createEl('cg-multi-point-score', playerIndex);
+  el.textContent = score.toString();
+  return el;
+}
+
+function renderMultiPointTarget(target: number): HTMLElement {
+  const el = createEl('cg-multi-point-target');
+  el.textContent = target.toString() + 'pt';
   return el;
 }
 
