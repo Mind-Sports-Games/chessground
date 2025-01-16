@@ -222,13 +222,21 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       container.appendChild(renderDoublingCube(s.doublingCube));
       if (s.cubeActions) {
         if (s.cubeActions.includes('offer'))
-          container.appendChild(renderCubeAction('double', s.turnPlayerIndex + ' left'));
+          container.appendChild(
+            renderCubeAction('double', s.turnPlayerIndex + ' left', s.turnPlayerIndex === s.myPlayerIndex),
+          );
         if (s.cubeActions.includes('offer'))
-          container.appendChild(renderCubeAction('roll', s.turnPlayerIndex + ' right'));
+          container.appendChild(
+            renderCubeAction('roll', s.turnPlayerIndex + ' right', s.turnPlayerIndex === s.myPlayerIndex),
+          );
         if (s.cubeActions.includes('reject'))
-          container.appendChild(renderCubeAction('drop', s.turnPlayerIndex + ' left'));
+          container.appendChild(
+            renderCubeAction('drop', s.turnPlayerIndex + ' left', s.turnPlayerIndex === s.myPlayerIndex),
+          );
         if (s.cubeActions.includes('accept'))
-          container.appendChild(renderCubeAction('take', s.turnPlayerIndex + ' right'));
+          container.appendChild(
+            renderCubeAction('take', s.turnPlayerIndex + ' right', s.turnPlayerIndex === s.myPlayerIndex),
+          );
       }
     }
     if (s.multiPointState) {
@@ -336,9 +344,9 @@ function renderUndoButton(canUndo: boolean, className: string): HTMLElement {
   return el;
 }
 
-function renderCubeAction(cubeAction: string, className: string): HTMLElement {
+function renderCubeAction(cubeAction: string, className: string, myButton: boolean): HTMLElement {
   const el = createEl('cg-buttons', className);
-  const d: HTMLElement = createEl('cg-button', cubeAction);
+  const d: HTMLElement = createEl('cg-button', cubeAction + (myButton ? ' available' : ' unavailable'));
   d.textContent = cubeAction.toUpperCase();
   el.appendChild(d);
   return el;
