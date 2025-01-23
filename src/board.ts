@@ -685,6 +685,24 @@ export function areMyDiceAtDomPos(
   return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctWidth && correctHeight;
 }
 
+function isButtonAtPos(
+  pos: cg.NumberPair,
+  orientation: cg.Orientation,
+  turnPlayerIndex: cg.PlayerIndex,
+  bounds: ClientRect,
+  placement: 'left' | 'right',
+): boolean {
+  const rightBound = placement === 'left' ? [9.875 / 15, 12.125 / 15] : [2.875 / 15, 5.125 / 15];
+  const leftBound = placement === 'left' ? [2.875 / 15, 5.125 / 15] : [9.875 / 15, 12.125 / 15];
+  const correctWidth =
+    (orientation === 'p1' && turnPlayerIndex === 'p2') || (orientation === 'p1vflip' && turnPlayerIndex === 'p1')
+      ? (pos[0] - bounds.left) / bounds.width > rightBound[0] && (pos[0] - bounds.left) / bounds.width < rightBound[1]
+      : (pos[0] - bounds.left) / bounds.width > leftBound[0] && (pos[0] - bounds.left) / bounds.width < leftBound[1];
+  const correctHeight =
+    (pos[1] - bounds.top) / bounds.height > 6.95 / 15 && (pos[1] - bounds.top) / bounds.height < 8.05 / 15;
+  return correctWidth && correctHeight;
+}
+
 export function isUndoButtonAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
@@ -696,13 +714,8 @@ export function isUndoButtonAtDomPos(
 ): boolean {
   if (cubeActions && cubeActions.length > 0) return false;
   if (turnPlayerIndex !== myPlayerIndex) return false;
-  const correctWidth =
-    (orientation === 'p1' && turnPlayerIndex === 'p2') || (orientation === 'p1vflip' && turnPlayerIndex === 'p1')
-      ? (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15
-      : (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15;
-  const correctHeight =
-    (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
-  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctWidth && correctHeight;
+  const correctPlacement = isButtonAtPos(pos, orientation, turnPlayerIndex, bounds, 'left');
+  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctPlacement;
 }
 
 export function isDoubleButtonAtDomPos(
@@ -716,13 +729,8 @@ export function isDoubleButtonAtDomPos(
 ): boolean {
   if (!(cubeActions && cubeActions.includes('offer'))) return false;
   if (turnPlayerIndex !== myPlayerIndex) return false;
-  const correctWidth =
-    (orientation === 'p1' && turnPlayerIndex === 'p2') || (orientation === 'p1vflip' && turnPlayerIndex === 'p1')
-      ? (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15
-      : (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15;
-  const correctHeight =
-    (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
-  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctWidth && correctHeight;
+  const correctPlacement = isButtonAtPos(pos, orientation, turnPlayerIndex, bounds, 'left');
+  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctPlacement;
 }
 
 export function isRollButtonAtDomPos(
@@ -736,13 +744,8 @@ export function isRollButtonAtDomPos(
 ): boolean {
   if (!(cubeActions && cubeActions.includes('offer'))) return false;
   if (turnPlayerIndex !== myPlayerIndex) return false;
-  const correctWidth =
-    (orientation === 'p1' && turnPlayerIndex === 'p2') || (orientation === 'p1vflip' && turnPlayerIndex === 'p1')
-      ? (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15
-      : (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15;
-  const correctHeight =
-    (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
-  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctWidth && correctHeight;
+  const correctPlacement = isButtonAtPos(pos, orientation, turnPlayerIndex, bounds, 'right');
+  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctPlacement;
 }
 
 export function isDropButtonAtDomPos(
@@ -756,13 +759,8 @@ export function isDropButtonAtDomPos(
 ): boolean {
   if (!(cubeActions && cubeActions.includes('reject'))) return false;
   if (turnPlayerIndex !== myPlayerIndex) return false;
-  const correctWidth =
-    (orientation === 'p1' && turnPlayerIndex === 'p2') || (orientation === 'p1vflip' && turnPlayerIndex === 'p1')
-      ? (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15
-      : (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15;
-  const correctHeight =
-    (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
-  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctWidth && correctHeight;
+  const correctPlacement = isButtonAtPos(pos, orientation, turnPlayerIndex, bounds, 'left');
+  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctPlacement;
 }
 
 export function isTakeButtonAtDomPos(
@@ -776,13 +774,8 @@ export function isTakeButtonAtDomPos(
 ): boolean {
   if (!(cubeActions && cubeActions.includes('accept'))) return false;
   if (turnPlayerIndex !== myPlayerIndex) return false;
-  const correctWidth =
-    (orientation === 'p1' && turnPlayerIndex === 'p2') || (orientation === 'p1vflip' && turnPlayerIndex === 'p1')
-      ? (pos[0] - bounds.left) / bounds.width > 1 / 15 && (pos[0] - bounds.left) / bounds.width < 7 / 15
-      : (pos[0] - bounds.left) / bounds.width > 8 / 15 && (pos[0] - bounds.left) / bounds.width < 14 / 15;
-  const correctHeight =
-    (pos[1] - bounds.top) / bounds.height > 6.5 / 15 && (pos[1] - bounds.top) / bounds.height < 8.5 / 15;
-  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctWidth && correctHeight;
+  const correctPlacement = isButtonAtPos(pos, orientation, turnPlayerIndex, bounds, 'right');
+  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctPlacement;
 }
 
 export function isPocketAtDomPos(
