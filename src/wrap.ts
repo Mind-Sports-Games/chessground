@@ -218,30 +218,28 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   }
 
   if (s.variant === 'backgammon' || s.variant === 'hyper' || s.variant === 'nackgammon') {
-    if (s.multiPointState) {
-      if (s.doublingCube === undefined) {
-        container.appendChild(renderDoublingCube({ owner: 'both', value: 0 }, true));
-      } else {
-        container.appendChild(renderDoublingCube(s.doublingCube, false));
-        if (s.cubeActions) {
-          if (s.cubeActions.includes('offer'))
-            container.appendChild(
-              renderCubeAction('double', s.turnPlayerIndex + ' left', s.turnPlayerIndex === s.myPlayerIndex),
-            );
-          if (s.cubeActions.includes('offer'))
-            container.appendChild(
-              renderCubeAction('roll', s.turnPlayerIndex + ' right', s.turnPlayerIndex === s.myPlayerIndex),
-            );
-          if (s.cubeActions.includes('reject'))
-            container.appendChild(
-              renderCubeAction('drop', s.turnPlayerIndex + ' left', s.turnPlayerIndex === s.myPlayerIndex),
-            );
-          if (s.cubeActions.includes('accept'))
-            container.appendChild(
-              renderCubeAction('take', s.turnPlayerIndex + ' right', s.turnPlayerIndex === s.myPlayerIndex),
-            );
-        }
+    if (s.doublingCube) {
+      container.appendChild(renderDoublingCube(s.doublingCube, false));
+      if (s.cubeActions) {
+        if (s.cubeActions.includes('offer'))
+          container.appendChild(
+            renderCubeAction('double', s.turnPlayerIndex + ' left', s.turnPlayerIndex === s.myPlayerIndex),
+          );
+        if (s.cubeActions.includes('offer'))
+          container.appendChild(
+            renderCubeAction('roll', s.turnPlayerIndex + ' right', s.turnPlayerIndex === s.myPlayerIndex),
+          );
+        if (s.cubeActions.includes('reject'))
+          container.appendChild(
+            renderCubeAction('drop', s.turnPlayerIndex + ' left', s.turnPlayerIndex === s.myPlayerIndex),
+          );
+        if (s.cubeActions.includes('accept'))
+          container.appendChild(
+            renderCubeAction('take', s.turnPlayerIndex + ' right', s.turnPlayerIndex === s.myPlayerIndex),
+          );
       }
+    } else if (s.doublingCube === undefined && s.multiPointState) {
+      container.appendChild(renderDoublingCube({ owner: 'both', value: 0 }, true));
     }
     if (s.multiPointState) {
       container.appendChild(renderMultiPointTarget(s.multiPointState.target));
