@@ -314,12 +314,27 @@ export interface SimpleGoScores {
   p2: number;
 }
 
+export interface DoublingCube {
+  owner: PlayerIndex | 'both';
+  value: number;
+}
+
+export type CubeAction = 'offer' | 'accept' | 'reject';
+
+export type Button = 'undo' | 'double' | 'roll' | 'take' | 'drop';
+
 export interface Dice {
   value: number;
   isAvailable: boolean;
 }
 
 export interface BackgammonScores {
+  p1: number;
+  p2: number;
+}
+
+export interface MultiPointState {
+  target: number;
   p1: number;
   p2: number;
 }

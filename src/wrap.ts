@@ -1,6 +1,17 @@
 import { HeadlessState } from './state';
 import { calculateBackgammonScores, setVisible, createEl, pos2key, NRanks, invNRanks } from './util';
-import { orientations, files, ranks, ranks19, shogiVariants, xiangqiVariants, Elements, Notation, Dice } from './types';
+import {
+  orientations,
+  files,
+  ranks,
+  ranks19,
+  shogiVariants,
+  xiangqiVariants,
+  Elements,
+  Notation,
+  Dice,
+  DoublingCube,
+} from './types';
 import { createElement as createSVG, setAttributes } from './svg';
 
 export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boolean): Elements {
@@ -206,10 +217,40 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     }
   }
 
+  if (s.variant === 'backgammon' || s.variant === 'hyper' || s.variant === 'nackgammon') {
+    if (s.doublingCube) {
+      container.appendChild(renderDoublingCube(s.doublingCube, false));
+      if (s.cubeActions) {
+        if (s.cubeActions.includes('offer'))
+          container.appendChild(
+            renderCubeAction('double', s.turnPlayerIndex + ' left', s.turnPlayerIndex === s.myPlayerIndex),
+          );
+        if (s.cubeActions.includes('offer'))
+          container.appendChild(
+            renderCubeAction('roll', s.turnPlayerIndex + ' right', s.turnPlayerIndex === s.myPlayerIndex),
+          );
+        if (s.cubeActions.includes('reject'))
+          container.appendChild(
+            renderCubeAction('drop', s.turnPlayerIndex + ' left', s.turnPlayerIndex === s.myPlayerIndex),
+          );
+        if (s.cubeActions.includes('accept'))
+          container.appendChild(
+            renderCubeAction('take', s.turnPlayerIndex + ' right', s.turnPlayerIndex === s.myPlayerIndex),
+          );
+      }
+    } else if (s.doublingCube === undefined && s.multiPointState) {
+      container.appendChild(renderDoublingCube({ owner: 'both', value: 0 }, true));
+    }
+    if (s.multiPointState) {
+      container.appendChild(renderMultiPointTarget(s.multiPointState.target));
+      container.appendChild(renderMultiPointPlayerScore(s.multiPointState.p1, 'p1'));
+      container.appendChild(renderMultiPointPlayerScore(s.multiPointState.p2, 'p2'));
+    }
+  }
   if (s.dice.length > 0) {
     container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
     if (s.showUndoButton) {
-      container.appendChild(renderUndoButton(s.canUndo, s.turnPlayerIndex));
+      container.appendChild(renderUndoButton(s.canUndo, s.turnPlayerIndex + ' left'));
     }
   }
 
@@ -266,6 +307,26 @@ function renderTogyBoardScores(elems: readonly string[], className: string): HTM
   return el;
 }
 
+function renderMultiPointPlayerScore(score: number, playerIndex: string): HTMLElement {
+  const el = createEl('cg-multi-point-score', playerIndex);
+  el.textContent = score.toString();
+  return el;
+}
+
+function renderMultiPointTarget(target: number): HTMLElement {
+  const el = createEl('cg-multi-point-target');
+  el.textContent = target.toString() + 'pt';
+  return el;
+}
+
+function renderDoublingCube(dCube: DoublingCube, unavailable: boolean): HTMLElement {
+  const el = createEl('cg-doubling-cube', dCube.owner);
+  const doubeCubeClass = ['zero', 'one', 'two', 'three', 'four', 'five', 'six'];
+  const cube = createEl('cube', doubeCubeClass[dCube.value] + (unavailable ? ' unavailable' : ''));
+  el.appendChild(cube);
+  return el;
+}
+
 function renderDice(dice: Dice[], className: string): HTMLElement {
   const el = createEl('cg-dice', className);
   const diceClass = ['one', 'two', 'three', 'four', 'five', 'six'];
@@ -281,6 +342,14 @@ function renderUndoButton(canUndo: boolean, className: string): HTMLElement {
   const el = createEl('cg-buttons', className);
   const d: HTMLElement = createEl('cg-button', 'undo ' + (canUndo ? 'available' : 'unavailable'));
   d.textContent = 'UNDO';
+  el.appendChild(d);
+  return el;
+}
+
+function renderCubeAction(cubeAction: string, className: string, myButton: boolean): HTMLElement {
+  const el = createEl('cg-buttons', className);
+  const d: HTMLElement = createEl('cg-button', cubeAction + (myButton ? ' available' : ' unavailable'));
+  d.textContent = cubeAction.toUpperCase();
   el.appendChild(d);
   return el;
 }
