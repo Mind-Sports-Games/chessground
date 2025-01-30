@@ -245,6 +245,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       container.appendChild(renderMultiPointTarget(s.multiPointState.target));
       container.appendChild(renderMultiPointPlayerScore(s.multiPointState.p1, 'p1'));
       container.appendChild(renderMultiPointPlayerScore(s.multiPointState.p2, 'p2'));
+      if (s.autoRoll !== undefined) container.appendChild(renderAutoRollButton(s.autoRoll));
     }
   }
   if (s.dice.length > 0) {
@@ -316,6 +317,12 @@ function renderMultiPointPlayerScore(score: number, playerIndex: string): HTMLEl
 function renderMultiPointTarget(target: number): HTMLElement {
   const el = createEl('cg-multi-point-target');
   el.textContent = target.toString() + 'pt';
+  return el;
+}
+
+function renderAutoRollButton(autoRoll: boolean): HTMLElement {
+  const el = createEl('cg-autoroll-button', autoRoll ? 'on' : 'off');
+  el.textContent = 'AUTO ROLL';
   return el;
 }
 

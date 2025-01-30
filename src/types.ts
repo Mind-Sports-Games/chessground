@@ -321,7 +321,7 @@ export interface DoublingCube {
 
 export type CubeAction = 'offer' | 'accept' | 'reject';
 
-export type Button = 'undo' | 'double' | 'roll' | 'take' | 'drop';
+export type Button = 'undo' | 'double' | 'roll' | 'take' | 'drop' | 'autoroll';
 
 export interface Dice {
   value: number;
