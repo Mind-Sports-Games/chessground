@@ -11,6 +11,7 @@ import {
   isRollButtonAtDomPos,
   isDropButtonAtDomPos,
   isTakeButtonAtDomPos,
+  isAutoRollButtonAtDomPos,
   userMove,
   userLift,
   reorderDice,
@@ -98,6 +99,12 @@ function startDragOrDraw(s: State): MouchBind {
           )
         ) {
           reorderDice(s);
+          stopProcessingClick(e);
+          return;
+        }
+        if (isAutoRollButtonAtDomPos(eventPosition(e)!, s.dom.bounds(), s.variant)) {
+          buttonPressed(s, 'autoroll');
+          s.autoRoll = !s.autoRoll;
           stopProcessingClick(e);
           return;
         }

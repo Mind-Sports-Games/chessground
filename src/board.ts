@@ -692,8 +692,8 @@ function isButtonAtPos(
   bounds: ClientRect,
   placement: 'left' | 'right',
 ): boolean {
-  const rightBound = placement === 'left' ? [9.875 / 15, 12.125 / 15] : [2.875 / 15, 5.125 / 15];
-  const leftBound = placement === 'left' ? [2.875 / 15, 5.125 / 15] : [9.875 / 15, 12.125 / 15];
+  const rightBound = placement === 'left' ? [9.625 / 15, 12.375 / 15] : [2.625 / 15, 5.375 / 15];
+  const leftBound = placement === 'left' ? [2.625 / 15, 5.375 / 15] : [9.625 / 15, 12.375 / 15];
   const correctWidth =
     (orientation === 'p1' && turnPlayerIndex === 'p2') || (orientation === 'p1vflip' && turnPlayerIndex === 'p1')
       ? (pos[0] - bounds.left) / bounds.width > rightBound[0] && (pos[0] - bounds.left) / bounds.width < rightBound[1]
@@ -778,6 +778,17 @@ export function isTakeButtonAtDomPos(
   return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctPlacement;
 }
 
+export function isAutoRollButtonAtDomPos(
+  pos: cg.NumberPair,
+  bounds: ClientRect,
+  variant: cg.Variant = 'chess',
+): boolean {
+  const correctWidth = (pos[0] - bounds.left) / bounds.width < 8 / 15 && (pos[0] - bounds.left) / bounds.width > 7 / 15;
+  const correctHeight =
+    (pos[1] - bounds.top) / bounds.height > 7.65 / 15 && (pos[1] - bounds.top) / bounds.height < 8.4 / 15;
+  return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctWidth && correctHeight;
+}
+
 export function isPocketAtDomPos(
   pos: cg.NumberPair,
   orientation: cg.Orientation,
@@ -788,8 +799,8 @@ export function isPocketAtDomPos(
   const correctWidth = (pos[0] - bounds.left) / bounds.width < 8 / 15 && (pos[0] - bounds.left) / bounds.width > 7 / 15;
   const correctHeight =
     (orientation === 'p1' && turnPlayerIndex === 'p1') || (orientation === 'p1vflip' && turnPlayerIndex === 'p2')
-      ? (pos[1] - bounds.top) / bounds.height > 1.6 / 15 && (pos[1] - bounds.top) / bounds.height < 7 / 15
-      : (pos[1] - bounds.top) / bounds.height > 8 / 15 && (pos[1] - bounds.top) / bounds.height < 13.4 / 15;
+      ? (pos[1] - bounds.top) / bounds.height > 1.6 / 15 && (pos[1] - bounds.top) / bounds.height < 6.5 / 15
+      : (pos[1] - bounds.top) / bounds.height > 8.5 / 15 && (pos[1] - bounds.top) / bounds.height < 13.4 / 15;
   return (variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon') && correctWidth && correctHeight;
 }
 

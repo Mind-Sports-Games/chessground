@@ -28,6 +28,7 @@ export interface HeadlessState {
   cubeActions?: cg.CubeAction[]; // actions to display on the doubling cube related options (backgammon)
   canUndo: boolean; // can user undo their last action (backgammon)
   showUndoButton: boolean; // render the undo button (backgammon)
+  autoRoll?: boolean; // automatically roll the dice even if allowed to double (backgammon)
   gameButtonsActive: boolean; // can user process game buttons (e.g. swap dice, undo)
   multiPointState?: cg.MultiPointState; // state of the multi-point game (e.g.  backgammon)
   autoCastle: boolean; // immediately complete the castle by moving the rook after king move
