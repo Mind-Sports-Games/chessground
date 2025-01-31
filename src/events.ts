@@ -102,7 +102,7 @@ function startDragOrDraw(s: State): MouchBind {
           stopProcessingClick(e);
           return;
         }
-        if (isAutoRollButtonAtDomPos(eventPosition(e)!, s.dom.bounds(), s.variant)) {
+        if (isAutoRollButtonAtDomPos(eventPosition(e)!, s.dom.bounds(), s.variant, s.autoRoll)) {
           buttonPressed(s, 'autoroll');
           s.autoRoll = !s.autoRoll;
           stopProcessingClick(e);

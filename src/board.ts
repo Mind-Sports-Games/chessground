@@ -782,7 +782,9 @@ export function isAutoRollButtonAtDomPos(
   pos: cg.NumberPair,
   bounds: ClientRect,
   variant: cg.Variant = 'chess',
+  autoRoll: boolean | undefined,
 ): boolean {
+  if (autoRoll === undefined) return false;
   const correctWidth = (pos[0] - bounds.left) / bounds.width < 8 / 15 && (pos[0] - bounds.left) / bounds.width > 7 / 15;
   const correctHeight =
     (pos[1] - bounds.top) / bounds.height > 7.65 / 15 && (pos[1] - bounds.top) / bounds.height < 8.4 / 15;
