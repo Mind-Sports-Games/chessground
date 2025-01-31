@@ -218,8 +218,11 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   }
 
   if (s.variant === 'backgammon' || s.variant === 'hyper' || s.variant === 'nackgammon') {
+    const mps = s.multiPointState;
     if (s.doublingCube) {
-      container.appendChild(renderDoublingCube(s.doublingCube, false));
+      container.appendChild(
+        renderDoublingCube(s.doublingCube, mps !== undefined && mps.p1 === mps.p2 && mps.p1 + 1 === mps.target),
+      );
       if (s.cubeActions) {
         if (s.cubeActions.includes('offer'))
           container.appendChild(
@@ -238,13 +241,13 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
             renderCubeAction('take', s.turnPlayerIndex + ' right', s.turnPlayerIndex === s.myPlayerIndex),
           );
       }
-    } else if (s.doublingCube === undefined && s.multiPointState) {
+    } else if (s.doublingCube === undefined && mps) {
       container.appendChild(renderDoublingCube({ owner: 'both', value: 0 }, true));
     }
-    if (s.multiPointState) {
-      container.appendChild(renderMultiPointTarget(s.multiPointState.target));
-      container.appendChild(renderMultiPointPlayerScore(s.multiPointState.p1, 'p1'));
-      container.appendChild(renderMultiPointPlayerScore(s.multiPointState.p2, 'p2'));
+    if (mps) {
+      container.appendChild(renderMultiPointTarget(mps.target));
+      container.appendChild(renderMultiPointPlayerScore(mps.p1, 'p1'));
+      container.appendChild(renderMultiPointPlayerScore(mps.p2, 'p2'));
       if (s.autoRoll !== undefined) container.appendChild(renderAutoRollButton(s.autoRoll));
     }
   }
