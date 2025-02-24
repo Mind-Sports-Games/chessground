@@ -242,7 +242,9 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
           );
       }
     } else if (s.doublingCube === undefined && mps) {
+      //crawford game
       container.appendChild(renderDoublingCube({ owner: 'both', value: 0 }, true));
+      container.appendChild(renderCrawford());
     }
     if (mps) {
       container.appendChild(renderMultiPointTarget(mps.target));
@@ -320,6 +322,12 @@ function renderMultiPointPlayerScore(score: number, playerIndex: string): HTMLEl
 function renderMultiPointTarget(target: number): HTMLElement {
   const el = createEl('cg-multi-point-target');
   el.textContent = target.toString() + 'pt';
+  return el;
+}
+
+function renderCrawford(): HTMLElement {
+  const el = createEl('cg-crawford-game');
+  el.textContent = 'Cr';
   return el;
 }
 
