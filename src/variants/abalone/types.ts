@@ -1,6 +1,9 @@
 import type * as cg from '../../types';
 
 import { DiagonalDirectionString, HorizontalDirectionString } from './directions';
+import {File, Rank} from "../../types";
+
+export type Key = `${Rank}${File}`;
 
 export type DirectionString = DiagonalDirectionString | HorizontalDirectionString;
 
