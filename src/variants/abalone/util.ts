@@ -1,5 +1,5 @@
 import type * as cg from '../../types';
-import {files, Pos, ranks, ranks19} from "../../types";
+import {files, Pos, ranks19} from "../../types";
 import {SquareDimensions, TranslateBase} from './types';
 
 export const pos2key = (pos: cg.Pos): cg.Key => {
@@ -34,49 +34,6 @@ export const key2posAlt = (k: cg.Key): cg.Pos => {
 // shift is used by analysis page and miniboards
 const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];//FIXME Alex size 9...
 
-// translateBase defines where the translation of a piece should be placed on the board.
-// It is used to render the piece at the correct place.
-const createTranslateBase = (): Record<cg.Orientation, cg.TranslateBase> => {
-	const squareWidth = 102.5;
-	const squareHeight = 88;
-	const bottomLeft = [295, 854];
-	const shift = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4];//FIXME Alex size 9...
-	
-	return {
-		p1: (pos: cg.Pos, _xScale: number, _yScale: number, _bt: cg.BoardDimensions) => {
-			if (pos[1] < 6) {
-				return [
-					bottomLeft[0] + squareWidth*pos[0] - (shift[pos[1] - 1] + 1)*squareWidth,
-					bottomLeft[1] - (pos[1] - 1)*squareHeight,
-				];
-			}
-			return [
-				bottomLeft[0] + squareWidth*pos[0] - (shift[pos[1] - 1] + 1)*squareWidth,
-				bottomLeft[1] - (pos[1] - 1)*squareHeight,
-			];
-		},
-		p2: (pos: cg.Pos, _xScale: number, _yScale: number, _bt: cg.BoardDimensions) => {
-			if (pos[1] < 6) {
-				return [
-					bottomLeft[0] + squareWidth*pos[0] - (shift[pos[1] - 1] + 1)*squareWidth,
-					bottomLeft[1] - (pos[1] - 1)*squareHeight,
-				];
-			}
-			return [
-				bottomLeft[0] + squareWidth*pos[0] - (shift[pos[1] - 1] + 1)*squareWidth,
-				bottomLeft[1] - (pos[1] - 1)*squareHeight,
-			];
-		},
-		right: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[1] - 1)*xScale, (pos[0] - 1)*yScale],
-		left: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [
-			(bt.width - pos[0])*xScale,
-			(pos[1] - 1)*yScale,
-		],
-		p1vflip: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[0] - 1)*xScale, (pos[1] - 1)*yScale],
-	};
-};
-
-const translateBase = createTranslateBase();
 
 export const posToTranslateRel = (
 	pos: cg.Pos,
@@ -120,6 +77,7 @@ export const posToTranslateAbs2 = (): ((
 	return (bounds, pos, orientation) => posToTranslateBase2(bounds, pos, orientation);
 };
 const translateBase2: Record<cg.Orientation, TranslateBase> = {
+	//TODO Alex
 	p1: (pos: cg.Pos, bounds: ClientRect) => {
 		const height = bounds.height;
 		const width = bounds.width;
@@ -205,8 +163,132 @@ export const isValidKey = (key: cg.Key): boolean => {//FIXME Alex size 9
 	return /^(a[1-5]|b[1-6]|c[1-7]|d[1-8]|e[1-9]|f[2-9]|g[3-9]|h[4-9]|i[5-9])$/.test(key);
 };
 
+//
+// Drawn
+const bottomLeft = [295, 854];
+
+const createTranslateBase = (): Record<cg.Orientation, cg.TranslateBase> => {
+	return {
+		p1: (pos: cg.Pos, xScale: number, yScale: number, _bt: cg.BoardDimensions) => {
+			const basic = cellToBasic(pos);
+			return [bottomLeft[0] + xScale*basic[0], bottomLeft[1] + yScale*basic[1]];
+		},
+		p2: (pos: cg.Pos, xScale: number, yScale: number, _bt: cg.BoardDimensions) => {
+			const basic = cellToBasic(pos);
+			return [bottomLeft[0] + xScale*basic[0], bottomLeft[1] + yScale*basic[1]];
+		},
+		right: (pos: cg.Pos, xScale: number, yScale: number, _) => [pos[1]*xScale, pos[0]*yScale],
+		left: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [(bt.width - pos[0] - 1)*xScale, pos[1]*yScale],
+		p1vflip: (pos: cg.Pos, xScale: number, yScale: number, _) => [pos[0]*xScale, pos[1]*yScale],
+	};
+};
+const translateBase = createTranslateBase();
+
+export const drawnToCell = (d: cg.BoardDimensions, pos: Pos): Pos => {
+	return drawnToCellCore(d, pos[0], pos[1]);
+}
+export const drawnToCellCore = (d: cg.BoardDimensions, x: number, y: number): Pos => {
+	return basicToCell(drawnToBasicCore(d, x, y));
+}
+
+export const drawnToBasicCore = (d: cg.BoardDimensions, x: number, y: number): Pos => {
+	return [0, 0] as Pos;//TODO
+}
+
+//
+// Basic
+const sr3 = Math.sqrt(3);
+
+export const basicToDrawn = (d: cg.BoardDimensions, pos: Pos): Pos => {
+	return basicToDrawnCore(d, pos[0], pos[1]);
+}
+export const basicToDrawnCore = (d: cg.BoardDimensions, x: number, y: number): Pos => {
+	const centre = cellToBasicCore(Math.floor(d.width/2), Math.floor(d.height/2));
+	const xScale = 100;
+	const yScale = 100;
+	
+	return [xScale*(x - centre[0]), yScale*(y - centre[1])];
+}
+
+export const basicToCell = (pos: Pos): Pos => {
+	return basicToCellCore(pos[0], pos[1]);
+}
+export const basicToCellCore = (x: number, y: number): Pos => {
+	return [x + y/sr3, y*2/sr3] as Pos;
+}
+
+//
+// Cell
+export const cellToBasic = (pos: Pos): Pos => {
+	return cellToBasicCore(pos[0], pos[1]);
+}
+export const cellToBasicCore = (x: number, y: number): Pos => {
+	return [x - y/2.0, y*sr3/2] as Pos;
+}
+
+export const cellToDrawn = (d: cg.BoardDimensions, pos: Pos): Pos => {
+	return cellToDrawnCore(d, pos[0], pos[1]);
+}
+export const cellToDrawnCore = (d: cg.BoardDimensions, x: number, y: number): Pos => {
+	return basicToDrawn(d, cellToBasicCore(x, y));
+}
+
 export const isCell = (dim: cg.BoardDimensions, pos: Pos): boolean => {
 	return dist([dim.width/2, dim.height/2] as Pos, pos) < dim.width/2;
+}
+
+//
+// Geometry
+export const add = (a: Pos, b: Pos): Pos => {
+	return [a[0] + b[0], a[1] + b[1]];
+}
+export const sub = (a: Pos, b: Pos): Pos => {
+	return add(a, mult(-1, b));
+}
+export const mult = (n: number, a: Pos): Pos => {
+	return [n*a[0], n*a[1]];
+}
+export const div = (n: number, a: Pos): Pos => {
+	return mult(1/n, a);
+}
+
+export const vectTo3 = (a: Pos): Pos => {
+	return cellToBasic(a);
+}
+export const cross = (a: Pos, b: Pos): number => {
+	return a[0]*b[1] - a[1]*b[0];
+}
+
+export const getRotated = (a: Pos, deg: number): Pos => {
+	const rot = deg*180/Math.PI;
+	const cos = Math.cos(rot)
+	const sin = Math.sin(rot)
+	return [cos*a[0] - sin*a[1], sin*a[0] + cos*a[1]];
+}
+export const getRotatedKeepNorm = (a: Pos, deg: number): Pos => {
+	const p = getRotated(a, deg);
+	
+	var n = norm(p);
+	if (n > 0) {
+		n = norm(a)/n
+	}
+	
+	return mult(n, p);
+}
+
+export const getAngle = (a: Pos): number => {
+	return Math.atan2(a[1], a[0])*180/Math.PIs;
+}
+export const getAngle360 = (a: Pos): number => {
+	return rest(getAngle(a), 360);
+}
+export const rest = (todiv: number, divby: number): number => {
+	var res = todiv%divby;
+	
+	if (res < 0) res += divby > 0? divby: -divby;
+	if (res == -0) res = 0;
+	
+	return res;
 }
 
 export const dist = (pos0: Pos, pos1: Pos): number => {
@@ -220,4 +302,18 @@ export const normCore = (x: number, y: number): number => {
 		Math.abs(x) + Math.abs(y):
 		Math.max(Math.abs(x), Math.abs(y));
 }
-//TODO in fact, here Pos refers to the drawn coordinates... in some cases
+
+const normRadius = 1;
+export const neighVectors = (): Pos[] => {
+	const res = new Array();
+	
+	for (let i = -normRadius; i <= normRadius; i++) {
+		for (let j = -normRadius; j <= normRadius; j++) {
+			if (normCore(i, j) == 1) {
+				res.push([i, j] as Pos)
+			}
+		}
+	}
+	
+	return res;
+}

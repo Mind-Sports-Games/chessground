@@ -58,7 +58,7 @@ export const getKeyAtDomPos = (
   ) {
     // line "e"
     const columnIndex = Math.floor((clickCenterX - horizontalCenter) / squareDimensions.width + 4.5);
-    if (columnIndex < 0 || columnIndex > 8) return undefined;
+    if (columnIndex < 0 || columnIndex > 8) return undefined;//FIXME Alex size 9 (see below too)
     return getCoordinates(columnIndex, 4, orientation);
   }
   if (

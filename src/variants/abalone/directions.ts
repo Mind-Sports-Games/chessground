@@ -1,7 +1,8 @@
 import type * as cg from '../../types';
 
 import type { DirectionString } from './types';
-import { isValidKey } from './util';
+import {getAngle, isValidKey, neighVectors, norm, vectTo3} from './util';
+import {Pos} from "../../types";
 
 export enum DiagonalDirectionString {
   UpLeft = 'NW',
@@ -37,26 +38,19 @@ export const move = (key: cg.Key, direction: DirectionString): cg.Key | undefine
   return undefined;
 };
 
-export const getDirectionString = (orig: cg.Key, dest: cg.Key): DirectionString | undefined => {
-  const fileDiff = orig[0].charCodeAt(0) - dest[0].charCodeAt(0);
-  const rankDiff = parseInt(orig[1], 10) - parseInt(dest[1], 10);
-
-  if (fileDiff !== 0 && rankDiff === 0) {
-    return fileDiff > 0 ? HorizontalDirectionString.Left : HorizontalDirectionString.Right;
-  } else if (fileDiff === 0 && rankDiff !== 0) {
-    return rankDiff > 0 ? DiagonalDirectionString.DownRight : DiagonalDirectionString.UpLeft;
-  } else if (fileDiff !== 0 && rankDiff !== 0) {
-    if (fileDiff > 0 && rankDiff > 0) {
-      return DiagonalDirectionString.DownLeft;
-    } else if (fileDiff < 0 && rankDiff < 0) {
-      return DiagonalDirectionString.UpRight;
-    } else if (fileDiff < 0 && rankDiff > 0) {
-      return DiagonalDirectionString.DownRight;
-    } else {
-      return DiagonalDirectionString.UpLeft;
-    }
-  }
-  return undefined;
+export const getDirectionString = (vect: Pos): DirectionString | undefined => {
+	if (norm(vect) == 1) {
+		const angle = getAngle(vectTo3(vect));
+		
+		if (angle < 60) return HorizontalDirectionString.Right;
+		if (angle < 120) return DiagonalDirectionString.UpRight;
+		if (angle < 180) return DiagonalDirectionString.UpLeft;
+		if (angle < 240) return HorizontalDirectionString.Left;
+		if (angle < 300) return DiagonalDirectionString.DownLeft;
+		return DiagonalDirectionString.DownRight;
+	}
+	
+	return undefined;
 };
 
 export const isMoveInLine = (orig: cg.Key, dest: cg.Key, directionString: DirectionString): boolean => {

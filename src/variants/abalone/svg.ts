@@ -11,7 +11,7 @@ export const pos2px = (pos: cg.Pos, bounds: ClientRect, _bd: cg.BoardDimensions)
   const computedHeight = height * 0.5 + squareDimensions.height * (5 - pos[1]);
   let computedWidth = width * 0.5 + squareDimensions.width * (pos[0] - 5);
 
-  if (!isValidKey((files[pos[0] - 1] + pos[1].toString()) as cg.Key)) {
+  if (!isValidKey((files[pos[0] - 1] + pos[1].toString()) as cg.Key)) {//FIXME Alex
     return [10, 10];
   }
 
