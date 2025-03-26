@@ -2,10 +2,11 @@ import type * as cg from '../../types';
 
 import {candidateLineDirs, deducePotentialSideDirs, DiagonalDirectionString, getDirectionString, inverseDirection, isMoveInLine, move,} from './directions';
 import type {MoveImpact, MoveVector} from './types';
-import {add, div, getRotatedKeepNorm, isCell, key2pos, mult, norm, pos2key, sub} from "./util";
+import {add, div, getRotatedKeepNorm, isCell, key2pos, mult, getNeighVectors, norm, pos2key, sub} from "./util";
+import {Pos} from "../../types";
 
 // Computes the effect of a move on the board before it is made
-export const computeMoveImpact2 = (d: cg.BoardDimensions, pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): MoveImpact | undefined => {
+export const computeMoveImpact = (d: cg.BoardDimensions, pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): MoveImpact | undefined => {
 	if (pieces.has(orig)) {
 		const from = key2pos(orig);
 		const to = key2pos(dest);
@@ -14,7 +15,7 @@ export const computeMoveImpact2 = (d: cg.BoardDimensions, pieces: cg.Pieces, ori
 		
 		if (n > 0) {
 			var uvect = div(n, vect);
-			const neighVectors = neighVectors();
+			const neighVectors = getNeighVectors();
 			
 			if (neighVectors.includes(uvect)) {// In-line move
 				const diff: cg.PiecesDiff = new Map(pieces);
@@ -55,7 +56,7 @@ export const computeMoveImpact2 = (d: cg.BoardDimensions, pieces: cg.Pieces, ori
 				const rot = 360/neighVectors.length;
 				var found = false;
 				var vvect;
-				for (var _vect in neighVectors) {
+				for (var _vect: Pos in neighVectors) {
 					const _nvect = mult(n, _vect);
 					vvect = getRotatedKeepNorm(_vect, rot);
 					
@@ -116,8 +117,53 @@ export const computeMoveImpact2 = (d: cg.BoardDimensions, pieces: cg.Pieces, ori
 	return undefined;
 };
 
-// compute a move vector after a move has been made
-export const computeMoveVectorPostMove = (pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): MoveVector | undefined => {
+// Computes a move vector after the move has been made
+export const computeMoveVectorPostMove = (d: cg.BoardDimensions, pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): MoveVector | undefined => {
+	const from = key2pos(orig);
+	const to = key2pos(dest);
+	const vect = sub(to, from);
+	var n = norm(vect);
+	
+	if (n > 0) {
+		var uvect = div(n, vect);
+		const neighVectors = getNeighVectors();
+		
+		if (neighVectors.includes(uvect)) {// In-line move
+			//TODO
+		} else if (--n > 0) {
+			const rot = 360/neighVectors.length;
+			var found = false;
+			var vvect;
+			for (var _vect: Pos in neighVectors) {
+				const _nvect = mult(n, _vect);
+				vvect = getRotatedKeepNorm(_vect, rot);
+				
+				if (add(_nvect, vvect) === vect) {
+					uvect = _vect;
+					found = true;
+					break;
+				} else {
+					vvect = getRotatedKeepNorm(_vect, -rot);
+					
+					if (add(_nvect, vvect) === vect) {
+						uvect = _vect;
+						found = true;
+						break;
+					}
+				}
+			}
+			
+			if (found) {// Broadside move
+				//TODO
+			}
+		}
+	}
+	
+	return undefined;
+	
+	
+	
+	
 	//TODO? Alex: the direction is just (dest - orig)/its norm (well, for in-line moves), but directionString is used in xhtml classes
 	const directionString = getDirectionString(dest, orig);
 	if (!directionString) return undefined;

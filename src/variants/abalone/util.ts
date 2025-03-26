@@ -304,7 +304,7 @@ export const normCore = (x: number, y: number): number => {
 }
 
 const normRadius = 1;
-export const neighVectors = (): Pos[] => {
+export const getNeighVectors = (): Pos[] => {
 	const res = new Array();
 	
 	for (let i = -normRadius; i <= normRadius; i++) {

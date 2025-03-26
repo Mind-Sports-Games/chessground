@@ -1,7 +1,7 @@
 import type * as cg from '../../types';
 
 import type { DirectionString } from './types';
-import {getAngle, isValidKey, neighVectors, norm, vectTo3} from './util';
+import {getAngle, isValidKey, getNeighVectors, norm, vectTo3} from './util';
 import {Pos} from "../../types";
 
 export enum DiagonalDirectionString {
