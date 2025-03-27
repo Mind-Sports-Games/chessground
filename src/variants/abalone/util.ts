@@ -1,6 +1,58 @@
 import type * as cg from '../../types';
-import {files, Pos, ranks19} from "../../types";
+import {files, Pos, ranks19, Variant} from "../../types";
 import {SquareDimensions, TranslateBase} from './types';
+
+export const getBoardSize = (variant: Variant): cg.BoardDimensions => {
+	switch (variant) {
+		default:
+		case 'abalone':
+			return {width: 9, height: 9};
+		case 'grandabalone':
+			return {width: 11, height: 11};
+	}
+}
+export const getMaxUsable = (variant: Variant): number | undefined => {
+	switch (variant) {
+		default:
+			return undefined;
+		case 'abalone':
+			return 3;
+		case 'grandabalone':
+			return 4;
+	}
+}
+export const getWinningScore = (variant: Variant): number => {
+	switch (variant) {
+		default:
+		case 'abalone':
+			return 6;
+		case 'grandabalone':
+			return 10;
+	}
+}
+export const hasPrevPlayer = (variant: Variant): boolean => {
+	switch (variant) {
+		default:
+		case 'abalone':
+			return false;
+		case 'grandabalone':
+			return true;
+	}
+}
+
+export const getCellList = (variant: Variant): Pos[] => {
+	const size = getBoardSize(variant);
+	const res: Pos[] = [];
+	
+	for (let y = 0; y < size.height; y++) {
+		for (let x = 0; x < size.width; x++) {
+			const pos: Pos = [x, y];
+			if (isCellCore(size, pos)) res.push(pos);
+		}
+	}
+	
+	return res;
+}
 
 export const pos2key = (pos: cg.Pos): cg.Key => {
 	return (ranks19[pos[1]] + files[pos[0]]) as cg.Key;
@@ -207,7 +259,10 @@ export const cellToDrawnCore = (d: cg.BoardDimensions, x: number, y: number): Po
 	return basicToDrawn(d, cellToBasicCore(x, y));
 }
 
-export const isCell = (dim: cg.BoardDimensions, pos: Pos): boolean => {
+export const isCell = (variant: Variant, pos: Pos): boolean => {
+	return isCellCore(getBoardSize(variant), pos);
+}
+const isCellCore = (dim: cg.BoardDimensions, pos: Pos): boolean => {
 	return dist([dim.width/2, dim.height/2] as Pos, pos) < dim.width/2;
 }
 
