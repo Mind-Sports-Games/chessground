@@ -77,28 +77,15 @@ export const posToTranslateAbs2 = (): ((
 	return (bounds, pos, orientation) => posToTranslateBase2(bounds, pos, orientation);
 };
 const translateBase2: Record<cg.Orientation, TranslateBase> = {
-	//TODO Alex
+	//TODO Alex centre instead of (5, 5)
 	p1: (pos: cg.Pos, bounds: ClientRect) => {
 		const height = bounds.height;
 		const width = bounds.width;
 		const squareDimensions = getSquareDimensions(bounds);
 		
 		const computedHeight = height*0.4546 + squareDimensions.height*(5 - pos[1]);
-		let computedWidth = width*0.4546 + squareDimensions.width*(5 - pos[0]);
+		let computedWidth = computedWidth = width*0.4546 + squareDimensions.width*(pos[0] - 5) - 0.5*(pos[1] - 5)*squareDimensions.width;
 		
-		if (pos[1] > 5) {
-			computedWidth =
-				width*0.4546 + squareDimensions.width*(pos[0] - 5) - 0.5*(pos[1] - 5)*squareDimensions.width;
-		} else if (pos[1] < 5) {
-			computedWidth =
-				width*0.4546 - squareDimensions.width*(5 - pos[0]) + 0.5*(5 - pos[1])*squareDimensions.width;
-		} else {
-			if (pos[0] >= 5) {
-				computedWidth = width*0.4546 + squareDimensions.width*(pos[0] - 5);
-			} else if (pos[0] < 5) {
-				computedWidth = width*0.4546 - squareDimensions.width*(5 - pos[0]);
-			}
-		}
 		return [computedWidth, computedHeight];
 	},
 	p2: (pos: cg.Pos, bounds: ClientRect) => {
@@ -107,21 +94,8 @@ const translateBase2: Record<cg.Orientation, TranslateBase> = {
 		const squareDimensions = getSquareDimensions(bounds);
 		
 		const computedHeight = height*0.4546 + squareDimensions.height*(pos[1] - 5);
-		let computedWidth = width*0.4546 + squareDimensions.width*(5 - pos[0]);
+		let computedWidth = computedWidth = width*0.4546 + squareDimensions.width*(5 - pos[0]) - 0.5*(5 - pos[1])*squareDimensions.width;
 		
-		if (pos[1] < 5) {
-			computedWidth =
-				width*0.4546 + squareDimensions.width*(5 - pos[0]) - 0.5*(5 - pos[1])*squareDimensions.width;
-		} else if (pos[1] > 5) {
-			computedWidth =
-				width*0.4546 - squareDimensions.width*(pos[0] - 5) + 0.5*(pos[1] - 5)*squareDimensions.width;
-		} else {
-			if (pos[0] <= 5) {
-				computedWidth = width*0.4546 + squareDimensions.width*(5 - pos[0]);
-			} else if (pos[0] > 5) {
-				computedWidth = width*0.4546 - squareDimensions.width*(pos[0] - 5);
-			}
-		}
 		return [computedWidth, computedHeight];
 	},
 	right: (pos: cg.Pos, bounds: ClientRect) => [(pos[1] - 1)*bounds.x, (pos[0] - 1)*bounds.x],
