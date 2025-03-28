@@ -1,9 +1,9 @@
 import type * as cg from '../../types';
 import {getCellList, pos2key} from "./util";
 import {roles} from "../../fen";
-import {FEN, Variant} from "../../types";
+import {FEN, Pieces, Variant} from "../../types";
 
-export const read = (variant: Variant, fen: FEN): cg.Pieces => {
+export const read = (variant: Variant, fen: FEN): Pieces => {
 	const res: cg.Pieces = new Map();
 	const cells: cg.Pos[] = getCellList(variant);
 	
