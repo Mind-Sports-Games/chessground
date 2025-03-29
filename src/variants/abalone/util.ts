@@ -297,7 +297,7 @@ export const getRotated = (a: Pos, deg: number): Pos => {
 export const getRotatedKeepNorm = (a: Pos, deg: number): Pos => {
 	const p = getRotated(a, deg);
 	
-	var n = norm(p);
+	let n = norm(p);
 	if (n > 0) {
 		n = norm(a)/n
 	}
@@ -312,10 +312,11 @@ export const getAngle360 = (a: Pos): number => {
 	return rest(getAngle(a), 360);
 }
 export const rest = (todiv: number, divby: number): number => {
-	var res = todiv%divby;
+	let res = todiv%divby;
 	
 	if (res < 0) res += divby > 0? divby: -divby;
-	if (res == -0) res = 0;
+	//if (res === -0) res = 0;
+	if (res < 0) res = 0;
 	
 	return res;
 }
@@ -334,11 +335,11 @@ export const normCore = (x: number, y: number): number => {
 
 const normRadius = 1;
 export const getNeighVectors = (): Pos[] => {
-	const res = new Array();
+	const res = [];
 	
 	for (let i = -normRadius; i <= normRadius; i++) {
 		for (let j = -normRadius; j <= normRadius; j++) {
-			if (normCore(i, j) == 1) {
+			if (normCore(i, j) === 1) {
 				res.push([i, j] as Pos)
 			}
 		}
