@@ -59,10 +59,7 @@ export const pos2key = (pos: Pos): Key => {
 };
 
 export const key2pos = (k: Key): Pos => {
-	const rank = parseInt(k.slice(1));//FIXME Alex
-	const file = k.charCodeAt(0) - 96;//FIXME Alex
-	
-	return [file, rank] as Pos;
+	return [parseInt(k.slice(1)), k.charCodeAt(0) - 96] as Pos;
 };
 
 const computeShift = (k: Key): Pos => {
