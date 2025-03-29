@@ -1,8 +1,8 @@
 import type * as cg from '../../types';
-import {files, Pos, ranks19, Variant} from "../../types";
+import {BoardDimensions, File, files, Key, NumberPair, Orientation, Pos, Rank, ranks19, Variant} from "../../types";
 import {SquareDimensions, TranslateBase} from './types';
 
-export const getBoardSize = (variant: Variant): cg.BoardDimensions => {
+export const getBoardSize = (variant: Variant): BoardDimensions => {
 	switch (variant) {
 		default:
 		case 'abalone':
@@ -54,18 +54,18 @@ export const getCellList = (variant: Variant): Pos[] => {
 	return res;
 }
 
-export const pos2key = (pos: cg.Pos): cg.Key => {
-	return (ranks19[pos[1]] + files[pos[0]]) as cg.Key;
+export const pos2key = (pos: Pos): Key => {
+	return (ranks19[pos[1]] + files[pos[0]]) as Key;
 };
 
-export const key2pos = (k: cg.Key): cg.Pos => {
+export const key2pos = (k: Key): Pos => {
 	const rank = parseInt(k.slice(1));//FIXME Alex
 	const file = k.charCodeAt(0) - 96;//FIXME Alex
 	
-	return [file, rank] as cg.Pos;
+	return [file, rank] as Pos;
 };
 
-const computeShift = (k: cg.Key): cg.Pos => {
+const computeShift = (k: Key): Pos => {
 	const bt = {width: 9, height: 9};//FIXME Alex
 	const radiush = bt.width/2
 	const rank = parseInt(k.slice(1));//FIXME Alex
@@ -73,13 +73,13 @@ const computeShift = (k: cg.Key): cg.Pos => {
 	const xScale = 100;
 	const yScale = 100*(0 < rank && rank < bt.height? 1: 10);
 	const x = file + shift[rank - 1] - 1;
-	const y = bt.height - rank + (rank < radiush? -1: rank == radiush? 0: 1);
+	const y = bt.height - rank + (rank < radiush? -1: rank === radiush? 0: 1);
 	
 	return [x*xScale, y*yScale];
 };
 
 // from a key, determine a position
-export const key2posAlt = (k: cg.Key): cg.Pos => {
+export const key2posAlt = (k: Key): Pos => {
 	return computeShift(k);
 };
 
@@ -88,19 +88,19 @@ const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];//FIXME Alex size 9...
 
 
 export const posToTranslateRel = (
-	pos: cg.Pos,
-	orientation: cg.Orientation,
-	_bt: cg.BoardDimensions,
-	_v: cg.Variant,
-): cg.NumberPair => {
+	pos: Pos,
+	orientation: Orientation,
+	_bt: BoardDimensions,
+	_v: Variant,
+): NumberPair => {
 	return translateBase[orientation](pos, 100, 100, {width: 9, height: 9});//FIXME Alex size 9...
 };
 
-export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
+export const translateAbs = (el: HTMLElement, pos: NumberPair): void => {
 	el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
 };
 
-export const translateRel = (el: HTMLElement, percents: cg.NumberPair): void => {
+export const translateRel = (el: HTMLElement, percents: NumberPair): void => {
 	el.style.transform = `translate(${percents[0]}%,${percents[1]}%)`;
 };
 
@@ -112,25 +112,25 @@ const getRanks = (n: number) => {
 	return ranks19.slice(0, n);
 };
 
-const allKeys = (bd: cg.BoardDimensions = {width: 9, height: 9}): cg.Key[] => {
-	return Array.prototype.concat(...getRanks(bd.height).map(r => getFiles(bd.width).map(f => r + f)));
+const allKeys = (d: BoardDimensions): Key[] => {
+	return Array.prototype.concat(...getRanks(d.height).map(r => getFiles(d.width).map(f => r + f)));
 };
 
-export const allPos = (bd: cg.BoardDimensions): cg.Pos[] => allKeys(bd).map(key2posAlt);
+export const allPos = (d: BoardDimensions): Pos[] => allKeys(d).map(key2posAlt);
 
-const posToTranslateBase2 = (bounds: ClientRect, pos: cg.Pos, orientation: cg.Orientation): cg.NumberPair => {
+const posToTranslateBase2 = (bounds: ClientRect, pos: Pos, orientation: Orientation): NumberPair => {
 	return translateBase2[orientation](pos, bounds);
 };
 export const posToTranslateAbs2 = (): ((
 	bounds: ClientRect,
-	pos: cg.Pos,
-	orientation: cg.Orientation,
-) => cg.NumberPair) => {
+	pos: Pos,
+	orientation: Orientation,
+) => NumberPair) => {
 	return (bounds, pos, orientation) => posToTranslateBase2(bounds, pos, orientation);
 };
-const translateBase2: Record<cg.Orientation, TranslateBase> = {
+const translateBase2: Record<Orientation, TranslateBase> = {
 	//TODO Alex centre instead of (5, 5)
-	p1: (pos: cg.Pos, bounds: ClientRect) => {
+	p1: (pos: Pos, bounds: ClientRect) => {
 		const height = bounds.height;
 		const width = bounds.width;
 		const squareDimensions = getSquareDimensions(bounds);
@@ -140,7 +140,7 @@ const translateBase2: Record<cg.Orientation, TranslateBase> = {
 		
 		return [computedWidth, computedHeight];
 	},
-	p2: (pos: cg.Pos, bounds: ClientRect) => {
+	p2: (pos: Pos, bounds: ClientRect) => {
 		const height = bounds.height;
 		const width = bounds.width;
 		const squareDimensions = getSquareDimensions(bounds);
@@ -150,9 +150,9 @@ const translateBase2: Record<cg.Orientation, TranslateBase> = {
 		
 		return [computedWidth, computedHeight];
 	},
-	right: (pos: cg.Pos, bounds: ClientRect) => [(pos[1] - 1)*bounds.x, (pos[0] - 1)*bounds.x],
-	left: (pos: cg.Pos, bounds: ClientRect) => [(pos[1] - 1)*bounds.x, (pos[0] - 1)*bounds.x],
-	p1vflip: (pos: cg.Pos, bounds: ClientRect) => [(pos[1] - 1)*bounds.x, (pos[0] - 1)*bounds.x],
+	right: (pos: Pos, bounds: ClientRect) => [(pos[1] - 1)*bounds.x, (pos[0] - 1)*bounds.x],
+	left: (pos: Pos, bounds: ClientRect) => [(pos[1] - 1)*bounds.x, (pos[0] - 1)*bounds.x],
+	p1vflip: (pos: Pos, bounds: ClientRect) => [(pos[1] - 1)*bounds.x, (pos[0] - 1)*bounds.x],
 };
 
 export const getSquareDimensions = (bounds: ClientRect): SquareDimensions => ({
@@ -161,16 +161,16 @@ export const getSquareDimensions = (bounds: ClientRect): SquareDimensions => ({
 });
 
 //FIXME isCell, with BoardDimensions
-export const getCoordinates = (x: number, y: number, orientation: cg.Orientation): cg.Key | undefined => {
-	const file = files[x] as cg.File;
-	const rank = ranks19[y] as cg.Rank;
+export const getCoordinates = (x: number, y: number, orientation: Orientation): Key | undefined => {
+	const file = files[x] as File;
+	const rank = ranks19[y] as Rank;
 	
-	const key = (rank + file) as cg.Key;
+	const key = (rank + file) as Key;
 	
 	return isValidKey(key)?
 		orientation === 'p1'?
 			key:
-			rotate180(file, rank) as cg.Key:
+			rotate180(file, rank) as Key:
 		undefined;
 };
 
@@ -185,7 +185,7 @@ const rotate180 = (file: string, rank: string): string => {
 
 //FIXME delete
 /** @deprecated */
-export const isValidKey = (key: cg.Key): boolean => {//FIXME Alex size 9
+export const isValidKey = (key: Key): boolean => {//FIXME Alex size 9
 	return /^(a[1-5]|b[1-6]|c[1-7]|d[1-8]|e[1-9]|f[2-9]|g[3-9]|h[4-9]|i[5-9])$/.test(key);
 };
 
@@ -193,31 +193,31 @@ export const isValidKey = (key: cg.Key): boolean => {//FIXME Alex size 9
 // Drawn
 const bottomLeft = [295, 854];
 
-const createTranslateBase = (): Record<cg.Orientation, cg.TranslateBase> => {
+const createTranslateBase = (): Record<Orientation, cg.TranslateBase> => {
 	return {
-		p1: (pos: cg.Pos, xScale: number, yScale: number, _bt: cg.BoardDimensions) => {
+		p1: (pos: Pos, xScale: number, yScale: number, _bt: BoardDimensions) => {
 			const basic = cellToBasic(pos);
 			return [bottomLeft[0] + xScale*basic[0], bottomLeft[1] + yScale*basic[1]];
 		},
-		p2: (pos: cg.Pos, xScale: number, yScale: number, _bt: cg.BoardDimensions) => {
+		p2: (pos: Pos, xScale: number, yScale: number, _bt: BoardDimensions) => {
 			const basic = cellToBasic(pos);
 			return [bottomLeft[0] + xScale*basic[0], bottomLeft[1] + yScale*basic[1]];
 		},
-		right: (pos: cg.Pos, xScale: number, yScale: number, _) => [pos[1]*xScale, pos[0]*yScale],
-		left: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [(bt.width - pos[0] - 1)*xScale, pos[1]*yScale],
-		p1vflip: (pos: cg.Pos, xScale: number, yScale: number, _) => [pos[0]*xScale, pos[1]*yScale],
+		right: (pos: Pos, xScale: number, yScale: number, _) => [pos[1]*xScale, pos[0]*yScale],// Not used
+		left: (pos: Pos, xScale: number, yScale: number, bt: BoardDimensions) => [(bt.width - pos[0] - 1)*xScale, pos[1]*yScale],// Not used
+		p1vflip: (pos: Pos, xScale: number, yScale: number, _) => [pos[0]*xScale, pos[1]*yScale],// Not used
 	};
 };
 const translateBase = createTranslateBase();
 
-export const drawnToCell = (d: cg.BoardDimensions, pos: Pos): Pos => {
+export const drawnToCell = (d: BoardDimensions, pos: Pos): Pos => {
 	return drawnToCellCore(d, pos[0], pos[1]);
 }
-export const drawnToCellCore = (d: cg.BoardDimensions, x: number, y: number): Pos => {
+export const drawnToCellCore = (d: BoardDimensions, x: number, y: number): Pos => {
 	return basicToCell(drawnToBasicCore(d, x, y));
 }
 
-export const drawnToBasicCore = (d: cg.BoardDimensions, x: number, y: number): Pos => {
+export const drawnToBasicCore = (d: BoardDimensions, x: number, y: number): Pos => {
 	return [0, 0] as Pos;//TODO
 }
 
@@ -225,10 +225,10 @@ export const drawnToBasicCore = (d: cg.BoardDimensions, x: number, y: number): P
 // Basic
 const sr3 = Math.sqrt(3);
 
-export const basicToDrawn = (d: cg.BoardDimensions, pos: Pos): Pos => {
+export const basicToDrawn = (d: BoardDimensions, pos: Pos): Pos => {
 	return basicToDrawnCore(d, pos[0], pos[1]);
 }
-export const basicToDrawnCore = (d: cg.BoardDimensions, x: number, y: number): Pos => {
+export const basicToDrawnCore = (d: BoardDimensions, x: number, y: number): Pos => {
 	const centre = cellToBasicCore(Math.floor(d.width/2), Math.floor(d.height/2));
 	const xScale = 100;
 	const yScale = 100;
@@ -252,17 +252,17 @@ export const cellToBasicCore = (x: number, y: number): Pos => {
 	return [x - y/2.0, y*sr3/2] as Pos;
 }
 
-export const cellToDrawn = (d: cg.BoardDimensions, pos: Pos): Pos => {
+export const cellToDrawn = (d: BoardDimensions, pos: Pos): Pos => {
 	return cellToDrawnCore(d, pos[0], pos[1]);
 }
-export const cellToDrawnCore = (d: cg.BoardDimensions, x: number, y: number): Pos => {
+export const cellToDrawnCore = (d: BoardDimensions, x: number, y: number): Pos => {
 	return basicToDrawn(d, cellToBasicCore(x, y));
 }
 
 export const isCell = (variant: Variant, pos: Pos): boolean => {
 	return isCellCore(getBoardSize(variant), pos);
 }
-const isCellCore = (dim: cg.BoardDimensions, pos: Pos): boolean => {
+const isCellCore = (dim: BoardDimensions, pos: Pos): boolean => {
 	return dist([dim.width/2, dim.height/2] as Pos, pos) < dim.width/2;
 }
 
@@ -306,7 +306,7 @@ export const getRotatedKeepNorm = (a: Pos, deg: number): Pos => {
 }
 
 export const getAngle = (a: Pos): number => {
-	return Math.atan2(a[1], a[0])*180/Math.PIs;
+	return Math.atan2(a[1], a[0])*180/Math.PI;
 }
 export const getAngle360 = (a: Pos): number => {
 	return rest(getAngle(a), 360);
