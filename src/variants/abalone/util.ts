@@ -76,12 +76,12 @@ const computeShift = (k: Key): Pos => {
 };
 
 // from a key, determine a position
-export const key2posAlt = (k: Key): Pos => {
+export const key2posAlt = (k: Key): Pos => {//TODO? or delete
 	return computeShift(k);
 };
 
 // shift is used by analysis page and miniboards
-const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];//FIXME Alex size 9...
+const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];//FIXME Alex size 9...//TODO delete, even
 
 
 export const posToTranslateRel = (
@@ -193,12 +193,10 @@ const bottomLeft = [295, 854];
 const createTranslateBase = (): Record<Orientation, cg.TranslateBase> => {
 	return {
 		p1: (pos: Pos, xScale: number, yScale: number, _bt: BoardDimensions) => {
-			const basic = cellToBasic(pos);
-			return [bottomLeft[0] + xScale*basic[0], bottomLeft[1] + yScale*basic[1]];
+			return add(bottomLeft, mult2(xScale, yScale, cellToBasic(pos)));
 		},
 		p2: (pos: Pos, xScale: number, yScale: number, _bt: BoardDimensions) => {
-			const basic = cellToBasic(pos);
-			return [bottomLeft[0] + xScale*basic[0], bottomLeft[1] + yScale*basic[1]];
+			return add(bottomLeft, mult2(xScale, yScale, cellToBasic(pos)));
 		},
 		right: (pos: Pos, xScale: number, yScale: number, _) => [pos[1]*xScale, pos[0]*yScale],// Not used
 		left: (pos: Pos, xScale: number, yScale: number, bt: BoardDimensions) => [(bt.width - pos[0] - 1)*xScale, pos[1]*yScale],// Not used
@@ -223,14 +221,11 @@ export const drawnToBasicCore = (d: BoardDimensions, x: number, y: number): Pos 
 const sr3 = Math.sqrt(3);
 
 export const basicToDrawn = (d: BoardDimensions, pos: Pos): Pos => {
-	return basicToDrawnCore(d, pos[0], pos[1]);
-}
-export const basicToDrawnCore = (d: BoardDimensions, x: number, y: number): Pos => {
 	const centre = cellToBasicCore(Math.floor(d.width/2), Math.floor(d.height/2));
 	const xScale = 100;
 	const yScale = 100;
 	
-	return [xScale*(x - centre[0]), yScale*(y - centre[1])];
+	return mult2(xScale, yScale, sub(pos, centre));
 }
 
 export const basicToCell = (pos: Pos): Pos => {
@@ -272,7 +267,10 @@ export const sub = (a: Pos, b: Pos): Pos => {
 	return add(a, mult(-1, b));
 }
 export const mult = (n: number, a: Pos): Pos => {
-	return [n*a[0], n*a[1]];
+	return mult2(n, n, a);
+}
+export const mult2 = (n: number, p: number, a: Pos): Pos => {
+	return [n*a[0], p*a[1]];
 }
 export const div = (n: number, a: Pos): Pos => {
 	return mult(1/n, a);

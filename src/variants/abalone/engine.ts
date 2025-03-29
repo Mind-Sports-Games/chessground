@@ -1,31 +1,30 @@
-import type * as cg from '../../types';
-import {Pos} from "../../types";
+import {Key, Pieces, PiecesDiff, Pos, Variant} from "../../types";
 
-import {candidateLineDirs, deducePotentialSideDirs, DiagonalDirectionString, getDirectionString, inverseDirection, isMoveInLine, move,} from './directions';
+import {getDirectionString,} from './directions';
 import type {MoveImpact, MoveVector} from './types';
 import {add, div, getNeighVectors, getRotatedKeepNorm, isCell, key2pos, mult, norm, pos2key, sub} from "./util";
 
 // Computes the effect of a move on the board before it is made
-export const computeMoveImpact = (d: cg.BoardDimensions, pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): MoveImpact | undefined => {
+export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, dest: Key): MoveImpact | undefined => {
 	if (pieces.has(orig) && !pieces.has(dest)) {
 		const from = key2pos(orig);
 		const to = key2pos(dest);
 		const vect = sub(to, from);
-		var n = norm(vect);
+		let n = norm(vect);
 		
 		if (n > 0) {
-			var uvect = div(n, vect);
+			let uvect = div(n, vect);
 			const neighVectors = getNeighVectors();
 			
 			if (neighVectors.includes(uvect)) {// In-line move
-				const diff: cg.PiecesDiff = new Map(pieces);
-				var dests: cg.Key[] = [];
-				var ejection = false;
+				const diff: PiecesDiff = new Map(pieces);
+				let dests = [];
+				let ejection = false;
 				
-				var a = from;
-				var ka = orig;
-				var pa = pieces.get(ka);
-				var k = 0;
+				let a = from;
+				let ka = orig;
+				let pa = pieces.get(ka);
+				let k = 0;
 				diff.set(ka, undefined);
 				
 				while (k < n) {
@@ -34,7 +33,7 @@ export const computeMoveImpact = (d: cg.BoardDimensions, pieces: cg.Pieces, orig
 					
 					if (k < n - 1 && !pieces.has(ka)) return undefined;
 					
-					if (isCell(d, a)) {
+					if (isCell(variant, a)) {
 						diff.set(ka, pa);
 						dests.push(ka);
 					} else {
@@ -54,8 +53,8 @@ export const computeMoveImpact = (d: cg.BoardDimensions, pieces: cg.Pieces, orig
 				} as MoveImpact;
 			} else if (--n > 0) {
 				const rot = 360/neighVectors.length;
-				var found = false;
-				var vvect;
+				let found = false;
+				let vvect;
 				for (var _vect: Pos in neighVectors) {
 					const _nvect = mult(n, _vect);
 					vvect = getRotatedKeepNorm(_vect, rot);
@@ -76,18 +75,18 @@ export const computeMoveImpact = (d: cg.BoardDimensions, pieces: cg.Pieces, orig
 				}
 				
 				if (found) {// Broadside move
-					const diff: cg.PiecesDiff = new Map(pieces);
-					var dests: cg.Key[] = [];
+					const diff: PiecesDiff = new Map(pieces);
+					let dests = [];
 					
-					var a = from;
-					var ka = orig;
-					var k = 0;
+					let a = from;
+					let ka = orig;
+					let k = 0;
 					
 					while (k < n) {
-						if (!isCell(d, a)) return undefined;
+						if (!isCell(variant, a)) return undefined;
 						
 						const b = add(a, vvect);
-						if (!isCell(d, b)) return undefined;
+						if (!isCell(variant, b)) return undefined;
 						const kb = pos2key(b);
 						if (pieces.has(kb)) return undefined;
 						
@@ -116,23 +115,23 @@ export const computeMoveImpact = (d: cg.BoardDimensions, pieces: cg.Pieces, orig
 };
 
 // Computes a move vector after the move has been made
-export const computeMoveVectorPostMove = (pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): MoveVector | undefined => {
+export const computeMoveVectorPostMove = (pieces: Pieces, orig: Key, dest: Key): MoveVector | undefined => {
 	if (!pieces.has(orig) && pieces.has(dest)) {
 		const from = key2pos(orig);
 		const to = key2pos(dest);
 		const vect = sub(to, from);
-		var n = norm(vect);
+		let n = norm(vect);
 		
 		if (n > 0) {
 			var uvect = div(n, vect);
 			const neighVectors = getNeighVectors();
 			
 			if (neighVectors.includes(uvect)) {// In-line move
-				var dests: cg.Key[] = [];
+				let dests: Key[] = [];
 				
-				var a = to;
-				var ka = dest;
-				var k = 0;
+				let a = to;
+				let ka = dest;
+				let k = 0;
 				
 				while (k < n) {
 					dests.push(ka);
@@ -149,8 +148,8 @@ export const computeMoveVectorPostMove = (pieces: cg.Pieces, orig: cg.Key, dest:
 				} as MoveVector;
 			} else if (--n > 0) {
 				const rot = 360/neighVectors.length;
-				var found = false;
-				var vvect;
+				let found = false;
+				let vvect;
 				for (var _vect: Pos in neighVectors) {
 					const _nvect = mult(n, _vect);
 					vvect = getRotatedKeepNorm(_vect, rot);
@@ -171,11 +170,11 @@ export const computeMoveVectorPostMove = (pieces: cg.Pieces, orig: cg.Key, dest:
 				}
 				
 				if (found) {// Broadside move
-					var dests: cg.Key[] = [];
+					let dests: Key[] = [];
 					
-					var a = from;
-					var ka = orig;
-					var k = 0;
+					let a = from;
+					let ka = orig;
+					let k = 0;
 					
 					while (k < n) {
 						const b = add(a, vvect);
