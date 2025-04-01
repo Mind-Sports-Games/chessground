@@ -62,35 +62,37 @@ export const key2pos = (k: Key): Pos => {
 	return [parseInt(k.slice(1)), k.charCodeAt(0) - 96] as Pos;
 };
 
-const computeShift = (k: Key): Pos => {
-	const bt = {width: 9, height: 9};//FIXME Alex
-	const radiush = bt.width/2
-	const rank = parseInt(k.slice(1));//FIXME Alex
-	const file = k.charCodeAt(0) - 96;//FIXME Alex
-	const xScale = 100;
-	const yScale = 100*(0 < rank && rank < bt.height? 1: 10);
-	const x = file + shift[rank - 1] - 1;
-	const y = bt.height - rank + (rank < radiush? -1: rank === radiush? 0: 1);
-	
-	return [x*xScale, y*yScale];
-};
+//TODO delete
+// const computeShift = (k: Key): Pos => {
+// 	const bt = {width: 9, height: 9};//FIXME Alex
+// 	const radiush = bt.width/2
+// 	const rank = parseInt(k.slice(1));//FIXME Alex
+// 	const file = k.charCodeAt(0) - 96;//FIXME Alex
+// 	const xScale = 100;
+// 	const yScale = 100*(0 < rank && rank < bt.height? 1: 10);
+// 	const x = file + shift[rank - 1] - 1;
+// 	const y = bt.height - rank + (rank < radiush? -1: rank === radiush? 0: 1);
+//
+// 	return [x*xScale, y*yScale];
+// };
 
-// from a key, determine a position
-export const key2posAlt = (k: Key): Pos => {//TODO? or delete
-	return computeShift(k);
-};
+//TODO delete
+// // from a key, determine a position
+// export const key2posAlt = (k: Key): Pos => {//TODO? or delete
+// 	return computeShift(k);
+// };
 
-// shift is used by analysis page and miniboards
-const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];//FIXME Alex size 9...//TODO delete, even
+//TODO delete?
+// // shift is used by analysis page and miniboards
+// const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];//FIXME Alex size 9...//TODO delete, even
 
-
+//TODO?
 export const posToTranslateRel = (
+	variant: Variant,
 	pos: Pos,
-	orientation: Orientation,
-	_bt: BoardDimensions,
-	_v: Variant,
+	orientation: Orientation
 ): NumberPair => {
-	return translateBase[orientation](pos, 100, 100, {width: 9, height: 9});//FIXME Alex size 9...
+	return add(bottomLeft, mult2(100, 100, cellToBasic(pos)));
 };
 
 export const translateAbs = (el: HTMLElement, pos: NumberPair): void => {
@@ -115,41 +117,18 @@ const allKeys = (d: BoardDimensions): Key[] => {
 
 export const allPos = (d: BoardDimensions): Pos[] => allKeys(d).map(key2posAlt);
 
-const posToTranslateBase2 = (bounds: ClientRect, pos: Pos, orientation: Orientation): NumberPair => {
-	return translateBase2[orientation](pos, bounds);
-};
-export const posToTranslateAbs2 = (): ((
-	bounds: ClientRect,
-	pos: Pos,
-	orientation: Orientation,
-) => NumberPair) => {
-	return (bounds, pos, orientation) => posToTranslateBase2(bounds, pos, orientation);
-};
-const translateBase2: Record<Orientation, TranslateBase> = {
-	//TODO Alex centre instead of (5, 5)
-	p1: (pos: Pos, bounds: ClientRect) => {
-		const height = bounds.height;
-		const width = bounds.width;
-		const squareDimensions = getSquareDimensions(bounds);
-		
-		const computedHeight = height*0.4546 + squareDimensions.height*(5 - pos[1]);
-		let computedWidth = computedWidth = width*0.4546 + squareDimensions.width*(pos[0] - 5) - 0.5*(pos[1] - 5)*squareDimensions.width;
-		
-		return [computedWidth, computedHeight];
-	},
-	p2: (pos: Pos, bounds: ClientRect) => {
-		const height = bounds.height;
-		const width = bounds.width;
-		const squareDimensions = getSquareDimensions(bounds);
-		
-		const computedHeight = height*0.4546 + squareDimensions.height*(pos[1] - 5);
-		let computedWidth = computedWidth = width*0.4546 + squareDimensions.width*(5 - pos[0]) - 0.5*(5 - pos[1])*squareDimensions.width;
-		
-		return [computedWidth, computedHeight];
-	},
-	right: (pos: Pos, bounds: ClientRect) => [(pos[1] - 1)*bounds.x, (pos[0] - 1)*bounds.x],
-	left: (pos: Pos, bounds: ClientRect) => [(pos[1] - 1)*bounds.x, (pos[0] - 1)*bounds.x],
-	p1vflip: (pos: Pos, bounds: ClientRect) => [(pos[1] - 1)*bounds.x, (pos[0] - 1)*bounds.x],
+export const posToTranslateAbs = (bounds: ClientRect, variant: Variant, pos: Pos, orientation: Orientation): NumberPair => {
+	const s = getSquareDimensions(bounds);
+	const ref = mult(.4546, [bounds.width, bounds.height]);
+	
+	const vect = sub(pos, getCentre(variant));
+	const tvect = mult2(s.width, s.height, [vect[0] - vect[1]/2., -vect[1]]);
+	
+	switch (orientation) {
+		default:
+		case "p1": return add(ref, tvect);
+		case "p2": return sub(ref, tvect);
+	}
 };
 
 export const getSquareDimensions = (bounds: ClientRect): SquareDimensions => ({
@@ -190,21 +169,6 @@ export const isValidKey = (key: Key): boolean => {//FIXME Alex size 9
 // Drawn
 const bottomLeft = [295, 854];
 
-const createTranslateBase = (): Record<Orientation, cg.TranslateBase> => {
-	return {
-		p1: (pos: Pos, xScale: number, yScale: number, _bt: BoardDimensions) => {
-			return add(bottomLeft, mult2(xScale, yScale, cellToBasic(pos)));
-		},
-		p2: (pos: Pos, xScale: number, yScale: number, _bt: BoardDimensions) => {
-			return add(bottomLeft, mult2(xScale, yScale, cellToBasic(pos)));
-		},
-		right: (pos: Pos, xScale: number, yScale: number, _) => [pos[1]*xScale, pos[0]*yScale],// Not used
-		left: (pos: Pos, xScale: number, yScale: number, bt: BoardDimensions) => [(bt.width - pos[0] - 1)*xScale, pos[1]*yScale],// Not used
-		p1vflip: (pos: Pos, xScale: number, yScale: number, _) => [pos[0]*xScale, pos[1]*yScale],// Not used
-	};
-};
-const translateBase = createTranslateBase();
-
 export const drawnToCell = (d: BoardDimensions, pos: Pos): Pos => {
 	return drawnToCellCore(d, pos[0], pos[1]);
 }
@@ -220,8 +184,13 @@ export const drawnToBasicCore = (d: BoardDimensions, x: number, y: number): Pos 
 // Basic
 const sr3 = Math.sqrt(3);
 
-export const basicToDrawn = (d: BoardDimensions, pos: Pos): Pos => {
-	const centre = cellToBasicCore(Math.floor(d.width/2), Math.floor(d.height/2));
+const getCentre = (variant: Variant): Pos => {
+	const d = getBoardSize(variant);
+	return [Math.floor(d.width/2), Math.floor(d.height/2)];
+}
+
+export const basicToDrawn = (variant: Variant, pos: Pos): Pos => {
+	const centre = cellToBasic(getCentre(variant));
 	const xScale = 100;
 	const yScale = 100;
 	
@@ -244,18 +213,18 @@ export const cellToBasicCore = (x: number, y: number): Pos => {
 	return [x - y/2.0, y*sr3/2] as Pos;
 }
 
-export const cellToDrawn = (d: BoardDimensions, pos: Pos): Pos => {
-	return cellToDrawnCore(d, pos[0], pos[1]);
+export const cellToDrawn = (variant: Variant, pos: Pos): Pos => {
+	return cellToDrawnCore(variant, pos[0], pos[1]);
 }
-export const cellToDrawnCore = (d: BoardDimensions, x: number, y: number): Pos => {
-	return basicToDrawn(d, cellToBasicCore(x, y));
+export const cellToDrawnCore = (variant: Variant, x: number, y: number): Pos => {
+	return basicToDrawn(variant, cellToBasicCore(x, y));
 }
 
 export const isCell = (variant: Variant, pos: Pos): boolean => {
 	return isCellCore(getBoardSize(variant), pos);
 }
-const isCellCore = (dim: BoardDimensions, pos: Pos): boolean => {
-	return dist([dim.width/2, dim.height/2] as Pos, pos) < dim.width/2;
+const isCellCore = (d: BoardDimensions, pos: Pos): boolean => {
+	return dist([d.width/2, d.height/2] as Pos, pos) < d.width/2;
 }
 
 //

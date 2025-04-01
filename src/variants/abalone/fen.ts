@@ -1,11 +1,10 @@
-import type * as cg from '../../types';
 import {getCellList, pos2key} from "./util";
 import {roles} from "../../fen";
-import {FEN, Pieces, Variant} from "../../types";
+import {FEN, Pieces, PlayerIndex, Pos, Variant} from "../../types";
 
 export const read = (variant: Variant, fen: FEN): Pieces => {
-	const res: cg.Pieces = new Map();
-	const cells: cg.Pos[] = getCellList(variant);
+	const res: Pieces = new Map();
+	const cells: Pos[] = getCellList(variant);
 	
 	var k = 0;
 	for (let i = 0; i < fen.length; i++) {
@@ -17,7 +16,7 @@ export const read = (variant: Variant, fen: FEN): Pieces => {
 			if (steps > 0) k += steps;
 			else {
 				const letter = c.toLowerCase();
-				const playerIndex = (c === c.toLowerCase()? 'p2': 'p1') as cg.PlayerIndex;
+				const playerIndex = (c === c.toLowerCase()? 'p2': 'p1') as PlayerIndex;
 				
 				res.set(
 					pos2key(cells[k]),
