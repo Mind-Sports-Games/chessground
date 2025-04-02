@@ -1,12 +1,12 @@
 import * as fen from './fen';
-import { AnimCurrent } from './anim';
-import { baseMove, getKeyAtDomPos, getSnappedKeyAtDomPos } from './board';
-import { DragCurrent, processDrag } from './drag';
-import { Drawable } from './draw';
-import { premove } from './premove';
-import { render } from './render';
-import { key2pos, posToTranslateAbs, posToTranslateRel, pos2key, timer } from './util';
-import { pos2px } from './svg';
+import {AnimCurrent} from './anim';
+import {baseMove, getKeyAtDomPos, getSnappedKeyAtDomPos} from './board';
+import {DragCurrent, processDrag} from './drag';
+import {Drawable} from './draw';
+import {premove} from './premove';
+import {render} from './render';
+import {key2pos, pos2key, posToTranslateAbs, posToTranslateRel, timer} from './util';
+import {pos2px} from './svg';
 import * as cg from './types';
 
 export interface HeadlessState {
@@ -158,6 +158,7 @@ export interface HeadlessState {
     orientation: cg.Orientation,
     bounds: ClientRect,
     bd: cg.BoardDimensions,
+	variant: cg.Variant,
   ) => cg.Key | undefined;
   key2pos: (k: cg.Key) => cg.Pos;
   posToTranslateAbsolute: (
@@ -171,7 +172,7 @@ export interface HeadlessState {
     bt: cg.BoardDimensions,
     v: cg.Variant,
   ) => cg.NumberPair;
-  pos2px: (pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions) => cg.NumberPair;
+  pos2px: (pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions, variant: cg.Variant) => cg.NumberPair;
   pos2key: (pos: cg.Pos, dimensions: cg.BoardDimensions) => cg.Key;
   premove: (
     pieces: cg.Pieces,

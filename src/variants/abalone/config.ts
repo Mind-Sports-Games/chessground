@@ -1,26 +1,25 @@
 import type {HeadlessState} from '../../state';
 
-import {baseMove, getKeyAtDomPos, getSnappedKeyAtDomPos} from './board';
+import {baseMove, getKeyAtDomPos} from './board';
 import {processDrag} from './drag';
 import {premove} from './premove';
 import {render} from './render';
-import {pos2px} from './svg';
-import {key2pos, pos2key, posToTranslateAbs, posToTranslateRel} from './util';
-import {BoardDimensions, Orientation, Pos, Variant} from "../../types";
+import {cellToPx, key2pos, pos2key, posToTranslateAbs, posToTranslateRel} from './util';
+import {BoardDimensions, Key, Orientation, Pos, Variant} from "../../types";
 
 export const configure = (state: HeadlessState): void => {
 	// HOF
 	state.baseMove = baseMove;
-	state.getKeyAtDomPos = getKeyAtDomPos;
-	state.getSnappedKeyAtDomPos = getSnappedKeyAtDomPos;
+	state.getKeyAtDomPos = getKeyAtDomPosBridge;
+	state.getSnappedKeyAtDomPos = getSnappedKeyAtDomPosBridge;
 	state.key2pos = key2pos;
 	state.posToTranslateAbsolute = posToTranslateAbsBridge;
 	state.posToTranslateRelative = posToTranslateRelBridge;
-	state.pos2px = pos2px;
+	state.pos2px = pos2pxBridge;
 	state.pos2key = pos2key;
-	state.premove = premove;
-	state.processDrag = processDrag;
-	state.render = render;
+	state.premove = premove;//TODO
+	state.processDrag = processDrag;//TODO?
+	state.render = render;//TODO?
 	
 	// these below could just have been overriden by a config object
 	state.animation.enabled = false;
@@ -28,9 +27,17 @@ export const configure = (state: HeadlessState): void => {
 
 const posToTranslateAbsBridge =
 	(bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
-		(pos: Pos, orientation: 'p1' | 'p2' | 'left' | 'right' | 'p1vflip') =>
+		(pos: Pos, orientation: Orientation) =>
 			posToTranslateAbs(bounds, variant, pos, orientation);
-
 const posToTranslateRelBridge =
 	(pos: Pos, orientation: Orientation, d: BoardDimensions, variant: Variant) =>
 		posToTranslateRel(variant, pos, orientation);
+const getKeyAtDomPosBridge =
+	(pos: Pos, orientation: Orientation, bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
+		getKeyAtDomPos(variant, pos, orientation, bounds);
+const getSnappedKeyAtDomPosBridge =
+	(orig: Key, pos: Pos, orientation: Orientation, bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
+		getKeyAtDomPos(variant, pos, orientation, bounds);// In Abalone we do not snap arrows to valid moves
+const pos2pxBridge =
+	(pos: Pos, bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
+		cellToPx(variant, pos, bounds);

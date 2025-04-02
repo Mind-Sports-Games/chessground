@@ -1,6 +1,5 @@
-import type * as cg from '../../types';
-import {BoardDimensions, File, files, Key, NumberPair, Orientation, Pos, Rank, ranks19, Variant} from "../../types";
-import {SquareDimensions, TranslateBase} from './types';
+import {BoardDimensions, files, Key, NumberPair, Orientation, Pos, ranks19, Variant} from "../../types";
+import {SquareDimensions} from './types';
 
 export const getBoardSize = (variant: Variant): BoardDimensions => {
 	switch (variant) {
@@ -86,7 +85,6 @@ export const key2pos = (k: Key): Pos => {
 // // shift is used by analysis page and miniboards
 // const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];//FIXME Alex size 9...//TODO delete, even
 
-//TODO?
 export const posToTranslateRel = (
 	variant: Variant,
 	pos: Pos,
@@ -126,8 +124,10 @@ export const posToTranslateAbs = (bounds: ClientRect, variant: Variant, pos: Pos
 	
 	switch (orientation) {
 		default:
-		case "p1": return add(ref, tvect);
-		case "p2": return sub(ref, tvect);
+		case "p1":
+			return add(ref, tvect);
+		case "p2":
+			return sub(ref, tvect);
 	}
 };
 
@@ -135,29 +135,6 @@ export const getSquareDimensions = (bounds: ClientRect): SquareDimensions => ({
 	width: bounds.width*0.093,
 	height: bounds.height*0.081,
 });
-
-//FIXME isCell, with BoardDimensions
-export const getCoordinates = (x: number, y: number, orientation: Orientation): Key | undefined => {
-	const file = files[x] as File;
-	const rank = ranks19[y] as Rank;
-	
-	const key = (rank + file) as Key;
-	
-	return isValidKey(key)?
-		orientation === 'p1'?
-			key:
-			rotate180(file, rank) as Key:
-		undefined;
-};
-
-//FIXME board size; string?
-const rotate180 = (file: string, rank: string): string => {
-	const files = 'abcdefghi';//FIXME Alex size 9
-	const ranks = '123456789';//FIXME Alex size 9
-	const rotatedFile = files[files.length - 1 - files.indexOf(file)];
-	const rotatedRank = ranks[ranks.length - 1 - ranks.indexOf(rank)];
-	return rotatedFile + rotatedRank;//FIXME Alex
-};
 
 //FIXME delete
 /** @deprecated */
@@ -169,24 +146,24 @@ export const isValidKey = (key: Key): boolean => {//FIXME Alex size 9
 // Drawn
 const bottomLeft = [295, 854];
 
-export const drawnToCell = (d: BoardDimensions, pos: Pos): Pos => {
-	return drawnToCellCore(d, pos[0], pos[1]);
+export const drawnToCell = (variant: Variant, pos: Pos): Pos => {
+	return drawnToCellCore(variant, pos[0], pos[1]);
 }
-export const drawnToCellCore = (d: BoardDimensions, x: number, y: number): Pos => {
-	return basicToCell(drawnToBasicCore(d, x, y));
+export const drawnToCellCore = (variant: Variant, x: number, y: number): Pos => {
+	return basicToCell(drawnToBasicCore(variant, x, y));
 }
 
-export const drawnToBasicCore = (d: BoardDimensions, x: number, y: number): Pos => {
+export const drawnToBasicCore = (variant: Variant, x: number, y: number): Pos => {
 	return [0, 0] as Pos;//TODO
 }
 
 //
 // Basic
-const sr3 = Math.sqrt(3);
+export const sr3 = Math.sqrt(3);
 
-const getCentre = (variant: Variant): Pos => {
-	const d = getBoardSize(variant);
-	return [Math.floor(d.width/2), Math.floor(d.height/2)];
+export const getCentre = (variant: Variant): Pos => {
+	const s = getBoardSize(variant);
+	return [Math.floor(s.width/2), Math.floor(s.height/2)];
 }
 
 export const basicToDrawn = (variant: Variant, pos: Pos): Pos => {
@@ -205,12 +182,56 @@ export const basicToCellCore = (x: number, y: number): Pos => {
 }
 
 //
+// Px
+export const pxToP = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
+	const d = getSquareDimensions(bounds);
+	
+	//TODO is it necessary?
+	pos = sub(pos, [bounds.left, bounds.top]);// Taking into account the T & L margins
+	
+	return div2(
+		d.width, d.height,
+		sub(pos, div(2., [bounds.width, bounds.height]))
+	);
+}
+export const pxToCell = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
+	return pToCell(variant, pxToP(variant, pos, bounds), bounds);
+}
+
+//
+// P
+export const pToPx = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
+	const d = getSquareDimensions(bounds);
+	
+	return add(
+		[bounds.left, bounds.top],// Taking into account the T & L margins//TODO is it necessary?
+		add(
+			div(2., [bounds.width, bounds.height]),
+			mult2(d.width, d.height, pos)
+		)
+	);
+}
+export const pToCell = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
+	return add(getCentre(variant), [pos[0] - pos[1]/2, -pos[1]]);
+}
+
+//
 // Cell
+export const cellToP = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
+	const c = getCentre(variant);
+	const p = sub(pos, c);
+	
+	return [p[0] - p[1]/2, -p[1]];
+}
+export const cellToPx = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
+	return pToPx(variant, cellToP(variant, pos, bounds), bounds);
+}
+
 export const cellToBasic = (pos: Pos): Pos => {
 	return cellToBasicCore(pos[0], pos[1]);
 }
 export const cellToBasicCore = (x: number, y: number): Pos => {
-	return [x - y/2.0, y*sr3/2] as Pos;
+	return [x - y/2., y*sr3/2] as Pos;
 }
 
 export const cellToDrawn = (variant: Variant, pos: Pos): Pos => {
@@ -243,6 +264,9 @@ export const mult2 = (n: number, p: number, a: Pos): Pos => {
 }
 export const div = (n: number, a: Pos): Pos => {
 	return mult(1/n, a);
+}
+export const div2 = (n: number, p: number, a: Pos): Pos => {
+	return mult2(1/n, 1/p, a);
 }
 
 export const vectTo3 = (a: Pos): Pos => {
@@ -281,6 +305,12 @@ export const rest = (todiv: number, divby: number): number => {
 	if (res < 0) res += divby > 0? divby: -divby;
 	//if (res === -0) res = 0;
 	if (res < 0) res = 0;
+	
+	return res;
+}
+export const divint = (todiv: number, divby: number): number => {
+	let res = todiv/divby;
+	if (todiv < 0 && todiv%divby != 0) res += divby > 0? -1: 1;
 	
 	return res;
 }
