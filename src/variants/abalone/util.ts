@@ -90,7 +90,7 @@ export const posToTranslateRel = (
 	pos: Pos,
 	orientation: Orientation
 ): NumberPair => {
-	return add(bottomLeft, mult2(100, 100, cellToBasic(pos)));
+	return cellToDrawn(variant, pos);//TODO shouldn't it depend on the orientation?
 }
 
 export const translateAbs = (el: HTMLElement, pos: NumberPair): void => {
@@ -126,39 +126,20 @@ export const isValidKey = (key: Key): boolean => {//FIXME Alex size 9
 // Drawn
 const bottomLeft = [295, 854];
 
+export const drawnToBasic = (variant: Variant, pos: Pos): Pos => {
+	return sub(div(100., pos), bottomLeft);
+}
 export const drawnToCell = (variant: Variant, pos: Pos): Pos => {
-	return drawnToCellCore(variant, pos[0], pos[1]);
-}
-export const drawnToCellCore = (variant: Variant, x: number, y: number): Pos => {
-	return basicToCell(drawnToBasicCore(variant, x, y));
-}
-
-export const drawnToBasicCore = (variant: Variant, x: number, y: number): Pos => {
-	return [0, 0] as Pos;//TODO
+	return basicToCell(drawnToBasic(variant, pos));
 }
 
 //
 // Basic
-export const sr3 = Math.sqrt(3);
-
-export const getCentre = (variant: Variant): Pos => {
-	const s = getBoardSize(variant);
-	return [Math.floor(s.width/2), Math.floor(s.height/2)];
-}
-
 export const basicToDrawn = (variant: Variant, pos: Pos): Pos => {
-	const centre = cellToBasic(getCentre(variant));
-	const xScale = 100;
-	const yScale = 100;
-	
-	return mult2(xScale, yScale, sub(pos, centre));
+	return add(bottomLeft, mult(100, pos));
 }
-
 export const basicToCell = (pos: Pos): Pos => {
-	return basicToCellCore(pos[0], pos[1]);
-}
-export const basicToCellCore = (x: number, y: number): Pos => {
-	return [x + y/sr3, y*2/sr3] as Pos;
+	return [pos[0] + pos[1]/sr3, pos[1]*2/sr3];
 }
 
 //
@@ -246,18 +227,18 @@ export const cellToCellrel = (variant: Variant, bounds: ClientRect, pos: Pos): N
 	return sub(pos, getCentre(variant));
 }
 
-export const cellToBasic = (pos: Pos): Pos => {
-	return cellToBasicCore(pos[0], pos[1]);
+export const cellToDrawn = (variant: Variant, pos: Pos): Pos => {
+	return basicToDrawn(variant, cellToBasic(variant, pos));
 }
-export const cellToBasicCore = (x: number, y: number): Pos => {
-	return [x - y/2., y*sr3/2] as Pos;
+export const cellToBasic = (variant: Variant, pos: Pos): Pos => {
+	return vectTo3(pos);
 }
 
-export const cellToDrawn = (variant: Variant, pos: Pos): Pos => {
-	return cellToDrawnCore(variant, pos[0], pos[1]);
-}
-export const cellToDrawnCore = (variant: Variant, x: number, y: number): Pos => {
-	return basicToDrawn(variant, cellToBasicCore(x, y));
+export const sr3 = Math.sqrt(3);
+
+export const getCentre = (variant: Variant): Pos => {
+	const s = getBoardSize(variant);
+	return [Math.floor(s.width/2), Math.floor(s.height/2)];
 }
 
 export const isCell = (variant: Variant, pos: Pos): boolean => {
@@ -289,7 +270,7 @@ export const div2 = (n: number, p: number, a: Pos): Pos => {
 }
 
 export const vectTo3 = (a: Pos): Pos => {
-	return cellToBasic(a);
+	return [a[0] - a[1]/2., a[1]*sr3/2];
 }
 export const cross = (a: Pos, b: Pos): number => {
 	return a[0]*b[1] - a[1]*b[0];
