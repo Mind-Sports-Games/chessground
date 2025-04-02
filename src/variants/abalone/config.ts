@@ -1,6 +1,4 @@
 import type {HeadlessState} from '../../state';
-import * as cg from "../../types";
-import {BoardDimensions, Orientation, Pos, Variant} from "../../types";
 
 import {baseMove, getKeyAtDomPos, getSnappedKeyAtDomPos} from './board';
 import {processDrag} from './drag';
@@ -8,6 +6,7 @@ import {premove} from './premove';
 import {render} from './render';
 import {pos2px} from './svg';
 import {key2pos, pos2key, posToTranslateAbs, posToTranslateRel} from './util';
+import {BoardDimensions, Orientation, Pos, Variant} from "../../types";
 
 export const configure = (state: HeadlessState): void => {
 	// HOF
