@@ -91,29 +91,15 @@ export const posToTranslateRel = (
 	orientation: Orientation
 ): NumberPair => {
 	return add(bottomLeft, mult2(100, 100, cellToBasic(pos)));
-};
+}
 
 export const translateAbs = (el: HTMLElement, pos: NumberPair): void => {
 	el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
-};
+}
 
 export const translateRel = (el: HTMLElement, percents: NumberPair): void => {
 	el.style.transform = `translate(${percents[0]}%,${percents[1]}%)`;
-};
-
-const getFiles = (n: number) => {
-	return files.slice(0, n);
-};
-
-const getRanks = (n: number) => {
-	return ranks19.slice(0, n);
-};
-
-const allKeys = (d: BoardDimensions): Key[] => {
-	return Array.prototype.concat(...getRanks(d.height).map(r => getFiles(d.width).map(f => r + f)));
-};
-
-export const allPos = (d: BoardDimensions): Pos[] => allKeys(d).map(key2posAlt);
+}
 
 export const posToTranslateAbs = (variant: Variant, bounds: ClientRect, pos: Pos, orientation: Orientation): NumberPair => {
 	let res = cellToPxrel(variant, bounds, pos);
@@ -123,18 +109,18 @@ export const posToTranslateAbs = (variant: Variant, bounds: ClientRect, pos: Pos
 	}
 	
 	return pxrelToPx(variant, bounds, res);
-};
+}
 
 export const getSquareDimensions = (bounds: ClientRect): SquareDimensions => ({
 	width: bounds.width*0.093,
 	height: bounds.height*0.081,
-});
+})
 
 //FIXME delete
 /** @deprecated */
 export const isValidKey = (key: Key): boolean => {//FIXME Alex size 9
 	return /^(a[1-5]|b[1-6]|c[1-7]|d[1-8]|e[1-9]|f[2-9]|g[3-9]|h[4-9]|i[5-9])$/.test(key);
-};
+}
 
 //
 // Drawn
@@ -185,8 +171,11 @@ export const pxToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): Numbe
 export const pxToP = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
 	return pxrelToP(variant, bounds, pxToPxrel(variant, bounds, pos));
 }
+export const pxToCellrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return pxrelToCellrel(variant, bounds, pxToPxrel(variant, bounds, pos));
+}
 export const pxToCell = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
-	return pToCell(variant, bounds, pxToP(variant, bounds, pos));
+	return pxrelToCell(variant, bounds, pxToPxrel(variant, bounds, pos));
 }
 
 //
@@ -204,6 +193,9 @@ export const pxrelToP = (variant: Variant, bounds: ClientRect, pos: Pos): Number
 	const d = getSquareDimensions(bounds);
 	return div2(d.width, d.height, pos);
 }
+export const pxrelToCellrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return pToCellrel(variant, bounds, pxrelToP(variant, bounds, pos));
+}
 export const pxrelToCell = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
 	return pToCell(variant, bounds, pxrelToP(variant, bounds, pos));
 }
@@ -217,23 +209,41 @@ export const pToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): Number
 	const d = getSquareDimensions(bounds);
 	return mult2(d.width, d.height, pos);
 }
+export const pToCellrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return cellrelToP(variant, bounds, pos);// Involution
+}
 export const pToCell = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
-	return add(getCentre(variant), [pos[0] - pos[1]/2, -pos[1]]);
+	return cellrelToCell(variant, bounds, pToCellrel(variant, bounds, pos));
+}
+
+//
+// Cellrel
+export const cellrelToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return pToPx(variant, bounds, cellrelToP(variant, bounds, pos));
+}
+export const cellrelToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return pToPxrel(variant, bounds, cellrelToP(variant, bounds, pos));
+}
+export const cellrelToP = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return [pos[0] - pos[1]/2, -pos[1]];
+}
+export const cellrelToCell = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return add(pos, getCentre(variant));
 }
 
 //
 // Cell
 export const cellToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
-	return pToPx(variant, bounds, cellToP(variant, bounds, pos));
+	return cellrelToPx(variant, bounds, cellToCellrel(variant, bounds, pos));
 }
 export const cellToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
-	return pToPxrel(variant, bounds, cellToP(variant, bounds, pos));
+	return cellrelToPxrel(variant, bounds, cellToCellrel(variant, bounds, pos));
 }
 export const cellToP = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
-	const c = getCentre(variant);
-	const p = sub(pos, c);
-	
-	return [p[0] - p[1]/2, -p[1]];
+	return cellrelToP(variant, bounds, cellToCellrel(variant, bounds, pos));
+}
+export const cellToCellrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return sub(pos, getCentre(variant));
 }
 
 export const cellToBasic = (pos: Pos): Pos => {

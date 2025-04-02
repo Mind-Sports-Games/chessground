@@ -4,7 +4,7 @@ import {Key, NumberPair, Orientation, Piece, Variant} from "../../types";
 import {callUserFunction} from '../../util';
 import {computeMoveImpact} from './engine';
 
-import {add, getCentre, isCell, mult, pos2key, pxToCell, sub} from './util';
+import {cellrelToCell, isCell, mult, pos2key, pxToCellrel} from './util';
 
 /**
   from a position in pixels, returns the key of the square
@@ -47,17 +47,14 @@ export const getKeyAtDomPos = (
 	pos: NumberPair,
 	orientation: Orientation,
 ): Key | undefined => {
-	let res = pxToCell(variant, bounds, pos);
-	
-	if (orientation == "p2") {
-		const centre = getCentre(variant);
-		res = add(centre, mult(-1, sub(res, centre)));
-	}
+	let res = pxToCellrel(variant, bounds, pos);
+	if (orientation == "p2") res = mult(-1, res);
+	res = cellrelToCell(variant, bounds, res);
 	
 	return isCell(variant, res)?
 		pos2key(res):
 		undefined;
-};
+}
 
 export const baseMove = (variant: Variant, state: HeadlessState, orig: Key, dest: Key): Piece | boolean => {
 	// Note: after you moved, you also receive the move from the API. But the piece is already gone, since you moved.
@@ -75,4 +72,4 @@ export const baseMove = (variant: Variant, state: HeadlessState, orig: Key, dest
 	state.check = undefined;
 	callUserFunction(state.events.change);
 	return moveImpact.capture || true;
-};
+}
