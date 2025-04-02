@@ -43,11 +43,11 @@ import {add, getCentre, isCell, mult, pos2key, pxToCell, sub} from './util';
  */
 export const getKeyAtDomPos = (
 	variant: Variant,
+	bounds: ClientRect,
 	pos: NumberPair,
 	orientation: Orientation,
-	bounds: ClientRect,
 ): Key | undefined => {
-	let res = pxToCell(variant, pos, bounds);
+	let res = pxToCell(variant, bounds, pos);
 	
 	if (orientation == "p2") {
 		const centre = getCentre(variant);

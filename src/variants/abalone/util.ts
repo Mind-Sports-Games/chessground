@@ -115,20 +115,14 @@ const allKeys = (d: BoardDimensions): Key[] => {
 
 export const allPos = (d: BoardDimensions): Pos[] => allKeys(d).map(key2posAlt);
 
-export const posToTranslateAbs = (bounds: ClientRect, variant: Variant, pos: Pos, orientation: Orientation): NumberPair => {
-	const s = getSquareDimensions(bounds);
-	const ref = mult(.4546, [bounds.width, bounds.height]);
+export const posToTranslateAbs = (variant: Variant, bounds: ClientRect, pos: Pos, orientation: Orientation): NumberPair => {
+	let res = cellToPxrel(variant, bounds, pos);
 	
-	const vect = sub(pos, getCentre(variant));
-	const tvect = mult2(s.width, s.height, [vect[0] - vect[1]/2., -vect[1]]);
-	
-	switch (orientation) {
-		default:
-		case "p1":
-			return add(ref, tvect);
-		case "p2":
-			return sub(ref, tvect);
+	if (orientation == "p2") {
+		res = mult(-1, res);
 	}
+	
+	return pxrelToPx(variant, bounds, res);
 };
 
 export const getSquareDimensions = (bounds: ClientRect): SquareDimensions => ({
@@ -183,48 +177,63 @@ export const basicToCellCore = (x: number, y: number): Pos => {
 
 //
 // Px
-export const pxToP = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
-	const d = getSquareDimensions(bounds);
-	
-	//TODO is it necessary?
-	pos = sub(pos, [bounds.left, bounds.top]);// Taking into account the T & L margins
-	
-	return div2(
-		d.width, d.height,
-		sub(pos, div(2., [bounds.width, bounds.height]))
-	);
+export const pxToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return sub(
+		sub(pos, [bounds.left, bounds.top]),// Taking into account the T & L margins//TODO is it necessary?
+		div(2., [bounds.width, bounds.height]));
 }
-export const pxToCell = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
-	return pToCell(variant, pxToP(variant, pos, bounds), bounds);
+export const pxToP = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return pxrelToP(variant, bounds, pxToPxrel(variant, bounds, pos));
+}
+export const pxToCell = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return pToCell(variant, bounds, pxToP(variant, bounds, pos));
 }
 
 //
-// P
-export const pToPx = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
-	const d = getSquareDimensions(bounds);
-	
+// Pxrel
+export const pxrelToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
 	return add(
 		[bounds.left, bounds.top],// Taking into account the T & L margins//TODO is it necessary?
 		add(
 			div(2., [bounds.width, bounds.height]),
-			mult2(d.width, d.height, pos)
+			pos
 		)
 	);
 }
-export const pToCell = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
+export const pxrelToP = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	const d = getSquareDimensions(bounds);
+	return div2(d.width, d.height, pos);
+}
+export const pxrelToCell = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return pToCell(variant, bounds, pxrelToP(variant, bounds, pos));
+}
+
+//
+// P
+export const pToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return pxrelToPx(variant, bounds, pToPxrel(variant, bounds, pos));
+}
+export const pToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	const d = getSquareDimensions(bounds);
+	return mult2(d.width, d.height, pos);
+}
+export const pToCell = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
 	return add(getCentre(variant), [pos[0] - pos[1]/2, -pos[1]]);
 }
 
 //
 // Cell
-export const cellToP = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
+export const cellToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return pToPx(variant, bounds, cellToP(variant, bounds, pos));
+}
+export const cellToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	return pToPxrel(variant, bounds, cellToP(variant, bounds, pos));
+}
+export const cellToP = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
 	const c = getCentre(variant);
 	const p = sub(pos, c);
 	
 	return [p[0] - p[1]/2, -p[1]];
-}
-export const cellToPx = (variant: Variant, pos: Pos, bounds: ClientRect): NumberPair => {
-	return pToPx(variant, cellToP(variant, pos, bounds), bounds);
 }
 
 export const cellToBasic = (pos: Pos): Pos => {

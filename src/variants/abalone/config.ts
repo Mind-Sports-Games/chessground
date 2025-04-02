@@ -28,16 +28,16 @@ export const configure = (state: HeadlessState): void => {
 const posToTranslateAbsBridge =
 	(bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
 		(pos: Pos, orientation: Orientation) =>
-			posToTranslateAbs(bounds, variant, pos, orientation);
+			posToTranslateAbs(variant, bounds, pos, orientation);
 const posToTranslateRelBridge =
 	(pos: Pos, orientation: Orientation, d: BoardDimensions, variant: Variant) =>
 		posToTranslateRel(variant, pos, orientation);
 const getKeyAtDomPosBridge =
 	(pos: Pos, orientation: Orientation, bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
-		getKeyAtDomPos(variant, pos, orientation, bounds);
+		getKeyAtDomPos(variant, bounds, pos, orientation);
 const getSnappedKeyAtDomPosBridge =
 	(orig: Key, pos: Pos, orientation: Orientation, bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
-		getKeyAtDomPos(variant, pos, orientation, bounds);// In Abalone we do not snap arrows to valid moves
+		getKeyAtDomPos(variant, bounds, pos, orientation);// In Abalone we do not snap arrows to valid moves
 const pos2pxBridge =
 	(pos: Pos, bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
-		cellToPx(variant, pos, bounds);
+		cellToPx(variant, bounds, pos);

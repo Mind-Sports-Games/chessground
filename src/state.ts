@@ -144,7 +144,7 @@ export interface HeadlessState {
   notation: cg.Notation;
   onlyDropsVariant: boolean;
   singleClickMoveVariant: boolean;
-  baseMove: (state: HeadlessState, orig: cg.Key, dest: cg.Key) => cg.Piece | boolean;
+  baseMove: (variant: cg.Variant, state: HeadlessState, orig: cg.Key, dest: cg.Key) => cg.Piece | boolean;
   getKeyAtDomPos: (
     pos: cg.NumberPair,
     orientation: cg.Orientation,
