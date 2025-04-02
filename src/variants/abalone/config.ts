@@ -1,4 +1,5 @@
 import type {HeadlessState} from '../../state';
+import * as cg from "../../types";
 import {BoardDimensions, Orientation, Pos, Variant} from "../../types";
 
 import {baseMove, getKeyAtDomPos, getSnappedKeyAtDomPos} from './board';
@@ -7,7 +8,6 @@ import {premove} from './premove';
 import {render} from './render';
 import {pos2px} from './svg';
 import {key2pos, pos2key, posToTranslateAbs, posToTranslateRel} from './util';
-import * as cg from "../../types";
 
 export const configure = (state: HeadlessState): void => {
 	// HOF
@@ -34,5 +34,4 @@ const posToTranslateAbsBridge =
 
 const posToTranslateRelBridge =
 	(pos: Pos, orientation: Orientation, d: BoardDimensions, variant: Variant) =>
-		(pos: Pos, orientation: 'p1' | 'p2' | 'left' | 'right' | 'p1vflip') =>
-			posToTranslateRel(variant, pos, orientation);
+		posToTranslateRel(variant, pos, orientation);
