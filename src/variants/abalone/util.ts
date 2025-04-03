@@ -139,7 +139,8 @@ export const basicToDrawn = (variant: Variant, pos: Pos): Pos => {
 	return add(bottomLeft, mult(100, pos));
 }
 export const basicToCell = (pos: Pos): Pos => {
-	return [pos[0] + pos[1]/sr3, pos[1]*2/sr3];
+	const res = [pos[0] + pos[1]/sr3, pos[1]*2/sr3];
+	return [Math.round(res[0]), Math.round(res[1])];
 }
 
 //
@@ -209,7 +210,8 @@ export const cellrelToP = (variant: Variant, bounds: ClientRect, pos: Pos): Numb
 	return [pos[0] - pos[1]/2, -pos[1]];
 }
 export const cellrelToCell = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
-	return add(pos, getCentre(variant));
+	const res = add(pos, getCentre(variant));
+	return [Math.round(res[0]), Math.round(res[1])];
 }
 
 //
