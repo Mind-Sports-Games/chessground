@@ -1,8 +1,26 @@
-import {Key, Pieces, PiecesDiff, Pos, Variant} from "../../types";
+import {Key, NumberPair, Pieces, PiecesDiff, Pos, Variant} from "../../types";
 
 import {getDirectionString,} from './directions';
 import type {MoveImpact, MoveVector} from './types';
 import {add, div, getNeighVectors, getRotatedKeepNorm, isCell, key2pos, mult, norm, pos2key, sub} from "./util";
+
+export const isInLineMove = (orig: Key, dest: Key): [NumberPair, number] | undefined => {
+	const from = key2pos(orig);
+	const to = key2pos(dest);
+	const vect = sub(to, from);
+	let n = norm(vect);
+	
+	if (n > 0) {
+		let uvect = div(n, vect);
+		const neighVectors = getNeighVectors();
+		
+		if (neighVectors.includes(uvect)) {
+			return [uvect, n];
+		}
+	}
+	
+	return undefined;
+}
 
 // Computes the effect of a move on the board before it is made
 export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, dest: Key): MoveImpact | undefined => {

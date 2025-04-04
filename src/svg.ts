@@ -424,6 +424,7 @@ function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece): string {
     case 'go13x13':
     case 'go19x19':
     case 'abalone':
+    case 'grandabalone':
       return (piece.playerIndex === 'p1' ? 'b' : 'w') + piece.role[0].toUpperCase();
     case 'oware':
     case 'togyzkumalak':

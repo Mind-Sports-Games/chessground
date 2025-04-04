@@ -1,4 +1,4 @@
-import {BoardDimensions, files, Key, NumberPair, Orientation, Pos, ranks19, Variant} from "../../types";
+import {BoardDimensions, files, Key, NumberPair, Orientation, Piece, PlayerIndex, Pos, ranks19, Variant} from "../../types";
 import {SquareDimensions} from './types';
 
 export const getBoardSize = (variant: Variant): BoardDimensions => {
@@ -10,6 +10,17 @@ export const getBoardSize = (variant: Variant): BoardDimensions => {
 			return {width: 11, height: 11};
 	}
 }
+
+export const isUsable = (variant: Variant, piece: Piece, player: PlayerIndex): boolean => {
+	return piece.playerIndex === player;
+}
+export const isPushable = (variant: Variant, piece: Piece, player: PlayerIndex): boolean => {
+	return isEjectable(variant, piece, player);
+}
+export const isEjectable = (variant: Variant, piece: Piece, player: PlayerIndex): boolean => {
+	return piece.playerIndex !== player;
+}
+
 export const getMaxUsable = (variant: Variant): number | undefined => {
 	switch (variant) {
 		default:
@@ -293,6 +304,18 @@ export const getRotatedKeepNorm = (a: Pos, deg: number): Pos => {
 	}
 	
 	return mult(n, p);
+}
+export const getPrev = (vect: Pos): Pos => {
+	return getPrevCore(getNeighVectors(), vect);
+}
+export const getPrevCore = (neighVectors: Pos[], vect: Pos): Pos => {
+	return getRotatedKeepNorm(vect, -360/neighVectors.length);
+}
+export const getNext = (vect: Pos): Pos => {
+	return getNextCore(getNeighVectors(), vect);
+}
+export const getNextCore = (neighVectors: Pos[], vect: Pos): Pos => {
+	return getRotatedKeepNorm(vect, 360/neighVectors.length);
 }
 
 export const getAngle = (a: Pos): number => {
