@@ -1,4 +1,4 @@
-import {Key, Pieces, Pos, Variant} from "../../types";
+import {Key, Piece, Pieces, Pos, Variant} from "../../types";
 import {add, getMaxUsable, getNeighVectors, getNextCore, getPrevCore, isCell, isEjectable, isPushable, isUsable, key2pos, pos2key, sub} from "./util";
 
 export const validDestinations = (variant: Variant, pieces: Pieces, orig: Key): Key[] => {
@@ -17,7 +17,7 @@ export const validDestinations = (variant: Variant, pieces: Pieces, orig: Key): 
 			for (const vect of neighVectors) {
 				let b = add(a, vect);
 				let dest = pos2key(b);
-				let bp = pieces.get(dest);
+				let bp: Piece = pieces.get(dest);
 				
 				let u = 1;
 				let max = false;

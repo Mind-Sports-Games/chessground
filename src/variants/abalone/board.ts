@@ -71,5 +71,5 @@ export const baseMove = (variant: Variant, state: HeadlessState, orig: Key, dest
 	state.lastMove = [orig, dest];
 	state.check = undefined;
 	callUserFunction(state.events.change);
-	return moveImpact.capture || true;
+	return moveImpact.capture || true;//TODO Wtf?
 }

@@ -2,7 +2,7 @@ import {Key, NumberPair, Pieces, PiecesDiff, Pos, Variant} from "../../types";
 
 import {getDirectionString,} from './directions';
 import type {MoveImpact, MoveVector} from './types';
-import {add, div, getNeighVectors, getRotatedKeepNorm, isCell, key2pos, mult, norm, pos2key, sub} from "./util";
+import {add, div, getNeighVectors, getNextCore, getPrevCore, getRotatedKeepNorm, isCell, key2pos, mult, norm, pos2key, sub} from "./util";
 
 export const isInLineMove = (orig: Key, dest: Key): [NumberPair, number] | undefined => {
 	const from = key2pos(orig);
@@ -64,25 +64,21 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 				return {
 					diff: diff,
 					capture: ejection,
-					moveVector: {
-						directionString: getDirectionString(uvect),
-						landingSquares: dests
-					}
+					landingSquares: dests
 				} as MoveImpact;
 			} else if (--n > 0) {
-				const rot = 360/neighVectors.length;
 				let found = false;
 				let vvect;
 				for (var _vect: Pos in neighVectors) {
 					const _nvect = mult(n, _vect);
-					vvect = getRotatedKeepNorm(_vect, rot);
+					vvect = getNextCore(neighVectors, _vect);
 					
 					if (add(_nvect, vvect) === vect) {
 						uvect = _vect;
 						found = true;
 						break;
 					} else {
-						vvect = getRotatedKeepNorm(_vect, -rot);
+						vvect = getPrevCore(neighVectors, _vect);
 						
 						if (add(_nvect, vvect) === vect) {
 							uvect = _vect;
@@ -108,7 +104,7 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 						const kb = pos2key(b);
 						if (pieces.has(kb)) return undefined;
 						
-						diff.set(ka, undefined);
+						diff.delete(ka);
 						diff.set(kb, pieces.get(ka));
 						dests.push(kb);
 						
@@ -119,10 +115,7 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 					return {
 						diff: diff,
 						capture: false,
-						moveVector: {
-							directionString: getDirectionString(vvect),
-							landingSquares: dests
-						}
+						landingSquares: dests
 					} as MoveImpact;
 				}
 			}

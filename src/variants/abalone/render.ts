@@ -9,7 +9,6 @@ import {DragCurrent} from '../../drag';
 
 import {translateAbs, translateRel} from './util';
 import {computeMoveVectorPostMove, isInLineMove} from './engine';
-import {getDirectionString, isMoveInLine} from './directions';
 
 // @TODO: remove parts unrelated to Abalone
 export const render = (s: State): void => {
@@ -179,10 +178,9 @@ export const render = (s: State): void => {
 };
 
 const pieceNameOf = (piece: Piece, myPlayerIndex: PlayerIndex, orientation: Orientation): string => {
-	const side =
-		(piece.playerIndex === myPlayerIndex) === (orientation === myPlayerIndex)?
-			'ally':
-			'enemy';
+	const side = (piece.playerIndex === myPlayerIndex) === (orientation === myPlayerIndex)?
+		'ally':
+		'enemy';
 	return `${piece.playerIndex} ${piece.role} ${side}`;
 };
 
@@ -203,7 +201,7 @@ export const computeSquareClasses = (s: State): SquareClasses => {
 		const player = opposite(lastPlayer);
 		
 		moveVector?.landingSquares.forEach(dest => {
-			addSquare(res, dest, `last-move to ${player}${moveVector.directionString}`);//TODO? not sure whether the player is the 'correct' one
+			addSquare(res, dest, `last-move to ${player}${moveVector?.directionString}`);//TODO? not sure whether the player is the 'correct' one
 		});
 	}
 	

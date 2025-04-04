@@ -1,27 +1,23 @@
 import type * as cg from '../../types';
-import {File, Rank} from "../../types";
+import {File, Key, Rank} from "../../types";
 
 import {DiagonalDirectionString, HorizontalDirectionString} from './directions';
-
-export type Key = `${Rank}${File}`;
 
 export type DirectionString = DiagonalDirectionString | HorizontalDirectionString;
 
 export type MoveImpact = {
-	diff: cg.PiecesDiff; // diff applied to pieces after the move
+	diff: cg.PiecesDiff; // Diff applied to pieces after the move
 	capture: boolean;
-	moveVector: MoveVector;
+	landingSquares: Key[];
 };
 
-// allow describing a move in terms of direction applied to some pieces
+// Allows describing a move in terms of direction applied to some pieces (the direction is used in CSS)
 export type MoveVector = {
 	directionString: DirectionString;
-	landingSquares: cg.Key[];
+	landingSquares: Key[];
 };
 
 export type SquareDimensions = {
 	width: number;
 	height: number;
 };
-
-export type TranslateBase = (pos: cg.Pos, bounds: ClientRect) => cg.NumberPair;

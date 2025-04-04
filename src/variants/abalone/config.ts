@@ -21,7 +21,7 @@ export const configure = (state: HeadlessState): void => {
 	state.processDrag = processDrag;//TODO?
 	state.render = render;//TODO?
 	
-	// these below could just have been overriden by a config object
+	// These below could just have been overriden by a config object
 	state.animation.enabled = false;
 };
 
