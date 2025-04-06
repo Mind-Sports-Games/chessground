@@ -56,11 +56,11 @@ export const getKeyAtDomPos = (
 		undefined;
 }
 
-export const baseMove = (variant: Variant, state: HeadlessState, orig: Key, dest: Key): Piece | boolean => {
+export const baseMove = (state: HeadlessState, orig: Key, dest: Key): Piece | boolean => {
 	// Note: after you moved, you also receive the move from the API. But the piece is already gone, since you moved.
 	if (!state.pieces.get(orig)) return false;
 	
-	const moveImpact = computeMoveImpact(variant, state.pieces, orig, dest);
+	const moveImpact = computeMoveImpact(state.variant, state.pieces, orig, dest);
 	if (!moveImpact) return false;
 	
 	if (dest === state.selected) unselect(state);

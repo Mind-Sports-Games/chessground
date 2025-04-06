@@ -144,7 +144,7 @@ export interface HeadlessState {
   notation: cg.Notation;
   onlyDropsVariant: boolean;
   singleClickMoveVariant: boolean;
-  baseMove: (variant: cg.Variant, state: HeadlessState, orig: cg.Key, dest: cg.Key) => cg.Piece | boolean;
+  baseMove: (state: HeadlessState, orig: cg.Key, dest: cg.Key) => cg.Piece | boolean;
   getKeyAtDomPos: (
     pos: cg.NumberPair,
     orientation: cg.Orientation,
@@ -182,7 +182,7 @@ export interface HeadlessState {
     variant: cg.Variant,
     chess960: boolean,
   ) => cg.Key[];
-  processDrag: (variant: cg.Variant, s: State) => void;
+  processDrag: (s: State) => void;
   render: (state: State) => void;
 }
 

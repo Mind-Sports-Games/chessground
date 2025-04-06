@@ -5,7 +5,7 @@ import {distanceSq, samePiece} from '../../util';
 import {add, sub, translateAbs} from './util';
 import {Variant} from "../../types";
 
-export const processDrag = (variant: Variant, s: State): void => {
+export const processDrag = (s: State): void => {
 	requestAnimationFrame(() => {
 		const cur = s.draggable.current;
 		if (!cur) return;
@@ -33,6 +33,6 @@ export const processDrag = (variant: Variant, s: State): void => {
 				translateAbs(cur.element, add(translation, cur.pos));
 			}
 		}
-		s.processDrag(variant, s);
+		s.processDrag(s);
 	});
 };
