@@ -182,7 +182,7 @@ export interface HeadlessState {
     variant: cg.Variant,
     chess960: boolean,
   ) => cg.Key[];
-  processDrag: (s: State) => void;
+  processDrag: (variant: cg.Variant, s: State) => void;
   render: (state: State) => void;
 }
 

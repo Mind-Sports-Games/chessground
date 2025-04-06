@@ -149,7 +149,7 @@ export const render = (s: State): void => {
 				}
 				translate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant));
 			}
-				// no piece in moved obj: insert the new piece
+			// no piece in moved obj: insert the new piece
 			// assumes the new piece is not being dragged
 			else {
 				const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation),
@@ -201,7 +201,7 @@ export const computeSquareClasses = (s: State): SquareClasses => {
 		const player = opposite(lastPlayer);
 		
 		moveVector?.landingSquares.forEach(dest => {
-			addSquare(res, dest, `last-move to ${player}${moveVector?.directionString}`);//TODO? not sure whether the player is the 'correct' one
+				addSquare(res, dest, `last-move to ${player}${moveVector?.directionString}`);//TODO? not sure whether the player is the 'correct' one
 		});
 	}
 	

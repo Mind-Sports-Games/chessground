@@ -18,7 +18,7 @@ export const configure = (state: HeadlessState): void => {
 	state.pos2px = pos2pxBridge;
 	state.pos2key = pos2key;
 	state.premove = premoveBridge;
-	state.processDrag = processDrag;//TODO?
+	state.processDrag = processDrag;
 	state.render = render;//TODO?
 	
 	// These below could just have been overriden by a config object
