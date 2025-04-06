@@ -3,7 +3,7 @@ import type {PieceName, SquareClasses} from '../../render';
 import {appendValue, isPieceNode, isSquareNode, posZIndex, removeNodes} from '../../render';
 import {p1Pov} from '../../board';
 import {State} from '../../state';
-import {createEl, opposite} from '../../util';
+import {createEl} from '../../util';
 import {AnimCurrent, AnimFadings, AnimVector, AnimVectors} from '../../anim';
 import {DragCurrent} from '../../drag';
 
@@ -149,7 +149,7 @@ export const render = (s: State): void => {
 				}
 				translate(pMvd, posToTranslate(pos, orientation, s.dimensions, s.variant));
 			}
-			// no piece in moved obj: insert the new piece
+				// no piece in moved obj: insert the new piece
 			// assumes the new piece is not being dragged
 			else {
 				const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation),
@@ -195,13 +195,13 @@ export const computeSquareClasses = (s: State): SquareClasses => {
 	if (s.lastMove && s.lastMove.length === 2) {
 		// s.highlight.lastMove is always false in profile page
 		const moveVector = computeMoveVectorPostMove(s.pieces, s.lastMove[0], s.lastMove[1]);
-		const lastPlayer = moveVector && s.pieces.get(moveVector.landingSquares[0])?
-			s.pieces.get(moveVector.landingSquares[0]).playerIndex:
-			s.myPlayerIndex;
-		const player = opposite(lastPlayer);
 		
 		moveVector?.landingSquares.forEach(dest => {
-				addSquare(res, dest, `last-move to ${player}${moveVector?.directionString}`);//TODO? not sure whether the player is the 'correct' one
+			const p = s.pieces.get(dest);
+			
+			if (p) {
+				addSquare(res, dest, `last-move to ${p.playerIndex}${moveVector?.directionString}`);
+			}
 		});
 	}
 	
