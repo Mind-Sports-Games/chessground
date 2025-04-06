@@ -17,7 +17,7 @@ export const validDestinations = (variant: Variant, pieces: Pieces, orig: Key): 
 			for (const vect of neighVectors) {
 				let b = add(a, vect);
 				let dest = pos2key(b);
-				let bp: Piece = pieces.get(dest);
+				let bp = pieces.get(dest);
 				
 				let u = 1;
 				let max = false;
