@@ -7,8 +7,8 @@ import {computeMoveImpact} from './engine';
 import {cellrelToCell, isCell, mult, pos2key, pxToCellrel} from './util';
 
 /**
-  from a position in pixels, returns the key of the square
-  by default squares positions in CG are computed like this :
+  From a position in pixels, returns the key of the square
+  by default squares positions in CG are computed like this:
       -----------------
      |_ _ _ _ _ _ _ _ _| 8
      |_ _ _ _ _ _ _ _ _| 7
@@ -21,8 +21,8 @@ import {cellrelToCell, isCell, mult, pos2key, pxToCellrel} from './util';
       -----------------
       a b c d e f g h i
 
-  But as triangular grid, we have to take into account the margin between the border of the board
-  ... and the limit of the area : [TODO Alex: but why is there a margin in this case not for a square board?]
+  But with the triangular grid, we have to take into account the margin between the border of the board
+  ... and the limit of the area: [TODO? Alex: but why is there a margin in this case not for a square board?]
       ----------------------
      |                      |margin
      |      _ _ _ _ _       | 9
