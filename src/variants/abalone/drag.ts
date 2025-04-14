@@ -3,7 +3,6 @@ import {State} from '../../state';
 import {distanceSq, samePiece} from '../../util';
 
 import {add, sub, translateAbs} from './util';
-import {Variant} from "../../types";
 
 export const processDrag = (s: State): void => {
 	requestAnimationFrame(() => {
@@ -29,7 +28,7 @@ export const processDrag = (s: State): void => {
 				cur.pos = sub(cur.epos, cur.rel);
 				
 				// move piece
-				const translation = s.posToTranslateAbsolute(s.dom.bounds(), s.dimensions, variant)(cur.origPos, s.orientation);
+				const translation = s.posToTranslateAbsolute(s.dom.bounds(), s.dimensions, s.variant)(cur.origPos, s.orientation);
 				translateAbs(cur.element, add(translation, cur.pos));
 			}
 		}
