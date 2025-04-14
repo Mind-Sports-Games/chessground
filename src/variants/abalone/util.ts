@@ -54,7 +54,7 @@ export const getCellList = (variant: Variant): Pos[] => {
 	const size = getBoardSize(variant);
 	const res: Pos[] = [];
 	
-	for (let y = 0; y < size.height; y++) {
+	for (let y = size.height - 1; y >= 0; y--) {
 		for (let x = 0; x < size.width; x++) {
 			const pos: Pos = [x, y];
 			if (isCellCore(size, pos)) res.push(pos);
@@ -71,30 +71,6 @@ export const pos2key = (pos: Pos): Key => {
 export const key2pos = (k: Key): Pos => {
 	return [parseInt(k.slice(1)), k.charCodeAt(0) - 96] as Pos;
 };
-
-//TODO delete
-// const computeShift = (k: Key): Pos => {
-// 	const bt = {width: 9, height: 9};//FIXME Alex
-// 	const radiush = bt.width/2
-// 	const rank = parseInt(k.slice(1));//FIXME Alex
-// 	const file = k.charCodeAt(0) - 96;//FIXME Alex
-// 	const xScale = 100;
-// 	const yScale = 100*(0 < rank && rank < bt.height? 1: 10);
-// 	const x = file + shift[rank - 1] - 1;
-// 	const y = bt.height - rank + (rank < radiush? -1: rank === radiush? 0: 1);
-//
-// 	return [x*xScale, y*yScale];
-// };
-
-//TODO delete
-// // from a key, determine a position
-// export const key2posAlt = (k: Key): Pos => {//TODO? or delete
-// 	return computeShift(k);
-// };
-
-//TODO delete?
-// // shift is used by analysis page and miniboards
-// const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];//FIXME Alex size 9...//TODO delete, even
 
 export const posToTranslateRel = (
 	variant: Variant,
@@ -126,12 +102,6 @@ export const getSquareDimensions = (bounds: ClientRect): SquareDimensions => ({
 	width: bounds.width*0.093,
 	height: bounds.height*0.081,
 })
-
-//FIXME delete
-/** @deprecated */
-export const isValidKey = (key: Key): boolean => {//FIXME Alex size 9
-	return /^(a[1-5]|b[1-6]|c[1-7]|d[1-8]|e[1-9]|f[2-9]|g[3-9]|h[4-9]|i[5-9])$/.test(key);
-}
 
 //
 // Drawn
