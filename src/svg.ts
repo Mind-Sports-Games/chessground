@@ -304,8 +304,7 @@ function renderPiece(
   const o = state.pos2px(pos, bounds, bd),
     width = (bounds.width / bd.width) * (piece.scale || 1),
     height = (bounds.height / bd.height) * (piece.scale || 1),
-    //name = piece.playerIndex[0] + piece.role[0].toUpperCase();
-    name = roleToSvgName(variant, piece);
+    name = roleToSvgName(variant, piece, variant === 'shogi' || variant === 'minishogi' ? myPlayerIndex : undefined);
   // If baseUrl doesn't end with '/' use it as full href
   // This is needed when drop piece suggestion .svg image file names are different than "name" produces
   const href = baseUrl.endsWith('/') ? baseUrl.slice('https://playstrategy.org'.length) + name + '.svg' : baseUrl;
@@ -378,38 +377,40 @@ export function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions):
   return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
 
-function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece): string {
+function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece, myPlayerIndex?: cg.PlayerIndex): string {
   switch (variant) {
     case 'shogi':
+    case 'minishogi':
+      const pov = (myPlayerIndex && Number(piece.playerIndex !== myPlayerIndex).toString()) || '0';
       switch (piece.role) {
         //promoted
         case 'pp-piece':
-          return '0' + 'TO';
+          return pov + 'TO';
         case 'pl-piece':
-          return '0' + 'NY';
+          return pov + 'NY';
         case 'pn-piece':
-          return '0' + 'NK';
+          return pov + 'NK';
         case 'ps-piece':
-          return '0' + 'NG';
+          return pov + 'NG';
         case 'pr-piece':
-          return '0' + 'RY';
+          return pov + 'RY';
         case 'pb-piece':
-          return '0' + 'UM';
+          return pov + 'UM';
         //not promoted - only draw your own pieces therefore always 0 not 1?
         case 'p-piece':
-          return '0FU';
+          return pov + 'FU';
         case 'l-piece':
-          return '0KY';
+          return pov + 'KY';
         case 'n-piece':
-          return '0KE';
+          return pov + 'KE';
         case 's-piece':
-          return '0GI';
+          return pov + 'GI';
         case 'r-piece':
-          return '0HI';
+          return pov + 'HI';
         case 'b-piece':
-          return '0KA';
+          return pov + 'KA';
         case 'g-piece':
-          return '0KI';
+          return pov + 'KI';
         case 'k-piece':
           return piece.playerIndex === 'p1' ? '0GY' : '0OU';
         default:
