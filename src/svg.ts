@@ -380,7 +380,7 @@ export function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions):
 function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece, myPlayerIndex?: cg.PlayerIndex): string {
   switch (variant) {
     case 'shogi':
-    case 'minishogi':
+    case 'minishogi': {
       const pov = (myPlayerIndex && Number(piece.playerIndex !== myPlayerIndex).toString()) || '0';
       switch (piece.role) {
         //promoted
@@ -416,6 +416,7 @@ function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece, myPlayerIndex
         default:
           return '';
       }
+    }
     case 'xiangqi':
       return (piece.playerIndex === 'p1' ? 'R' : 'B') + piece.role[0].toUpperCase();
     case 'flipello10':
