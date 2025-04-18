@@ -381,7 +381,7 @@ function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece, orientation?:
   switch (variant) {
     case 'shogi':
     case 'minishogi': {
-      const reversePiece = orientation && orientation !== piece.playerIndex;
+      const reversePiece = !!orientation && orientation !== piece.playerIndex;
 
       let role = '';
       switch (piece.role) {
