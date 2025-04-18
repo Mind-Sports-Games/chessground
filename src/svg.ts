@@ -430,7 +430,7 @@ function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece, orientation?:
           role = piece.playerIndex === 'p1' ? 'GY' : 'OU';
           break;
       }
-      return Number(reversePiece).toString() + role;
+      return `${Number(reversePiece).toString()}${role}`;
     }
     case 'xiangqi':
       return (piece.playerIndex === 'p1' ? 'R' : 'B') + piece.role[0].toUpperCase();
