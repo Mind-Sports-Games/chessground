@@ -304,7 +304,7 @@ function renderPiece(
   const o = state.pos2px(pos, bounds, bd),
     width = (bounds.width / bd.width) * (piece.scale || 1),
     height = (bounds.height / bd.height) * (piece.scale || 1),
-    name = roleToSvgName(variant, piece, variant === 'shogi' || variant === 'minishogi' ? myPlayerIndex : undefined);
+    name = roleToSvgName(variant, piece, state.orientation);
   // If baseUrl doesn't end with '/' use it as full href
   // This is needed when drop piece suggestion .svg image file names are different than "name" produces
   const href = baseUrl.endsWith('/') ? baseUrl.slice('https://playstrategy.org'.length) + name + '.svg' : baseUrl;
@@ -377,45 +377,60 @@ export function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions):
   return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
 
-function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece, myPlayerIndex?: cg.PlayerIndex): string {
+function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece, orientation?: cg.Orientation): string {
   switch (variant) {
     case 'shogi':
     case 'minishogi': {
-      const pov = (myPlayerIndex && Number(piece.playerIndex !== myPlayerIndex).toString()) || '0';
+      const reversePiece = orientation && orientation !== piece.playerIndex;
+
+      let role = '';
       switch (piece.role) {
         //promoted
         case 'pp-piece':
-          return pov + 'TO';
+          role = 'TO';
+          break;
         case 'pl-piece':
-          return pov + 'NY';
+          role = 'NY';
+          break;
         case 'pn-piece':
-          return pov + 'NK';
+          role = 'NK';
+          break;
         case 'ps-piece':
-          return pov + 'NG';
+          role = 'NG';
+          break;
         case 'pr-piece':
-          return pov + 'RY';
+          role = 'RY';
+          break;
         case 'pb-piece':
-          return pov + 'UM';
-        //not promoted - only draw your own pieces therefore always 0 not 1?
+          role = 'UM';
+          break;
+        //not promoted
         case 'p-piece':
-          return pov + 'FU';
+          role = 'FU';
+          break;
         case 'l-piece':
-          return pov + 'KY';
+          role = 'KY';
+          break;
         case 'n-piece':
-          return pov + 'KE';
+          role = 'KE';
+          break;
         case 's-piece':
-          return pov + 'GI';
+          role = 'GI';
+          break;
         case 'r-piece':
-          return pov + 'HI';
+          role = 'HI';
+          break;
         case 'b-piece':
-          return pov + 'KA';
+          role = 'KA';
+          break;
         case 'g-piece':
-          return pov + 'KI';
+          role = 'KI';
+          break;
         case 'k-piece':
-          return piece.playerIndex === 'p1' ? '0GY' : '0OU';
-        default:
-          return '';
+          role = piece.playerIndex === 'p1' ? 'GY' : 'OU';
+          break;
       }
+      return Number(reversePiece).toString() + role;
     }
     case 'xiangqi':
       return (piece.playerIndex === 'p1' ? 'R' : 'B') + piece.role[0].toUpperCase();
