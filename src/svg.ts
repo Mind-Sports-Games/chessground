@@ -194,7 +194,7 @@ function renderShape(
       state.drawable.pieces.baseUrl,
       orient(state.key2pos(shape.orig), state.orientation, state.dimensions),
       shape.piece,
-      bounds
+      bounds,
     );
   else {
     const orig = orient(state.key2pos(shape.orig), state.orientation, state.dimensions);
@@ -295,7 +295,7 @@ function renderPiece(
   piece: DrawShapePiece,
   bounds: ClientRect,
 ): SVGElement {
-    const o = state.pos2px(pos, bounds, state.dimensions),
+  const o = state.pos2px(pos, bounds, state.dimensions),
     width = (bounds.width / state.dimensions.width) * (piece.scale || 1),
     height = (bounds.height / state.dimensions.height) * (piece.scale || 1),
     name = state.roleToSvgName(state, piece);
