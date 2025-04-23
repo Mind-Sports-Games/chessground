@@ -2,12 +2,12 @@ import * as fen from './fen';
 import { AnimCurrent } from './anim';
 import { baseMove, getKeyAtDomPos, getSnappedKeyAtDomPos } from './board';
 import { DragCurrent, processDrag } from './drag';
-import { Drawable } from './draw';
 import { premove } from './premove';
 import { render } from './render';
 import { key2pos, posToTranslateAbs, posToTranslateRel, pos2key, timer } from './util';
-import { pos2px } from './svg';
+import { pos2px, roleToSvgName } from './svg';
 import * as cg from './types';
+import type { DrawShapePiece, Drawable } from './draw';
 
 export interface HeadlessState {
   pieces: cg.Pieces;
@@ -183,6 +183,7 @@ export interface HeadlessState {
   ) => cg.Key[];
   processDrag: (s: State) => void;
   render: (state: State) => void;
+  roleToSvgName: (state: State, piece: DrawShapePiece) => string;
 }
 
 export interface State extends HeadlessState {
@@ -306,5 +307,6 @@ export function defaults(): HeadlessState {
     premove,
     processDrag,
     render,
+    roleToSvgName,
   };
 }

@@ -194,10 +194,7 @@ function renderShape(
       state.drawable.pieces.baseUrl,
       orient(state.key2pos(shape.orig), state.orientation, state.dimensions),
       shape.piece,
-      bounds,
-      state.dimensions,
-      state.myPlayerIndex,
-      state.variant,
+      bounds
     );
   else {
     const orig = orient(state.key2pos(shape.orig), state.orientation, state.dimensions);
@@ -297,18 +294,16 @@ function renderPiece(
   pos: cg.Pos,
   piece: DrawShapePiece,
   bounds: ClientRect,
-  bd: cg.BoardDimensions,
-  myPlayerIndex: cg.PlayerIndex,
-  variant: cg.Variant,
 ): SVGElement {
-  const o = state.pos2px(pos, bounds, bd),
-    width = (bounds.width / bd.width) * (piece.scale || 1),
-    height = (bounds.height / bd.height) * (piece.scale || 1),
-    name = roleToSvgName(variant, piece, state.orientation);
+    const o = state.pos2px(pos, bounds, state.dimensions),
+    width = (bounds.width / state.dimensions.width) * (piece.scale || 1),
+    height = (bounds.height / state.dimensions.height) * (piece.scale || 1),
+    name = state.roleToSvgName(state, piece);
+
   // If baseUrl doesn't end with '/' use it as full href
   // This is needed when drop piece suggestion .svg image file names are different than "name" produces
   const href = baseUrl.endsWith('/') ? baseUrl.slice('https://playstrategy.org'.length) + name + '.svg' : baseUrl;
-  const side = piece.playerIndex === myPlayerIndex ? 'ally' : 'enemy';
+  const side = piece.playerIndex === state.myPlayerIndex ? 'ally' : 'enemy';
   return setAttributes(createElement('image'), {
     className: `${piece.role} ${piece.playerIndex} ${side}`,
     x: o[0] - width / 2,
@@ -377,61 +372,8 @@ export function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions):
   return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
 
-function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece, orientation?: cg.Orientation): string {
-  switch (variant) {
-    case 'shogi':
-    case 'minishogi': {
-      const reversePiece = !!orientation && orientation !== piece.playerIndex;
-
-      let role = '';
-      switch (piece.role) {
-        //promoted
-        case 'pp-piece':
-          role = 'TO';
-          break;
-        case 'pl-piece':
-          role = 'NY';
-          break;
-        case 'pn-piece':
-          role = 'NK';
-          break;
-        case 'ps-piece':
-          role = 'NG';
-          break;
-        case 'pr-piece':
-          role = 'RY';
-          break;
-        case 'pb-piece':
-          role = 'UM';
-          break;
-        //not promoted
-        case 'p-piece':
-          role = 'FU';
-          break;
-        case 'l-piece':
-          role = 'KY';
-          break;
-        case 'n-piece':
-          role = 'KE';
-          break;
-        case 's-piece':
-          role = 'GI';
-          break;
-        case 'r-piece':
-          role = 'HI';
-          break;
-        case 'b-piece':
-          role = 'KA';
-          break;
-        case 'g-piece':
-          role = 'KI';
-          break;
-        case 'k-piece':
-          role = piece.playerIndex === 'p1' ? 'GY' : 'OU';
-          break;
-      }
-      return `${Number(reversePiece).toString()}${role}`;
-    }
+export function roleToSvgName(state: State, piece: DrawShapePiece): string {
+  switch (state.variant) {
     case 'xiangqi':
       return (piece.playerIndex === 'p1' ? 'R' : 'B') + piece.role[0].toUpperCase();
     case 'flipello10':
