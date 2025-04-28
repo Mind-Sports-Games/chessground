@@ -195,9 +195,6 @@ function renderShape(
       orient(state.key2pos(shape.orig), state.orientation, state.dimensions),
       shape.piece,
       bounds,
-      state.dimensions,
-      state.myPlayerIndex,
-      state.variant,
     );
   else {
     const orig = orient(state.key2pos(shape.orig), state.orientation, state.dimensions);
@@ -297,19 +294,16 @@ function renderPiece(
   pos: cg.Pos,
   piece: DrawShapePiece,
   bounds: ClientRect,
-  bd: cg.BoardDimensions,
-  myPlayerIndex: cg.PlayerIndex,
-  variant: cg.Variant,
 ): SVGElement {
-  const o = state.pos2px(pos, bounds, bd),
-    width = (bounds.width / bd.width) * (piece.scale || 1),
-    height = (bounds.height / bd.height) * (piece.scale || 1),
-    //name = piece.playerIndex[0] + piece.role[0].toUpperCase();
-    name = roleToSvgName(variant, piece);
+  const o = state.pos2px(pos, bounds, state.dimensions),
+    width = (bounds.width / state.dimensions.width) * (piece.scale || 1),
+    height = (bounds.height / state.dimensions.height) * (piece.scale || 1),
+    name = state.roleToSvgName(state, piece);
+
   // If baseUrl doesn't end with '/' use it as full href
   // This is needed when drop piece suggestion .svg image file names are different than "name" produces
   const href = baseUrl.endsWith('/') ? baseUrl.slice('https://playstrategy.org'.length) + name + '.svg' : baseUrl;
-  const side = piece.playerIndex === myPlayerIndex ? 'ally' : 'enemy';
+  const side = piece.playerIndex === state.myPlayerIndex ? 'ally' : 'enemy';
   return setAttributes(createElement('image'), {
     className: `${piece.role} ${piece.playerIndex} ${side}`,
     x: o[0] - width / 2,
@@ -378,43 +372,8 @@ export function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions):
   return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
 
-function roleToSvgName(variant: cg.Variant, piece: DrawShapePiece): string {
-  switch (variant) {
-    case 'shogi':
-      switch (piece.role) {
-        //promoted
-        case 'pp-piece':
-          return '0' + 'TO';
-        case 'pl-piece':
-          return '0' + 'NY';
-        case 'pn-piece':
-          return '0' + 'NK';
-        case 'ps-piece':
-          return '0' + 'NG';
-        case 'pr-piece':
-          return '0' + 'RY';
-        case 'pb-piece':
-          return '0' + 'UM';
-        //not promoted - only draw your own pieces therefore always 0 not 1?
-        case 'p-piece':
-          return '0FU';
-        case 'l-piece':
-          return '0KY';
-        case 'n-piece':
-          return '0KE';
-        case 's-piece':
-          return '0GI';
-        case 'r-piece':
-          return '0HI';
-        case 'b-piece':
-          return '0KA';
-        case 'g-piece':
-          return '0KI';
-        case 'k-piece':
-          return piece.playerIndex === 'p1' ? '0GY' : '0OU';
-        default:
-          return '';
-      }
+export function roleToSvgName(state: State, piece: DrawShapePiece): string {
+  switch (state.variant) {
     case 'xiangqi':
       return (piece.playerIndex === 'p1' ? 'R' : 'B') + piece.role[0].toUpperCase();
     case 'flipello10':
