@@ -25,15 +25,15 @@ export const configure = (state: HeadlessState): void => {
 	state.animation.enabled = false;
 };
 
-const posToTranslateAbsBridge = (bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
+const posToTranslateAbsBridge = (bounds: ClientRect, _d: BoardDimensions, variant: Variant) =>
 	(pos: Pos, orientation: Orientation) => posToTranslateAbs(variant, bounds, pos, orientation);
-const posToTranslateRelBridge = (pos: Pos, orientation: Orientation, d: BoardDimensions, variant: Variant) =>
+const posToTranslateRelBridge = (pos: Pos, orientation: Orientation, _d: BoardDimensions, variant: Variant) =>
 	posToTranslateRel(variant, pos, orientation);
-const getKeyAtDomPosBridge = (pos: Pos, orientation: Orientation, bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
+const getKeyAtDomPosBridge = (pos: Pos, orientation: Orientation, bounds: ClientRect, _d: BoardDimensions, variant: Variant) =>
 	getKeyAtDomPos(variant, bounds, pos, orientation);
-const getSnappedKeyAtDomPosBridge = (orig: Key, pos: Pos, orientation: Orientation, bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
+const getSnappedKeyAtDomPosBridge = (_orig: Key, pos: Pos, orientation: Orientation, bounds: ClientRect, _d: BoardDimensions, variant: Variant) =>
 	getKeyAtDomPos(variant, bounds, pos, orientation);// In Abalone we do not snap arrows to valid moves
-const pos2pxBridge = (pos: Pos, bounds: ClientRect, d: BoardDimensions, variant: Variant) =>
+const pos2pxBridge = (pos: Pos, bounds: ClientRect, _d: BoardDimensions, variant: Variant) =>
 	cellToPx(variant, bounds, pos);
-const premoveBridge = (pieces: Pieces, key: Key, canCastle: boolean, d: BoardDimensions, variant: Variant, chess960: boolean,): Key[] =>
+const premoveBridge = (pieces: Pieces, key: Key, _canCastle: boolean, _d: BoardDimensions, variant: Variant, _chess960: boolean,): Key[] =>
 	validDestinations(variant, pieces, key);

@@ -210,8 +210,9 @@ function renderShape(
         (arrowDests.get(shape.dest) || 0) > 1,
         bounds,
         state.dimensions,
+        state.variant,
       );
-    } else el = renderCircle(state, brushes[shape.brush!], orig, current, bounds, state.dimensions);
+    } else el = renderCircle(state, brushes[shape.brush!], orig, current, bounds, state.dimensions, state.variant);
   }
   el.setAttribute('cgHash', hash);
   return el;
@@ -242,8 +243,9 @@ function renderCircle(
   current: boolean,
   bounds: ClientRect,
   bd: cg.BoardDimensions,
+  variant: cg.Variant
 ): SVGElement {
-  const o = state.pos2px(pos, bounds, bd),
+  const o = state.pos2px(pos, bounds, bd, variant),
     widths = circleWidth(bounds, bd),
     radius = (bounds.width + bounds.height) / (2 * (bd.height + bd.width));
   return setAttributes(createElement('circle'), {
@@ -266,10 +268,11 @@ function renderArrow(
   shorten: boolean,
   bounds: ClientRect,
   bd: cg.BoardDimensions,
+  variant: cg.Variant
 ): SVGElement {
   const m = arrowMargin(bounds, shorten && !current, bd),
-    a = state.pos2px(orig, bounds, bd),
-    b = state.pos2px(dest, bounds, bd),
+    a = state.pos2px(orig, bounds, bd, variant),
+    b = state.pos2px(dest, bounds, bd, variant),
     dx = b[0] - a[0],
     dy = b[1] - a[1],
     angle = Math.atan2(dy, dx),
@@ -295,7 +298,7 @@ function renderPiece(
   piece: DrawShapePiece,
   bounds: ClientRect,
 ): SVGElement {
-  const o = state.pos2px(pos, bounds, state.dimensions),
+  const o = state.pos2px(pos, bounds, state.dimensions, state.variant),
     width = (bounds.width / state.dimensions.width) * (piece.scale || 1),
     height = (bounds.height / state.dimensions.height) * (piece.scale || 1),
     name = state.roleToSvgName(state, piece);

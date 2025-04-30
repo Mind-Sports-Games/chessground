@@ -193,7 +193,7 @@ export function configure(state: HeadlessState, config: Config): void {
   }
 
   // configure variants
-  if (state.variant === 'abalone') {
+  if (state.variant === 'abalone' || state.variant === 'grandabalone') {
     abaloneConfigure(state);
   }
   if (state.variant === 'shogi' || state.variant === 'minishogi') {
