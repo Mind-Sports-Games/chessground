@@ -5,6 +5,7 @@ import { read as fenRead, readPocket as fenReadPocket } from './fen';
 import { DrawShape, DrawBrush } from './draw';
 
 import { configure as abaloneConfigure } from './variants/abalone/config';
+import { configure as shogiConfigure } from './variants/shogi/config';
 
 export interface Config {
   fen?: cg.FEN; // chess position in Forsyth notation
@@ -194,6 +195,9 @@ export function configure(state: HeadlessState, config: Config): void {
   // configure variants
   if (state.variant === 'abalone') {
     abaloneConfigure(state);
+  }
+  if (state.variant === 'shogi' || state.variant === 'minishogi') {
+    shogiConfigure(state);
   }
 }
 
