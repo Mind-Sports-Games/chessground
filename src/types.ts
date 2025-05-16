@@ -11,6 +11,7 @@ export type Variant =
   | 'monster'
   | 'linesOfAction'
   | 'scrambledEggs'
+  | 'dameo'
   | 'makruk'
   | 'cambodian'
   | 'sittuyin'

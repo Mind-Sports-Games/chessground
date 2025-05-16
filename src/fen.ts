@@ -17,6 +17,7 @@ function letters(role: cg.Role) {
 }
 
 export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Variant): cg.Pieces {
+  //TODO Dameo add FEN parsing in here
   if (variant === 'abalone') return abaloneRead(fen, dimensions);
   if (fen === 'start') fen = initial;
   if (fen.indexOf('[') !== -1) fen = fen.slice(0, fen.indexOf('['));
