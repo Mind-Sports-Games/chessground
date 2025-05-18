@@ -68,8 +68,8 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 				} as MoveImpact;
 			} else if (--n > 0) {
 				let found = false;
-				let vvect;
-				for (var _vect: Pos in neighVectors) {
+				let vvect: Pos = [0, 0];
+				for (var _vect of neighVectors) {
 					const _nvect = mult(n, _vect);
 					vvect = getNextCore(neighVectors, _vect);
 					
@@ -160,8 +160,8 @@ export const computeMoveVectorPostMove = (pieces: Pieces, orig: Key, dest: Key):
 			} else if (--n > 0) {
 				const rot = 360/neighVectors.length;
 				let found = false;
-				let vvect;
-				for (var _vect: Pos in neighVectors) {
+				let vvect: Pos = [0, 0];
+				for (var _vect of neighVectors) {
 					const _nvect = mult(n, _vect);
 					vvect = getRotatedKeepNorm(_vect, rot);
 					

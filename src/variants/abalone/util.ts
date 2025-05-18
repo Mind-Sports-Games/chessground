@@ -65,11 +65,11 @@ export const getCellList = (variant: Variant): Pos[] => {
 }
 
 export const pos2key = (pos: Pos): Key => {
-	return (ranks19[pos[1]] + files[pos[0]]) as Key;
+	return (files[pos[1]] + ranks19[pos[0]]) as Key;
 };
 
 export const key2pos = (k: Key): Pos => {
-	return [parseInt(k.slice(1)), k.charCodeAt(0) - 96] as Pos;
+	return [parseInt(k.slice(1)) -1, k.charCodeAt(0) - 97] as Pos;
 };
 
 export const posToTranslateRel = (
@@ -144,12 +144,13 @@ export const pxToCell = (variant: Variant, bounds: ClientRect, pos: Pos): Number
 //
 // Pxrel
 export const pxrelToPx = (_variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
-	return add(
-		[bounds.left, bounds.top],// Taking into account the T & L margins//TODO is it necessary?
+	const d = getSquareDimensions(bounds).width/2.;
+	return sub(
 		add(
 			div(2., [bounds.width, bounds.height]),
 			pos
-		)
+		),
+		[d, d]
 	);
 }
 export const pxrelToP = (_variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
@@ -220,15 +221,18 @@ export const cellToBasic = (_variant: Variant, pos: Pos): Pos => {
 export const sr3 = Math.sqrt(3);
 
 export const getCentre = (variant: Variant): Pos => {
-	const s = getBoardSize(variant);
-	return [Math.floor(s.width/2), Math.floor(s.height/2)];
+	return getCentreCore(getBoardSize(variant));
+}
+export const getCentreCore = (d: BoardDimensions): Pos => {
+	return [Math.floor(d.width/2), Math.floor(d.height/2)];
 }
 
 export const isCell = (variant: Variant, pos: Pos): boolean => {
 	return isCellCore(getBoardSize(variant), pos);
 }
 const isCellCore = (d: BoardDimensions, pos: Pos): boolean => {
-	return dist([d.width/2, d.height/2] as Pos, pos) < d.width/2;
+	const centre = getCentreCore(d);
+	return dist(centre, pos) <= centre[0];
 }
 
 //

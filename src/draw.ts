@@ -95,7 +95,7 @@ export function processDraw(state: State): void {
         cur.snapToValidMove = false;
       }
       const mouseSq = cur.snapToValidMove
-        ? state.getSnappedKeyAtDomPos(cur.orig, cur.pos, state.orientation, state.dom.bounds(), state.dimensions)
+        ? state.getSnappedKeyAtDomPos(cur.orig, cur.pos, state.orientation, state.dom.bounds(), state.dimensions, state.variant)
         : keyAtDomPos;
       if (mouseSq !== cur.mouseSq) {
         cur.mouseSq = mouseSq;
