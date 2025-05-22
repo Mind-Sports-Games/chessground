@@ -143,8 +143,8 @@ export const pxToCell = (variant: Variant, bounds: ClientRect, pos: Pos): Number
 
 //
 // Pxrel
-export const pxrelToPx = (_variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
-	const d = getSquareDimensions(bounds).width/2.;
+export const pxrelToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	const d = getSquareDimensions(bounds).width/2.*(variant === 'grandabalone'? .865: 1);
 	return sub(
 		add(
 			div(2., [bounds.width, bounds.height]),
@@ -326,6 +326,16 @@ export const normCore = (x: number, y: number): number => {
 		Math.max(Math.abs(x), Math.abs(y));
 }
 
+export const dist2 = (pos0: Pos, pos1: Pos): number => {
+	return norm2Core(pos0[0] - pos1[0], pos0[1] - pos1[1]);
+}
+export const norm2 = (pos: Pos): number => {
+	return norm2Core(pos[0], pos[1]);
+}
+export const norm2Core = (x: number, y: number): number => {
+	return Math.sqrt(x*x + y*y);
+}
+
 const normRadius = 1;
 export const getNeighVectors = (): Pos[] => {
 	const res = [];
@@ -339,4 +349,10 @@ export const getNeighVectors = (): Pos[] => {
 	}
 	
 	return res;
+}
+export const includes = (positions: Pos[], pos: Pos): boolean => {
+	for (const p of positions) {
+		if (p[0] === pos[0] && p[1] === pos[1]) return true;
+	}
+	return false;
 }

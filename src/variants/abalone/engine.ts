@@ -2,7 +2,7 @@ import {Key, NumberPair, Pieces, PiecesDiff, Pos, Variant} from "../../types";
 
 import {getDirectionString,} from './directions';
 import type {MoveImpact, MoveVector} from './types';
-import {add, div, getNeighVectors, getNextCore, getPrevCore, getRotatedKeepNorm, isCell, key2pos, mult, norm, pos2key, sub} from "./util";
+import {add, div, getNeighVectors, getNextCore, getPrevCore, getRotatedKeepNorm, includes, isCell, key2pos, mult, norm, pos2key, sub} from "./util";
 
 export const isInLineMove = (orig: Key, dest: Key): [NumberPair, number] | undefined => {
 	const from = key2pos(orig);
@@ -14,7 +14,7 @@ export const isInLineMove = (orig: Key, dest: Key): [NumberPair, number] | undef
 		let uvect = div(n, vect);
 		const neighVectors = getNeighVectors();
 		
-		if (neighVectors.includes(uvect)) {
+		if (includes(neighVectors, uvect)) {
 			return [uvect, n];
 		}
 	}
@@ -24,7 +24,7 @@ export const isInLineMove = (orig: Key, dest: Key): [NumberPair, number] | undef
 
 // Computes the effect of a move on the board before it is made
 export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, dest: Key): MoveImpact | undefined => {
-	if (pieces.has(orig) && !pieces.has(dest)) {
+	if (pieces.has(orig)) {
 		const from = key2pos(orig);
 		const to = key2pos(dest);
 		const vect = sub(to, from);
@@ -32,12 +32,14 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 		
 		if (n > 0) {
 			let uvect = div(n, vect);
+			let ejection = pieces.has(dest);
+			if (ejection) n++;
+			
 			const neighVectors = getNeighVectors();
 			
-			if (neighVectors.includes(uvect)) {// In-line move
-				const diff: PiecesDiff = new Map(pieces);
+			if (includes(neighVectors, uvect)) {// In-line move
+				const diff: PiecesDiff = new Map();
 				let dests = [];
-				let ejection = false;
 				
 				let a = from;
 				let ka = orig;
@@ -54,8 +56,8 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 					if (isCell(variant, a)) {
 						diff.set(ka, pa);
 						dests.push(ka);
-					} else {
-						ejection = true;
+					} else if (!ejection) {
+						return undefined;
 					}
 					
 					pa = pieces.get(ka);
@@ -66,7 +68,7 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 					capture: ejection,
 					landingSquares: dests
 				} as MoveImpact;
-			} else if (--n > 0) {
+			} else if (!ejection && --n > 0) {
 				let found = false;
 				let vvect: Pos = [0, 0];
 				for (var _vect of neighVectors) {
@@ -89,7 +91,7 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 				}
 				
 				if (found) {// Broadside move
-					const diff: PiecesDiff = new Map(pieces);
+					const diff: PiecesDiff = new Map();
 					let dests = [];
 					
 					let a = from;
@@ -137,7 +139,7 @@ export const computeMoveVectorPostMove = (pieces: Pieces, orig: Key, dest: Key):
 			var uvect = div(n, vect);
 			const neighVectors = getNeighVectors();
 			
-			if (neighVectors.includes(uvect)) {// In-line move
+			if (includes(neighVectors, uvect)) {// In-line move
 				let dests: Key[] = [];
 				
 				let a = to;
