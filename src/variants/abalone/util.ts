@@ -69,7 +69,7 @@ export const pos2key = (pos: Pos): Key => {
 };
 
 export const key2pos = (k: Key): Pos => {
-	return [parseInt(k.slice(1)) -1, k.charCodeAt(0) - 97] as Pos;
+	return [parseInt(k.slice(1)) - 1, k.charCodeAt(0) - 97] as Pos;
 };
 
 export const posToTranslateRel = (
