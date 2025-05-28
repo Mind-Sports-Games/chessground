@@ -36,7 +36,7 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 			if (ejection) n++;
 			
 			const neighVectors = getNeighVectors();
-			
+
 			if (includes(neighVectors, uvect)) {// In-line move
 				const diff: PiecesDiff = new Map();
 				let dests = [];
@@ -51,7 +51,9 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 					a = add(from, mult(++k, uvect));
 					ka = pos2key(a);
 					
-					if (k < n - 1 && !pieces.has(ka)) return undefined;
+					if (k < n - 1 && !pieces.has(ka)) {
+						return undefined;
+					}
 					
 					if (isCell(variant, a)) {
 						diff.set(ka, pa);
