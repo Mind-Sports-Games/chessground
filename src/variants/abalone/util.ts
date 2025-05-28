@@ -98,10 +98,16 @@ export const posToTranslateAbs = (variant: Variant, bounds: ClientRect, pos: Pos
 	return pxrelToPx(variant, bounds, res);
 }
 
-export const getSquareDimensions = (bounds: ClientRect): SquareDimensions => ({
-	width: bounds.width*0.093,
-	height: bounds.height*0.081,
-})
+export const getSquareDimensions = (_variant: Variant, bounds: ClientRect): SquareDimensions => {
+	return {
+		width: 1.028*bounds.width*0.091,
+		height: 1.02*bounds.height*0.0788,
+	};
+}
+
+const getFactor = (variant: Variant): number => {
+	return variant === 'grandabalone'? .865: 1;
+}
 
 //
 // Drawn
@@ -126,10 +132,12 @@ export const basicToCell = (pos: Pos): Pos => {
 
 //
 // Px
-export const pxToPxrel = (_variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+export const pxToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	const d = getSquareDimensions(variant, bounds).width/2;
 	return sub(
-		sub(pos, [bounds.left, bounds.top]),// Taking into account the T & L margins//TODO is it necessary?
-		div(2., [bounds.width, bounds.height]));
+		add(pos, [d, d]),
+		div(2., [bounds.width, bounds.height])
+	);
 }
 export const pxToP = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
 	return pxrelToP(variant, bounds, pxToPxrel(variant, bounds, pos));
@@ -144,7 +152,7 @@ export const pxToCell = (variant: Variant, bounds: ClientRect, pos: Pos): Number
 //
 // Pxrel
 export const pxrelToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
-	const d = getSquareDimensions(bounds).width/2.*(variant === 'grandabalone'? .865: 1);
+	const d = getSquareDimensions(variant, bounds).width/2;
 	return sub(
 		add(
 			div(2., [bounds.width, bounds.height]),
@@ -153,9 +161,10 @@ export const pxrelToPx = (variant: Variant, bounds: ClientRect, pos: Pos): Numbe
 		[d, d]
 	);
 }
-export const pxrelToP = (_variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
-	const d = getSquareDimensions(bounds);
-	return div2(d.width, d.height, pos);
+export const pxrelToP = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	const d = getSquareDimensions(variant, bounds);
+	const f = getFactor(variant);
+	return div2(d.width*f, d.height*f, pos);
 }
 export const pxrelToCellrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
 	return pToCellrel(variant, bounds, pxrelToP(variant, bounds, pos));
@@ -169,9 +178,10 @@ export const pxrelToCell = (variant: Variant, bounds: ClientRect, pos: Pos): Num
 export const pToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
 	return pxrelToPx(variant, bounds, pToPxrel(variant, bounds, pos));
 }
-export const pToPxrel = (_variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
-	const d = getSquareDimensions(bounds);
-	return mult2(d.width, d.height, pos);
+export const pToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+	const d = getSquareDimensions(variant, bounds);
+	const f = getFactor(variant);
+	return mult2(d.width*f, d.height*f, pos);
 }
 export const pToCellrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
 	return cellrelToP(variant, bounds, pos);// Involution

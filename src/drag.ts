@@ -58,7 +58,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   const stillSelected = s.selected === orig;
   const element = pieceElementByKey(s, orig);
   if (piece && element && stillSelected && board.isDraggable(s, orig) && !s.selectOnly) {
-    const squareBounds = computeSquareBounds(orig, bounds, s.dimensions, s.orientation);
+    const squareBounds = computeSquareBounds(s, orig, bounds);
     s.draggable.current = {
       orig,
       origPos: s.key2pos(orig),
@@ -100,11 +100,10 @@ export function start(s: State, e: cg.MouchEvent): void {
 }
 
 function pieceCloseTo(s: State, pos: cg.NumberPair): boolean {
-  const orientation = s.orientation,
-    bounds = s.dom.bounds(),
+  const bounds = s.dom.bounds(),
     radiusSq = Math.pow(bounds.width / 8, 2);
   for (const key in s.pieces) {
-    const squareBounds = computeSquareBounds(key as cg.Key, bounds, s.dimensions, orientation),
+    const squareBounds = computeSquareBounds(s, key as cg.Key, bounds),
       center: cg.NumberPair = [squareBounds.left + squareBounds.width / 2, squareBounds.top + squareBounds.height / 2];
     if (util.distanceSq(center, pos) <= radiusSq) return true;
   }
@@ -119,7 +118,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
   const position = util.eventPosition(e)!,
     asP1 = board.p1Pov(s),
     bounds = s.dom.bounds(),
-    squareBounds = computeSquareBounds(key, bounds, s.dimensions, s.orientation);
+    squareBounds = computeSquareBounds(s, key, bounds);
 
   const rel: cg.NumberPair = [
     (asP1 ? 0 : s.dimensions.width - 1) * squareBounds.width + bounds.left,
@@ -128,7 +127,7 @@ export function dragNewPiece(s: State, piece: cg.Piece, e: cg.MouchEvent, force?
 
   s.draggable.current = {
     orig: key,
-    origPos: util.key2pos('a0'),
+    origPos: s.key2pos('a0'),
     piece,
     rel,
     epos: position,
@@ -246,13 +245,13 @@ function removeDragElements(s: State): void {
   if (e.ghost) util.setVisible(e.ghost, false);
 }
 
-function computeSquareBounds(key: cg.Key, bounds: ClientRect, bd: cg.BoardDimensions, orientation: cg.Orientation) {
-  const pos = T.mapToP1Inverse[orientation](util.key2pos(key), bd);
+function computeSquareBounds(s: State, key: cg.Key, bounds: ClientRect) {
+  const pos = T.mapToP1Inverse[s.orientation](s.key2pos(key), s.dimensions);
   return {
-    left: bounds.left + (bounds.width * (pos[0] - 1)) / bd.width,
-    top: bounds.top + (bounds.height * (bd.height - pos[1])) / bd.height,
-    width: bounds.width / bd.width,
-    height: bounds.height / bd.height,
+    left: bounds.left + (bounds.width * (pos[0] - 1)) / s.dimensions.width,
+    top: bounds.top + (bounds.height * (s.dimensions.height - pos[1])) / s.dimensions.height,
+    width: bounds.width / s.dimensions.width,
+    height: bounds.height / s.dimensions.height,
   };
 }
 

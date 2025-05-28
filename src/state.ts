@@ -125,7 +125,7 @@ export interface HeadlessState {
   };
   events: {
     change?: () => void; // called after the situation changes on the board
-    // called after a piece has been moved.
+    // move is called after a piece has been moved.
     // capturedPiece is undefined or like {playerIndex: 'p1'; 'role': 'queen'}
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
@@ -158,7 +158,7 @@ export interface HeadlessState {
     orientation: cg.Orientation,
     bounds: ClientRect,
     bd: cg.BoardDimensions,
-	variant: cg.Variant,
+	  variant: cg.Variant,
   ) => cg.Key | undefined;
   key2pos: (k: cg.Key) => cg.Pos;
   posToTranslateAbsolute: (

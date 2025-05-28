@@ -1,5 +1,5 @@
 import type * as cg from '../../types';
-import {File, Key, Rank} from "../../types";
+import {Key} from "../../types";
 
 import {DiagonalDirectionString, HorizontalDirectionString} from './directions';
 
