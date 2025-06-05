@@ -261,10 +261,18 @@ function computeSquareClasses(s: State): SquareClasses {
     for (const k of s.lastMove) {
       if (k !== 'a0') {
         if (first) {
-          addSquare(squares, k, 'last-move from' + variantSpecificHighlightClass(s.variant, k, s.orientation));
+          addSquare(
+            squares,
+            k,
+            'last-move from' + variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
+          );
           first = false;
         } else {
-          addSquare(squares, k, 'last-move to' + variantSpecificHighlightClass(s.variant, k, s.orientation));
+          addSquare(
+            squares,
+            k,
+            'last-move to' + variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
+          );
         }
       } else {
         first = false;
@@ -285,7 +293,11 @@ function computeSquareClasses(s: State): SquareClasses {
     }
   }
   if (s.selected) {
-    addSquare(squares, s.selected, 'selected' + variantSpecificHighlightClass(s.variant, s.selected, s.orientation));
+    addSquare(
+      squares,
+      s.selected,
+      'selected' + variantSpecificHighlightClass(s.variant, s.selected, s.orientation, s.turnPlayerIndex),
+    );
     if (s.movable.showDests) {
       const dests = s.movable.dests?.get(s.selected);
       if (dests)
@@ -293,7 +305,9 @@ function computeSquareClasses(s: State): SquareClasses {
           addSquare(
             squares,
             k,
-            'move-dest' + (s.pieces.has(k) ? ' oc' : '') + variantSpecificHighlightClass(s.variant, k, s.orientation),
+            'move-dest' +
+              (s.pieces.has(k) ? ' oc' : '') +
+              variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
           );
         }
       const pDests = s.premovable.dests;
@@ -304,7 +318,7 @@ function computeSquareClasses(s: State): SquareClasses {
             k,
             'premove-dest' +
               (s.pieces.has(k) ? ' oc' : '') +
-              variantSpecificHighlightClass(s.variant, k, s.orientation),
+              variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
           );
         }
     }
@@ -354,7 +368,12 @@ export function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {
   else map.set(key, [value]);
 }
 
-function variantSpecificHighlightClass(variant: cg.Variant, k: cg.Key, orientation: cg.Orientation): string {
+function variantSpecificHighlightClass(
+  variant: cg.Variant,
+  k: cg.Key,
+  orientation: cg.Orientation,
+  turnPlayerIndex: cg.PlayerIndex,
+): string {
   switch (variant) {
     case 'togyzkumalak':
     case 'bestemshe':
@@ -363,6 +382,10 @@ function variantSpecificHighlightClass(variant: cg.Variant, k: cg.Key, orientati
     case 'hyper':
     case 'backgammon':
       return backgammonPosClass(k, orientation);
+    case 'go9x9':
+    case 'go13x13':
+    case 'go19x19':
+      return turnPlayerIndex === 'p1' ? ' p2' : ' p1';
     default:
       return '';
   }
