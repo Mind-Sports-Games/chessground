@@ -2,6 +2,7 @@ import { pos2key, NRanks, invNRanks } from './util';
 import * as cg from './types';
 
 import { read as abaloneRead } from './variants/abalone/fen';
+import { read as dameoRead } from './variants/dameo/fen';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 const commaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'];
@@ -19,6 +20,7 @@ function letters(role: cg.Role) {
 export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Variant): cg.Pieces {
   //TODO Dameo add FEN parsing in here
   if (variant === 'abalone') return abaloneRead(fen, dimensions);
+  if (variant === 'dameo') return dameoRead(fen);
   if (fen === 'start') fen = initial;
   if (fen.indexOf('[') !== -1) fen = fen.slice(0, fen.indexOf('['));
   const pieces: cg.Pieces = new Map();
