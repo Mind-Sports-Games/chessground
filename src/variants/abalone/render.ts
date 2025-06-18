@@ -197,8 +197,8 @@ const addSquare = (squares: SquareClasses, key: cg.Key, klass: string): void => 
 export const computeSquareClasses = (s: State): SquareClasses => {
   const squares: SquareClasses = new Map();
 
-  if (s.lastMove && s.lastMove.length === 2) {
-    // s.highlight.lastMove is always false in profile page
+  // highlight.lastMove is false on board editor, so it makes sense to check for it
+  if (s.highlight.lastMove && s.lastMove && s.lastMove.length === 2) {
     const moveImpact = computeMoveVectorPostMove(s.pieces, s.lastMove[0], s.lastMove[1]);
     const lastMovePlayer = s.pieces.get(s.lastMove[1])?.playerIndex || s.myPlayerIndex;
     const player = opposite(lastMovePlayer);

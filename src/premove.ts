@@ -528,7 +528,7 @@ function amazonsQueen(pieces: cg.Pieces): Mobility {
   };
 }
 
-const breakthroughPawn = (pieces: cg.Pieces, playerIndex: cg.PlayerIndex): Mobility => {
+const breakthroughtroykaPawn = (pieces: cg.Pieces, playerIndex: cg.PlayerIndex): Mobility => {
   return (x1, y1, x2, y2) => {
     if (!diff(x1, x2)) {
       // prevents a premove in front of us on a friendly pawn
@@ -1144,7 +1144,7 @@ export function premove(
 
     case 'breakthroughtroyka':
     case 'minibreakthroughtroyka':
-      mobility = breakthroughPawn(pieces, playerIndex);
+      mobility = breakthroughtroykaPawn(pieces, playerIndex);
       break;
 
     // Variants using standard pieces and additional fairy pieces like S-chess, Capablanca, etc.
