@@ -217,7 +217,7 @@ describe('premove() test', () => {
 });
 
 describe('premove() test', () => {
-  it('breakthroughTroyka pawns can premove forward diagonally and in front of them when there is no piece', () => {
+  it('breakthroughtroyka pawns can premove forward diagonally and in front of them when there is no piece', () => {
     const state = defaults() as State;
     configure(state, {
       dimensions: { width: 8, height: 8 },
@@ -237,7 +237,7 @@ describe('premove() test', () => {
     expect(premoves).toEqual(expected);
   });
 
-  it('breakthroughTroyka pawns on the edge can not premove outside the board', () => {
+  it('breakthroughtroyka pawns on the edge can not premove outside the board', () => {
     const state = defaults() as State;
     configure(state, {
       dimensions: { width: 8, height: 8 },
@@ -257,7 +257,7 @@ describe('premove() test', () => {
     expect(premoves).toEqual(expected);
   });
 
-  it('breakthroughTroyka pawns can premove to opponent pawn in front of them', () => {
+  it('breakthroughtroyka pawns can premove to opponent pawn in front of them', () => {
     const state = defaults() as State;
     configure(state, {
       dimensions: { width: 8, height: 8 },
@@ -277,7 +277,7 @@ describe('premove() test', () => {
     expect(premoves).toEqual(expected);
   });
 
-  it('breakthroughTroyka pawns can not premove to friendly pawn in front of them', () => {
+  it('breakthroughtroyka pawns can not premove to friendly pawn in front of them', () => {
     const state = defaults() as State;
     configure(state, {
       dimensions: { width: 8, height: 8 },
@@ -297,7 +297,7 @@ describe('premove() test', () => {
     expect(premoves).toEqual(expected);
   });
 
-  it('breakthroughTroyka pawns can premove to friendly and opponent pawn in diagonal', () => {
+  it('breakthroughtroyka pawns can premove to friendly and opponent pawn in diagonal', () => {
     const state = defaults() as State;
     configure(state, {
       dimensions: { width: 8, height: 8 },

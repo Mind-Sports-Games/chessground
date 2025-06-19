@@ -165,6 +165,15 @@ export const getSnappedKeyAtDomPos = (
 };
 
 export const baseMove = (state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean => {
+  if (state.movable.free && state.movable.playerIndex === 'both') {
+    // board editor
+    const piece = state.pieces.get(orig);
+    if (!piece) return false;
+    state.pieces.delete(orig);
+    state.pieces.set(dest, piece);
+    return true;
+  }
+
   // Note: after you moved, you also receive the move from the API. But the piece is already gone, since you moved.
   if (!state.pieces.get(orig)) return false;
 
