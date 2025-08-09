@@ -488,6 +488,14 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
     } else if ((state.selectable.enabled || force) && state.selected !== key) {
       if (userMove(state, state.selected, key)) {
         state.stats.dragged = false;
+        if (
+          state.variant === 'dameo' &&
+          state.movable.captLen !== undefined &&
+          state.movable.captLen > 1
+        ) {
+          // if we can continue capturing, keep the piece selected
+          setSelected(state, key);
+        }
         return;
       }
     }
