@@ -13,6 +13,7 @@ export interface Config {
   myPlayerIndex?: cg.PlayerIndex; // turn of player p1 | p2
   turnPlayerIndex?: cg.PlayerIndex; // turn to play. p1 | p2
   check?: cg.PlayerIndex | boolean; // true for current playerIndex, false to unset
+  captureLength?: number; //Amount of forced captures in this turn
   lastMove?: cg.Key[]; // squares part of the last move ["c3", "c4"]
   selected?: cg.Key; // square currently selected "a1"
   coordinates?: boolean; // include coords attributes
@@ -165,6 +166,8 @@ export function configure(state: HeadlessState, config: Config): void {
   // if the previous last move had two squares,
   // the merge algorithm will incorrectly keep the second square.
   else if (config.lastMove) state.lastMove = config.lastMove;
+
+  if (config.captureLength !== undefined) state.movable.captLen = config.captureLength;
 
   // fix move/premove dests
   if (state.selected) setSelected(state, state.selected);
