@@ -214,7 +214,6 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
       break;
     case 'dameo':
       const captLen: number = state.movable.captLen ?? 0;
-      console.log("Captlen:", captLen);
       // Detect capture and remove cap'd piece
       const posOrig: cg.Pos = key2pos(orig);
       const posDest: cg.Pos = key2pos(dest);
@@ -248,11 +247,19 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
           }
         }
       }
+
+      // Promote if we finish the move on the back row
+      const backrow: boolean = (origPiece.playerIndex === 'p1' && posDest[1] === state.dimensions.height) ||
+        (origPiece.playerIndex === 'p2' && posDest[1] === 1)
+      if (captLen < 2 && backrow === true) {
+        origPiece.role = 'k-piece';
+      }
+
       state.pieces.set(dest, origPiece);
       state.pieces.delete(orig);
 
       // Remove remaining ghost pieces if this was the last capture of a chain
-      if(state.movable.captLen === 1){
+      if(captLen === 1){
         for(const [pieceKey, piece] of state.pieces.entries()){
           if(piece.role === 'g-piece' || piece.role === 'p-piece'){
             state.pieces.delete(pieceKey);
