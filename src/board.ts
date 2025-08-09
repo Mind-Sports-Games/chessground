@@ -213,46 +213,38 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
       setPieces(state, backgammonUpdatePiecesFromMove(state.pieces, orig, dest));
       break;
     case 'dameo':
-
+      const captLen: number = state.movable.captLen ?? 0;
+      console.log("Captlen:", captLen);
       // Detect capture and remove cap'd piece
       const posOrig: cg.Pos = key2pos(orig);
       const posDest: cg.Pos = key2pos(dest);
       const dx: number = posDest[0] - posOrig[0];
       const dy: number = posDest[1] - posOrig[1];
-      if(Math.abs(dx) > 1 || Math.abs(dy) > 1){
-        // This move is potentially a capture
-        // Step through the intervening pieces and if we find an opponent piece, remove it
-        // If we find an own-piece, it is a linear move (and therefore not a capture)
+      if(captLen > 0){
+        // Step through the intervening pieces until we find the captured piece
         const stepX: number = Math.sign(dx);
         const stepY: number = Math.sign(dy);
         var stepPos: cg.Pos = posOrig;
         while(true){
           stepPos = [stepPos[0] + stepX, stepPos[1] + stepY];
-          if(stepPos[0] < 1 || stepPos[1] < 1 || stepPos[0] > state.dimensions.width || stepPos[1] > state.dimensions.height){
-            break;
-          }
           const stepKey: cg.Key = pos2key(stepPos);
           const stepPiece = state.pieces.get(stepKey);
           if(stepPiece){
-            if(stepPiece.playerIndex === state.turnPlayerIndex){
-              break;
-            } else {
-              // Convert captured pieces to ghosts
-              if (stepPiece.role === 'm-piece') {
-                state.pieces.delete(stepKey);
-                state.pieces.set(stepKey, {
-                  role: 'g-piece',
-                  playerIndex: stepPiece.playerIndex,
-                });
-              } else if (stepPiece.role === 'k-piece') {
-                state.pieces.delete(stepKey);
-                state.pieces.set(stepKey, {
-                  role: 'p-piece',
-                  playerIndex: stepPiece.playerIndex,
-                });
-              }
-              break;
+            // Convert captured pieces to ghosts
+            if (stepPiece.role === 'm-piece') {
+              state.pieces.delete(stepKey);
+              state.pieces.set(stepKey, {
+                role: 'g-piece',
+                playerIndex: stepPiece.playerIndex,
+              });
+            } else if (stepPiece.role === 'k-piece') {
+              state.pieces.delete(stepKey);
+              state.pieces.set(stepKey, {
+                role: 'p-piece',
+                playerIndex: stepPiece.playerIndex,
+              });
             }
+            break;
           }
         }
       }
