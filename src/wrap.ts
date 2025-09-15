@@ -181,7 +181,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       container.appendChild(renderCoords(['c', '', 'i'], 'ranks' + orientClass + ' file-4'));
       container.appendChild(renderCoords(['b', '', '', '', 'j'], 'ranks' + orientClass + ' file-5'));
       container.appendChild(renderCoords(['a', '', '', '', '', 'k'], 'ranks' + orientClass + ' file-6'));
-	} else {
+    } else {
       container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
       container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
     }

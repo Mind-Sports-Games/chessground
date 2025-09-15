@@ -158,7 +158,7 @@ export interface HeadlessState {
     orientation: cg.Orientation,
     bounds: ClientRect,
     bd: cg.BoardDimensions,
-	  variant: cg.Variant,
+    variant: cg.Variant,
   ) => cg.Key | undefined;
   key2pos: (k: cg.Key) => cg.Pos;
   posToTranslateAbsolute: (
