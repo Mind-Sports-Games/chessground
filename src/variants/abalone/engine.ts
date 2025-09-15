@@ -2,7 +2,7 @@ import {Key, NumberPair, Pieces, PiecesDiff, Pos, Variant} from "../../types";
 
 import {getDirectionString,} from './directions';
 import type {MoveImpact, MoveVector} from './types';
-import {add, div, getNeighVectors, getNextCore, getPrevCore, getRotatedKeepNorm, includes, isCell, key2pos, mult, norm, pos2key, sub} from "./util";
+import {add, div, areEqual, getNeighVectors, getNextCore, getPrevCore, includes, isCell, key2pos, mult, norm, pos2key, sub} from "./util";
 
 export const isInLineMove = (orig: Key, dest: Key): [NumberPair, number] | undefined => {
 	const from = key2pos(orig);
@@ -73,25 +73,26 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 			} else if (!ejection && --n > 0) {
 				let found = false;
 				let vvect: Pos = [0, 0];
-				for (var _vect of neighVectors) {
+				for (const _vect of neighVectors) {
 					const _nvect = mult(n, _vect);
-					vvect = getNextCore(neighVectors, _vect);
-					
-					if (add(_nvect, vvect) === vect) {
-						uvect = _vect;
-						found = true;
-						break;
-					} else {
-						vvect = getPrevCore(neighVectors, _vect);
-						
-						if (add(_nvect, vvect) === vect) {
+					if (pieces.get(pos2key(add(from, _nvect)))?.playerIndex === pieces.get(orig)?.playerIndex) {
+						vvect = getNextCore(neighVectors, _vect);
+
+						if (areEqual(add(_nvect, vvect), vect)) {
 							uvect = _vect;
 							found = true;
 							break;
+						} else {
+							vvect = getPrevCore(neighVectors, _vect);
+							
+							if (areEqual(add(_nvect, vvect), vect)) {
+								uvect = _vect;
+								found = true;
+								break;
+							}
 						}
 					}
 				}
-				
 				if (found) {// Broadside move
 					const diff: PiecesDiff = new Map();
 					let dests = [];
@@ -99,8 +100,7 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 					let a = from;
 					let ka = orig;
 					let k = 0;
-					
-					while (k < n) {
+					while (k <= n) {
 						if (!isCell(variant, a)) return undefined;
 						
 						const b = add(a, vvect);
@@ -108,7 +108,7 @@ export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, d
 						const kb = pos2key(b);
 						if (pieces.has(kb)) return undefined;
 						
-						diff.delete(ka);
+						diff.set(ka, undefined);
 						diff.set(kb, pieces.get(ka));
 						dests.push(kb);
 						
@@ -162,24 +162,25 @@ export const computeMoveVectorPostMove = (pieces: Pieces, orig: Key, dest: Key):
 					landingSquares: dests
 				} as MoveVector;
 			} else if (--n > 0) {
-				const rot = 360/neighVectors.length;
 				let found = false;
 				let vvect: Pos = [0, 0];
 				for (var _vect of neighVectors) {
 					const _nvect = mult(n, _vect);
-					vvect = getRotatedKeepNorm(_vect, rot);
-					
-					if (add(_nvect, vvect) === vect) {
-						uvect = _vect;
-						found = true;
-						break;
-					} else {
-						vvect = getRotatedKeepNorm(_vect, -rot);
-						
-						if (add(_nvect, vvect) === vect) {
+					if (!pieces.has(pos2key(add(from, _nvect)))) {
+						vvect = getNextCore(neighVectors, _vect);
+
+						if (areEqual(add(_nvect, vvect), vect)) {
 							uvect = _vect;
 							found = true;
 							break;
+						} else {
+							vvect = getPrevCore(neighVectors, _vect);
+
+							if (areEqual(add(_nvect, vvect), vect)) {
+								uvect = _vect;
+								found = true;
+								break;
+							}
 						}
 					}
 				}
@@ -190,8 +191,7 @@ export const computeMoveVectorPostMove = (pieces: Pieces, orig: Key, dest: Key):
 					let a = from;
 					let ka = orig;
 					let k = 0;
-					
-					while (k < n) {
+					while (k <= n) {
 						const b = add(a, vvect);
 						const kb = pos2key(b);
 						if (!pieces.has(kb)) return undefined;
