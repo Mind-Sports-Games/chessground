@@ -212,6 +212,62 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
       }
       setPieces(state, backgammonUpdatePiecesFromMove(state.pieces, orig, dest));
       break;
+    case 'dameo':
+      const captLen: number = state.movable.captLen ?? 0;
+      // Detect capture and remove cap'd piece
+      const posOrig: cg.Pos = key2pos(orig);
+      const posDest: cg.Pos = key2pos(dest);
+      const dx: number = posDest[0] - posOrig[0];
+      const dy: number = posDest[1] - posOrig[1];
+      if(captLen > 0){
+        // Step through the intervening pieces until we find the captured piece
+        const stepX: number = Math.sign(dx);
+        const stepY: number = Math.sign(dy);
+        var stepPos: cg.Pos = posOrig;
+        while(true){
+          stepPos = [stepPos[0] + stepX, stepPos[1] + stepY];
+          const stepKey: cg.Key = pos2key(stepPos);
+          const stepPiece = state.pieces.get(stepKey);
+          if(stepPiece){
+            // Convert captured pieces to ghosts
+            if (stepPiece.role === 'm-piece') {
+              state.pieces.delete(stepKey);
+              state.pieces.set(stepKey, {
+                role: 'g-piece',
+                playerIndex: stepPiece.playerIndex,
+              });
+            } else if (stepPiece.role === 'k-piece') {
+              state.pieces.delete(stepKey);
+              state.pieces.set(stepKey, {
+                role: 'p-piece',
+                playerIndex: stepPiece.playerIndex,
+              });
+            }
+            break;
+          }
+        }
+      }
+
+      // Promote if we finish the move on the back row
+      const backrow: boolean = (origPiece.playerIndex === 'p1' && posDest[1] === state.dimensions.height) ||
+        (origPiece.playerIndex === 'p2' && posDest[1] === 1)
+      if (captLen < 2 && backrow === true) {
+        origPiece.role = 'k-piece';
+      }
+
+      state.pieces.set(dest, origPiece);
+      state.pieces.delete(orig);
+
+      // Remove remaining ghost pieces if this was the last capture of a chain
+      if(captLen === 1){
+        for(const [pieceKey, piece] of state.pieces.entries()){
+          if(piece.role === 'g-piece' || piece.role === 'p-piece'){
+            state.pieces.delete(pieceKey);
+          }
+        }
+      }
+
+      break;
     default:
       if (!tryAutoCastle(state, orig, dest)) {
         state.pieces.set(dest, origPiece);
@@ -432,6 +488,14 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
     } else if ((state.selectable.enabled || force) && state.selected !== key) {
       if (userMove(state, state.selected, key)) {
         state.stats.dragged = false;
+        if (
+          state.variant === 'dameo' &&
+          state.movable.captLen !== undefined &&
+          state.movable.captLen > 1
+        ) {
+          // if we can continue capturing, keep the piece selected
+          setSelected(state, key);
+        }
         return;
       }
     }
