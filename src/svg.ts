@@ -379,6 +379,7 @@ export function roleToSvgName(state: State, piece: DrawShapePiece): string {
     case 'flipello10':
     case 'flipello':
     case 'linesOfAction':
+    case 'dameo':
     case 'go9x9':
     case 'go13x13':
     case 'go19x19':
