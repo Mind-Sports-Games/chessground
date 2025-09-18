@@ -474,7 +474,6 @@ function emptysquares(pieces: cg.Pieces): Mobility {
   };
 }
 
-
 function dameoMan(pieces: cg.Pieces, playerIndex: cg.PlayerIndex): Mobility {
   return (x1, y1, x2, y2) => {
     const sx: number = Math.sign(x2 - x1);
@@ -488,12 +487,13 @@ function dameoMan(pieces: cg.Pieces, playerIndex: cg.PlayerIndex): Mobility {
       }
       return true;
     }
-    if ((playerIndex === 'p1' && sy != 1) || (playerIndex === 'p2' && sy != -1)){
+    if ((playerIndex === 'p1' && sy != 1) || (playerIndex === 'p2' && sy != -1)) {
       return false;
     }
     var stepx = x1;
     var stepy = y1;
-    while (true) { // Line move
+    while (true) {
+      // Line move
       stepx += sx;
       stepy += sy;
       if (stepx == x2 && stepy == y2) {
@@ -506,7 +506,7 @@ function dameoMan(pieces: cg.Pieces, playerIndex: cg.PlayerIndex): Mobility {
         return false;
       }
     }
-  }
+  };
 }
 
 function amazonsQueen(pieces: cg.Pieces): Mobility {
