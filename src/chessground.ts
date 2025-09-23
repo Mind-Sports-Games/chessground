@@ -39,7 +39,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
     redrawNow(false);
     events.bindBoard(state, boundsUpdated);
     if (!prevUnbind) state.dom.unbind = events.bindDocument(state, boundsUpdated);
-    state.events.insert && state.events.insert(elements);
+    if (state.events.insert) state.events.insert(elements);
     return state;
   }
 
