@@ -16,8 +16,8 @@ export enum HorizontalDirectionString {
 }
 
 export const getDirectionString = (vect: Pos): DirectionString | undefined => {
-	if (norm(vect) == 1) {
-		const angle = getAngle360(vectTo3(vect));
+	if (norm(vect) === 1) {
+		const angle = Math.round(10000*getAngle360(vectTo3(vect)))/10000;
 		
 		if (angle < 60) return HorizontalDirectionString.Right;
 		if (angle < 120) return DiagonalDirectionString.UpRight;

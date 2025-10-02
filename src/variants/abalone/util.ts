@@ -266,25 +266,34 @@ export const div2 = (n: number, p: number, a: Pos): Pos => {
 	return mult2(1/n, 1/p, a);
 }
 
+export const areEqual = (a: Pos, b: Pos): boolean => {
+	return a[0] === b[0] && a[1] === b[1];
+}
+export const round = (a: Pos): Pos => {
+	return [Math.round(a[0]), Math.round(a[1])];
+}
 export const vectTo3 = (a: Pos): Pos => {
 	return [a[0] - a[1]/2., a[1]*sr3/2];
+}
+export const vectFrom3 = (a: Pos): Pos => {
+	return [a[0] + a[1]/sr3, a[1]*2/sr3];
 }
 export const cross = (a: Pos, b: Pos): number => {
 	return a[0]*b[1] - a[1]*b[0];
 }
 
 export const getRotated = (a: Pos, deg: number): Pos => {
-	const rot = deg*180/Math.PI;
-	const cos = Math.cos(rot)
-	const sin = Math.sin(rot)
+	const rot = deg*/180Math.PI;
+	const cos = Math.cos(rot);
+	const sin = Math.sin(rot);
 	return [cos*a[0] - sin*a[1], sin*a[0] + cos*a[1]];
 }
 export const getRotatedKeepNorm = (a: Pos, deg: number): Pos => {
-	const p = getRotated(a, deg);
+	const p = round(vectFrom3(getRotated(vectTo3(a), deg)));
 	
 	let n = norm(p);
 	if (n > 0) {
-		n = norm(a)/n
+		n = norm(a)/n;
 	}
 	
 	return mult(n, p);
