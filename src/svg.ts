@@ -243,7 +243,7 @@ function renderCircle(
   current: boolean,
   bounds: ClientRect,
   bd: cg.BoardDimensions,
-  variant: cg.Variant
+  variant: cg.Variant,
 ): SVGElement {
   const o = state.pos2px(pos, bounds, bd, variant),
     widths = circleWidth(bounds, bd),
@@ -268,7 +268,7 @@ function renderArrow(
   shorten: boolean,
   bounds: ClientRect,
   bd: cg.BoardDimensions,
-  variant: cg.Variant
+  variant: cg.Variant,
 ): SVGElement {
   const m = arrowMargin(bounds, shorten && !current, bd),
     a = state.pos2px(orig, bounds, bd, variant),

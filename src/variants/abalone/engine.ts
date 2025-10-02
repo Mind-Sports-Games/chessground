@@ -1,8 +1,8 @@
-import {Key, NumberPair, Pieces, PiecesDiff, Pos, Variant} from "../../types";
+import {Key, NumberPair, Pieces, PiecesDiff, Pos, Variant} from '../../types';
 
 import {getDirectionString,} from './directions';
 import type {MoveImpact, MoveVector} from './types';
-import {add, div, areEqual, getNeighVectors, getNextCore, getPrevCore, getRotatedKeepNorm, includes, isCell, key2pos, mult, norm, pos2key, sub} from "./util";
+import {add, areEqual, div, getNeighVectors, getNextCore, getPrevCore, includes, isCell, key2pos, mult, norm, pos2key, sub} from "./util";
 
 export const isInLineMove = (orig: Key, dest: Key): [NumberPair, number] | undefined => {
 	const from = key2pos(orig);

@@ -1,4 +1,4 @@
-import {Pos} from "../../types";
+import {Pos} from '../../types';
 
 import type {DirectionString} from './types';
 import {getAngle360, norm, vectTo3} from './util';
