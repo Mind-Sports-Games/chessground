@@ -132,8 +132,10 @@ export default function predrop(
       mobility = (_x, y) => y <= 4; // Only p1 can drop, and only on their own half of the board
       break;
 
-    case 'flipello10':
     case 'flipello':
+    case 'flipello10':
+    case 'antiflipello':
+    case 'octagonflipello':
       mobility = emptysquares(pieces); // cant drop on current pieces (either side) as they cant move
       break;
 
