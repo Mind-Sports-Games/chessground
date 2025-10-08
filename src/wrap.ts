@@ -7,6 +7,7 @@ import {
   ranks19,
   shogiVariants,
   xiangqiVariants,
+  goVariants,
   Elements,
   Notation,
   Dice,
@@ -65,6 +66,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     const orientClass = ' ' + s.orientation;
     const shogi = shogiVariants.includes(s.variant);
     const xiangqi = xiangqiVariants.includes(s.variant);
+    const go = goVariants.includes(s.variant);
     if (shogi) {
       container.appendChild(renderCoords(ranks.slice(0, s.dimensions.height).reverse(), 'files' + orientClass));
       container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'ranks' + orientClass));
@@ -79,6 +81,14 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width), 'files' + ' p1'));
         container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width), 'files' + ' p2'));
       }
+    } else if (go) {
+      container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
+      container.appendChild(
+        renderCoords(
+          files.slice(0, s.dimensions.width + 1).filter(x => x !== 'i'),
+          'files' + orientClass,
+        ),
+      );
     } else if (
       s.variant === 'flipello' ||
       s.variant === 'flipello10' ||

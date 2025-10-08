@@ -1,6 +1,6 @@
 {
   "name": "chessground",
-  "version": "7.11.1-pstrat3.18",
+  "version": "7.11.1-pstrat3.19",
   "description": "playstrategy.org chess ui, forked from lichess.org",
   "type": "module",
   "module": "dist/chessground.js",
@@ -40,6 +40,7 @@
     "@jest/globals": "^29.7.0",
     "@typescript-eslint/eslint-plugin": "^8.44.0",
     "@typescript-eslint/parser": "^8.44.0",
+    "@types/node": "^20.19.17",
     "esbuild": "^0.25.10",
     "eslint": "^9.35.0",
     "globals": "^16.4.0",
