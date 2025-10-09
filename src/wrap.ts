@@ -3,6 +3,7 @@ import { calculateBackgammonScores, setVisible, createEl, pos2key, NRanks, invNR
 import {
   orientations,
   files,
+  letters,
   ranks,
   ranks19,
   shogiVariants,
@@ -85,7 +86,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
       container.appendChild(
         renderCoords(
-          files.slice(0, s.dimensions.width + 1).filter(x => x !== 'i'),
+          letters.slice(0, s.dimensions.width + 1).filter(x => x !== 'i'),
           'files' + orientClass,
         ),
       );
