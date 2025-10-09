@@ -157,7 +157,7 @@ export const pxrelToCell = (variant: Variant, bounds: ClientRect, pos: Pos): Num
 
 //
 // Pxrelmini
-export const pxrelminiToPxmini = (variant: Variant, pos: Pos): NumberPair => {
+export const pxrelminiToPxmini = (_variant: Variant, pos: Pos): NumberPair => {
 	return add(bottomLeft, pos);
 };
 

@@ -28,7 +28,7 @@ export const configure = (state: HeadlessState): void => {
 const posToTranslateAbsBridge =
   (bounds: ClientRect, _d: BoardDimensions, variant: Variant) => (pos: Pos, orientation: Orientation) =>
     posToTranslateAbs(variant, bounds, pos, orientation);
-const posToTranslateRelBridge = (pos: Pos, orientation: Orientation, _d: BoardDimensions, variant: Variant) =>
+const posToTranslateRelBridge = (pos: Pos, _orientation: Orientation, _d: BoardDimensions, variant: Variant) =>
   posToTranslateRel(variant, pos);
 const getKeyAtDomPosBridge = (
   pos: Pos,
