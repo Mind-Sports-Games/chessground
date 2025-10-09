@@ -112,6 +112,12 @@ export const getSquareDimensions = (_variant: Variant): SquareDimensions => {
 		height: 1.02*0.0788,
 	};
 };
+export const getSquareDimensions_normed = (_variant: Variant): SquareDimensions => {
+	return {
+		width: 1,
+		height: sr3/2,
+	};
+};
 
 const getFactor = (variant: Variant): number => {
 	return variant === 'grandabalone'? 0.865: 1;
@@ -175,7 +181,7 @@ export const pToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): Number
 	return mult2(d.width*f, d.height*f, pos);
 };
 export const pToPxrelmini = (variant: Variant, pos: Pos): NumberPair => {
-	const d = getSquareDimensions(variant);
+	const d = getSquareDimensions_normed(variant);
 	const f = 100*getFactor(variant);
 	return mult2(d.width*f, d.height*f, pos);
 };
