@@ -4,7 +4,7 @@ import { Key, NumberPair, Orientation, Piece, Variant } from '../../types';
 import { callUserFunction } from '../../util';
 import { computeMoveImpact } from './engine';
 
-import { cellrelToCell, dist2, getSquareDimensions, isCell, mult, pos2key, pxToCellrel } from './util';
+import { cellrelToCell, dist2, getSquareDimensions_bounded, isCell, mult, pos2key, pxToCellrel } from './util';
 
 /**
   From a position in pixels, returns the key of the square
@@ -47,7 +47,7 @@ export const getKeyAtDomPos = (
   pos: NumberPair,
   orientation: Orientation,
 ): Key | undefined => {
-  const d = getSquareDimensions(variant, bounds).width / 2;
+  const d = getSquareDimensions_bounded(variant, bounds).width / 2;
   pos = [pos[0] - bounds.left - d, pos[1] - bounds.top - d];
 
   let res = pxToCellrel(variant, bounds, pos);
