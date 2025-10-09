@@ -194,6 +194,7 @@ export const files = [
   'q',
   'r',
   's',
+  't',
 ] as const;
 export const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', ':'] as const;
 export const ranks10 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] as const;
