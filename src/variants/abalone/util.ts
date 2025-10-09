@@ -141,7 +141,7 @@ export const pxToCell = (variant: Variant, bounds: ClientRect, pos: Pos): Number
 
 //
 // Pxmini
-const bottomLeft = [295, 854] as Pos;
+const centrePxmini = [500, 500] as Pos;
 
 //
 // Pxrel
@@ -163,8 +163,8 @@ export const pxrelToCell = (variant: Variant, bounds: ClientRect, pos: Pos): Num
 
 //
 // Pxrelmini
-export const pxrelminiToPxmini = (_variant: Variant, pos: Pos): NumberPair => {
-	return add(bottomLeft, pos);
+export const pxrelminiToPxmini = (variant: Variant, pos: Pos): NumberPair => {
+	return add(div(getFactor(variant), centrePxmini), pos);
 };
 
 //
@@ -182,8 +182,9 @@ export const pToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): Number
 };
 export const pToPxrelmini = (variant: Variant, pos: Pos): NumberPair => {
 	const d = getSquareDimensions_normed(variant);
-	const f = 100*getFactor(variant);
-	return mult2(d.width*f, d.height*f, pos);
+	const f = 102.5;
+	const centre = cellToP(variant, getCentre(variant));
+	return mult2(d.width*f, d.height*f, add(centre, pos));
 };
 export const pToCellrel = (variant: Variant, pos: Pos): NumberPair => {
 	return cellrelToP(variant, pos); // Involution
