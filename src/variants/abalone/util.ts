@@ -141,15 +141,11 @@ export const cellToPxmini = (variant: Variant, pos: Pos): NumberPair => {
 };
 
 ///
-/// To pxrelmini (same as P
-/*
-Pxrelmini: f*(a, b)*(Cp + Pp) = f*(a, b)*Cp + f*(a, b)*Pp
-Pxmini:    C'/f + f*(a, b)*Cp + f*(a, b)*Pp
- */
+/// To pxrelmini (same as P, scaled)
 const pToPxrelmini = (variant: Variant, pos: Pos): NumberPair => {
 	const d = getSquareDimensions_normed(variant),
 		f = 102.5;
-	return mult2(d.width*f, d.height*f, add(cellToP(variant, getCentre(variant)), pos));
+	return mult2(d.width*f, d.height*f, pos);
 };
 
 //
