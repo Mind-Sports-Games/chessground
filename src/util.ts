@@ -1,8 +1,6 @@
 import * as cg from './types';
 import * as T from './transformations';
 
-import { HeadlessState } from './state';
-
 export const playerIndexs: cg.PlayerIndex[] = ['p1', 'p2'];
 export const invRanks: readonly cg.Rank[] = [...cg.ranks19].reverse();
 export const NRanks: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
@@ -703,13 +701,16 @@ export function backgammonUpdatePiecesFromMove(pieces: cg.Pieces, orig: cg.Key, 
 }
 
 export function dameoUpdatePiecesFromMove(
-  state: HeadlessState,
+  pieces: cg.Pieces,
   orig: cg.Key,
-  dest: cg.Key
-) {
-  const origPiece = state.pieces.get(orig);
+  dest: cg.Key,
+  captLen: number,
+  bd: cg.BoardDimensions
+): cg.PiecesDiff {
+  const origPiece = pieces.get(orig);
 
-  const captLen: number = state.movable.captLen ?? 0;
+  const diff: cg.PiecesDiff = new Map();
+
   // Detect capture and remove cap'd piece
   const posOrig: cg.Pos = key2pos(orig);
   const posDest: cg.Pos = key2pos(dest);
@@ -723,18 +724,16 @@ export function dameoUpdatePiecesFromMove(
     while (true) {
       stepPos = [stepPos[0] + stepX, stepPos[1] + stepY];
       const stepKey: cg.Key = pos2key(stepPos);
-      const stepPiece = state.pieces.get(stepKey);
+      const stepPiece = pieces.get(stepKey);
       if (stepPiece) {
         // Convert captured pieces to ghosts
         if (stepPiece.role === 'm-piece') {
-          state.pieces.delete(stepKey);
-          state.pieces.set(stepKey, {
+          diff.set(stepKey, {
             role: 'g-piece',
             playerIndex: stepPiece.playerIndex,
           });
         } else if (stepPiece.role === 'k-piece') {
-          state.pieces.delete(stepKey);
-          state.pieces.set(stepKey, {
+          diff.set(stepKey, {
             role: 'p-piece',
             playerIndex: stepPiece.playerIndex,
           });
@@ -744,25 +743,32 @@ export function dameoUpdatePiecesFromMove(
     }
   }
 
-  // Promote if we finish the move on the back row
-  const backrow: boolean =
-    (origPiece!.playerIndex === 'p1' && posDest[1] === state.dimensions.height) ||
-    (origPiece!.playerIndex === 'p2' && posDest[1] === 1);
-  if (captLen < 2 && backrow === true) {
-    origPiece!.role = 'k-piece';
-  }
+  if (origPiece) {
+    // Promote if we finish the move on the back row
+    const backrow: boolean =
+      (origPiece.playerIndex === 'p1' && posDest[1] === bd.height) ||
+      (origPiece.playerIndex === 'p2' && posDest[1] === 1);
+    if (captLen < 2 && backrow === true) {
+      origPiece.role = 'k-piece';
+    }
 
-  state.pieces.set(dest, origPiece!);
-  state.pieces.delete(orig);
+    diff.set(dest, origPiece);
+    diff.set(orig, undefined);
 
-  // Remove remaining ghost pieces if this was the last capture of a chain
-  if (captLen === 1) {
-    for (const [pieceKey, piece] of state.pieces.entries()) {
-      if (piece.role === 'g-piece' || piece.role === 'p-piece') {
-        state.pieces.delete(pieceKey);
+    // Remove remaining ghost pieces if this was the last capture of a chain
+    if (captLen === 1) {
+      for (const [pieceKey, piece] of [...pieces.entries(), ...diff.entries()]) {
+        if (piece === undefined) {
+          continue;
+        }
+        if (piece.role === 'g-piece' || piece.role === 'p-piece') {
+          diff.set(pieceKey, undefined);
+        }
       }
     }
   }
+
+  return diff;
 }
 
 export type Callback = (...args: any[]) => void;
