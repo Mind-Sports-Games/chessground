@@ -720,7 +720,7 @@ export function dameoUpdatePiecesFromMove(
     // Step through the intervening pieces until we find the captured piece
     const stepX: number = Math.sign(dx);
     const stepY: number = Math.sign(dy);
-    var stepPos: cg.Pos = posOrig;
+    let stepPos: cg.Pos = posOrig;
     while (true) {
       stepPos = [stepPos[0] + stepX, stepPos[1] + stepY];
       const stepKey: cg.Key = pos2key(stepPos);

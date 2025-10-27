@@ -490,8 +490,8 @@ function dameoMan(pieces: cg.Pieces, playerIndex: cg.PlayerIndex): Mobility {
     if ((playerIndex === 'p1' && sy != 1) || (playerIndex === 'p2' && sy != -1)) {
       return false;
     }
-    var stepx = x1;
-    var stepy = y1;
+    let stepx = x1;
+    let stepy = y1;
     while (true) {
       // Line move
       stepx += sx;
