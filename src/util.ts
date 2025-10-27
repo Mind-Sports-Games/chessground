@@ -721,7 +721,7 @@ export function dameoUpdatePiecesFromMove(
     const stepX: number = Math.sign(dx);
     const stepY: number = Math.sign(dy);
     let stepPos: cg.Pos = posOrig;
-    while (true) {
+    for (;;) {
       stepPos = [stepPos[0] + stepX, stepPos[1] + stepY];
       const stepKey: cg.Key = pos2key(stepPos);
       const stepPiece = pieces.get(stepKey);

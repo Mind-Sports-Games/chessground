@@ -487,16 +487,16 @@ function dameoMan(pieces: cg.Pieces, playerIndex: cg.PlayerIndex): Mobility {
       }
       return true;
     }
-    if ((playerIndex === 'p1' && sy != 1) || (playerIndex === 'p2' && sy != -1)) {
+    if ((playerIndex === 'p1' && sy !== 1) || (playerIndex === 'p2' && sy !== -1)) {
       return false;
     }
     let stepx = x1;
     let stepy = y1;
-    while (true) {
+    for (;;) {
       // Line move
       stepx += sx;
       stepy += sy;
-      if (stepx == x2 && stepy == y2) {
+      if (stepx === x2 && stepy === y2) {
         return true;
       }
       const pos = util.pos2key([stepx, stepy]) as cg.Key;
