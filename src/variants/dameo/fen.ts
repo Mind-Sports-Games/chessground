@@ -3,8 +3,8 @@ import type * as cg from '../../types';
 export const read = (fen: cg.FEN): cg.Pieces => {
   const pieces: cg.Pieces = new Map();
 
-  for(const pieceList of fen.split(':').slice(1, 3)){
-    const playerIndex = pieceList[0] === 'W' ? 'p1' : 'p2' as cg.PlayerIndex;
+  for (const pieceList of fen.split(':').slice(1, 3)) {
+    const playerIndex = (pieceList[0] === 'W' ? 'p1' : 'p2') as cg.PlayerIndex;
     for (const pieceStr of pieceList.slice(1).split(',')) {
       let key: cg.Key;
       /* Possible roles: m = man, k = king,

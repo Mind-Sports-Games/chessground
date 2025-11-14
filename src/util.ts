@@ -705,7 +705,7 @@ export function dameoUpdatePiecesFromMove(
   orig: cg.Key,
   dest: cg.Key,
   captLen: number,
-  bd: cg.BoardDimensions
+  bd: cg.BoardDimensions,
 ): cg.PiecesDiff {
   const origPiece = pieces.get(orig);
 

@@ -216,7 +216,10 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
       setPieces(state, backgammonUpdatePiecesFromMove(state.pieces, orig, dest));
       break;
     case 'dameo':
-      setPieces(state, dameoUpdatePiecesFromMove(state.pieces, orig, dest, state.movable.captLen ?? 0, state.dimensions));
+      setPieces(
+        state,
+        dameoUpdatePiecesFromMove(state.pieces, orig, dest, state.movable.captLen ?? 0, state.dimensions),
+      );
       break;
     default:
       if (!tryAutoCastle(state, orig, dest)) {
