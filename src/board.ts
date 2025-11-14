@@ -113,8 +113,10 @@ function tryAutoCastle(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolea
 //update state pieces based on drop for specific game logics
 function setDropVariantState(state: HeadlessState, piece: cg.Piece, key: cg.Key): void {
   switch (state.variant) {
+    case 'flipello':
     case 'flipello10':
-    case 'flipello': {
+    case 'antiflipello':
+    case 'octagonflipello': {
       const flipping = calculateFlippingPieces(state.dimensions, state.pieces, piece, key);
       const flipPiece: cg.Piece = { role: 'p-piece', playerIndex: state.turnPlayerIndex };
       flipping.forEach(key => state.pieces.set(key, flipPiece));

@@ -48,6 +48,8 @@ export type Variant =
   | 'ordamirror'
   | 'flipello'
   | 'flipello10'
+  | 'antiflipello'
+  | 'octagonflipello'
   | 'amazons'
   | 'oware'
   | 'togyzkumalak'
