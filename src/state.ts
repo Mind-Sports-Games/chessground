@@ -51,6 +51,7 @@ export interface HeadlessState {
     free: boolean; // all moves are valid - board editor
     playerIndex?: cg.PlayerIndex | 'both'; // playerIndex that can move. p1 | p2 | both
     dests?: cg.Dests; // valid moves. {"a2" ["a3" "a4"] "b1" ["a3" "c3"]}
+    captLen?: number;
     showDests: boolean; // whether to add the move-dest class on squares
     events: {
       after?: (orig: cg.Key, dest: cg.Key, metadata: cg.MoveMetadata) => void; // called after the move has been played
