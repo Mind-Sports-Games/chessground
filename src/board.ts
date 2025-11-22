@@ -519,7 +519,7 @@ function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
 
 function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
   const piece = state.pieces.get(orig);
-  if(state.variant === 'dameo' && piece && ['a-piece', 'b-piece'].includes(piece.role)) {
+  if(state.variant === 'dameo' && piece && ['a-piece', 'b-piece', 'g-piece', 'p-piece'].includes(piece.role)) {
     return false;
   }
   return (
