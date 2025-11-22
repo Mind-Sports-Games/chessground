@@ -738,6 +738,14 @@ export function dameoUpdatePiecesFromMove(
             playerIndex: stepPiece.playerIndex,
           });
         }
+        // Convert capturing piece to active
+        if (origPiece) {
+          if (origPiece.role === 'm-piece') {
+            origPiece.role = 'a-piece';
+          } else if (origPiece.role === 'k-piece') {
+            origPiece.role = 'b-piece';
+          }
+        }
         break;
       }
     }
@@ -752,9 +760,6 @@ export function dameoUpdatePiecesFromMove(
       origPiece.role = 'k-piece';
     }
 
-    diff.set(dest, origPiece);
-    diff.set(orig, undefined);
-
     // Remove remaining ghost pieces if this was the last capture of a chain
     if (captLen === 1) {
       for (const [pieceKey, piece] of [...pieces.entries(), ...diff.entries()]) {
@@ -765,7 +770,16 @@ export function dameoUpdatePiecesFromMove(
           diff.set(pieceKey, undefined);
         }
       }
+      // .. and convert active piece back to normal
+      if (origPiece.role === 'a-piece') {
+        origPiece.role = 'm-piece';
+      } else if (origPiece.role === 'b-piece') {
+        origPiece.role = 'k-piece';
+      }
     }
+
+    diff.set(dest, origPiece);
+    diff.set(orig, undefined);
   }
 
   return diff;
