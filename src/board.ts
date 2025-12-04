@@ -188,10 +188,9 @@ function updatePocketPieces(
  * @returns: false if the move is invalid, true if the move is valid but no capture happened, or the captured piece if a capture happened
  */
 export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
-  const origPiece = state.pieces.get(orig),
-    destPiece = state.pieces.get(dest);
+  const origPiece = state.pieces.get(orig);
   if ((orig === dest && state.variant !== 'togyzkumalak' && state.variant !== 'bestemshe') || !origPiece) return false;
-  const captured = isCapture(state.variant, destPiece, origPiece);
+  const captured = isCapture(state.variant, state.pieces, orig, dest);
   if (dest === state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captured);
 
@@ -227,19 +226,46 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
   return captured || true;
 }
 
-function isCapture(variant: cg.Variant, destPiece: cg.Piece | undefined, origPiece: cg.Piece): cg.Piece | undefined {
+function isCapture(variant: cg.Variant, pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): cg.Piece | undefined {
+  const origPiece = pieces.get(orig);
+  if (origPiece === undefined) return undefined;
+  const destPiece = pieces.get(dest);
+  const changedRank = key2pos(orig)[1] !== key2pos(dest)[1];
+
   switch (variant) {
-    case 'togyzkumalak':
     case 'bestemshe': {
-      //TODO account for wrapping around board (simimlar to oware capture)
-      const count = destPiece && Number(destPiece.role.split('-')[0].substring(1));
-      return destPiece && destPiece.playerIndex !== origPiece.playerIndex && count && (count === 2 || count % 2 === 1)
-        ? destPiece
+      const countDest = destPiece && Number(destPiece.role.split('-')[0].substring(1));
+      const countOrig = origPiece && Number(origPiece.role.split('-')[0].substring(1));
+      const wrapCount = Math.floor((countOrig - 1) / 10);
+      const totalDest = (countDest ?? 0) + wrapCount + 1;
+      const capturedBestemshePiece =
+        destPiece ?? ({ role: `s${totalDest}-piece`, playerIndex: opposite(origPiece.playerIndex) } as cg.Piece);
+      return changedRank && totalDest % 2 === 0 ? capturedBestemshePiece : undefined;
+    }
+    case 'togyzkumalak': {
+      const countDest = destPiece && Number(destPiece.role.split('-')[0].substring(1));
+      const countOrig = origPiece && Number(origPiece.role.split('-')[0].substring(1));
+      const wrapCount = Math.floor((countOrig - 1) / 18);
+      const totalDest = (countDest ?? 0) + wrapCount + 1;
+      const capturedTogyPiece =
+        destPiece ?? ({ role: `s${totalDest}-piece`, playerIndex: opposite(origPiece.playerIndex) } as cg.Piece);
+      const myTuzdik = Array.from(pieces.entries()).filter(
+        ([_, p]) => p.role === 't-piece' && p.playerIndex === opposite(origPiece.playerIndex),
+      );
+      const noExistingTuzdik = myTuzdik.length === 0;
+      return changedRank && (totalDest % 2 === 0 || (totalDest === 3 && noExistingTuzdik))
+        ? capturedTogyPiece
         : undefined;
     }
-    case 'oware':
-      //TODO this is more complicated to calculate... (but its only used for sound in lila atm)
-      return destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
+    case 'oware': {
+      const countDest = destPiece && Number(destPiece.role.split('-')[0].substring(1));
+      const countOrig = origPiece && Number(origPiece.role.split('-')[0].substring(1));
+      const wrapCount = Math.floor((countOrig - 1) / 11);
+      const totalDest = (countDest ?? 0) + wrapCount + 1;
+      const capturedPiece =
+        destPiece ?? ({ role: `s${totalDest}-piece`, playerIndex: opposite(origPiece.playerIndex) } as cg.Piece);
+      return changedRank && (totalDest === 2 || totalDest === 3) ? capturedPiece : undefined;
+    }
     default:
       return destPiece && destPiece.playerIndex !== origPiece.playerIndex ? destPiece : undefined;
   }
