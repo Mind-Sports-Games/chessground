@@ -700,6 +700,91 @@ export function backgammonUpdatePiecesFromMove(pieces: cg.Pieces, orig: cg.Key, 
   return diff;
 }
 
+export function dameoUpdatePiecesFromMove(
+  pieces: cg.Pieces,
+  orig: cg.Key,
+  dest: cg.Key,
+  captLen: number,
+  bd: cg.BoardDimensions,
+): cg.PiecesDiff {
+  const origPiece = pieces.get(orig);
+
+  const diff: cg.PiecesDiff = new Map();
+
+  // Detect capture and remove cap'd piece
+  const posOrig: cg.Pos = key2pos(orig);
+  const posDest: cg.Pos = key2pos(dest);
+  const dx: number = posDest[0] - posOrig[0];
+  const dy: number = posDest[1] - posOrig[1];
+  if (captLen > 0) {
+    // Step through the intervening pieces until we find the captured piece
+    const stepX: number = Math.sign(dx);
+    const stepY: number = Math.sign(dy);
+    let stepPos: cg.Pos = posOrig;
+    for (;;) {
+      stepPos = [stepPos[0] + stepX, stepPos[1] + stepY];
+      const stepKey: cg.Key = pos2key(stepPos);
+      const stepPiece = pieces.get(stepKey);
+      if (stepPiece) {
+        // Convert captured pieces to ghosts
+        if (stepPiece.role === 'm-piece') {
+          diff.set(stepKey, {
+            role: 'g-piece',
+            playerIndex: stepPiece.playerIndex,
+          });
+        } else if (stepPiece.role === 'k-piece') {
+          diff.set(stepKey, {
+            role: 'p-piece',
+            playerIndex: stepPiece.playerIndex,
+          });
+        }
+        // Convert capturing piece to active
+        if (origPiece) {
+          if (origPiece.role === 'm-piece') {
+            origPiece.role = 'a-piece';
+          } else if (origPiece.role === 'k-piece') {
+            origPiece.role = 'b-piece';
+          }
+        }
+        break;
+      }
+    }
+  }
+
+  if (origPiece) {
+    // Promote if we finish the move on the back row
+    const backrow: boolean =
+      (origPiece.playerIndex === 'p1' && posDest[1] === bd.height) ||
+      (origPiece.playerIndex === 'p2' && posDest[1] === 1);
+    if (captLen < 2 && backrow === true) {
+      origPiece.role = 'k-piece';
+    }
+
+    // Remove remaining ghost pieces if this was the last capture of a chain
+    if (captLen === 1) {
+      for (const [pieceKey, piece] of [...pieces.entries(), ...diff.entries()]) {
+        if (piece === undefined) {
+          continue;
+        }
+        if (piece.role === 'g-piece' || piece.role === 'p-piece') {
+          diff.set(pieceKey, undefined);
+        }
+      }
+      // .. and convert active piece back to normal
+      if (origPiece.role === 'a-piece') {
+        origPiece.role = 'm-piece';
+      } else if (origPiece.role === 'b-piece') {
+        origPiece.role = 'k-piece';
+      }
+    }
+
+    diff.set(dest, origPiece);
+    diff.set(orig, undefined);
+  }
+
+  return diff;
+}
+
 export type Callback = (...args: any[]) => void;
 
 export function callUserFunction(f: Callback | undefined, ...args: any[]): void {

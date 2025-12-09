@@ -17,6 +17,7 @@ import {
   owareUpdatePiecesFromMove,
   togyzkumalakUpdatePiecesFromMove,
   backgammonUpdatePiecesFromMove,
+  dameoUpdatePiecesFromMove,
   calculateFlippingPieces,
 } from './util';
 import { queen, knight } from './premove';
@@ -212,6 +213,12 @@ export function baseMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.P
         updatePocketPieces(state, opposite(origPiece.playerIndex), false, true);
       }
       setPieces(state, backgammonUpdatePiecesFromMove(state.pieces, orig, dest));
+      break;
+    case 'dameo':
+      setPieces(
+        state,
+        dameoUpdatePiecesFromMove(state.pieces, orig, dest, state.movable.captLen ?? 0, state.dimensions),
+      );
       break;
     default:
       if (!tryAutoCastle(state, orig, dest)) {
@@ -460,6 +467,10 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
     } else if ((state.selectable.enabled || force) && state.selected !== key) {
       if (userMove(state, state.selected, key)) {
         state.stats.dragged = false;
+        if (state.variant === 'dameo' && state.movable.captLen !== undefined && state.movable.captLen > 1) {
+          // if we can continue capturing, keep the piece selected
+          setSelected(state, key);
+        }
         return;
       }
     }
@@ -534,6 +545,9 @@ function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
 
 function isPremovable(state: HeadlessState, orig: cg.Key): boolean {
   const piece = state.pieces.get(orig);
+  if (state.variant === 'dameo' && piece && ['a-piece', 'b-piece', 'g-piece', 'p-piece'].includes(piece.role)) {
+    return false;
+  }
   return (
     !!piece &&
     state.premovable.enabled &&

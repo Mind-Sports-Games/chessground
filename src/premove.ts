@@ -474,6 +474,41 @@ function emptysquares(pieces: cg.Pieces): Mobility {
   };
 }
 
+function dameoMan(pieces: cg.Pieces, playerIndex: cg.PlayerIndex): Mobility {
+  return (x1, y1, x2, y2) => {
+    const sx: number = Math.sign(x2 - x1);
+    const sy: number = Math.sign(y2 - y1);
+    if ((diff(x1, x2) === 0 && diff(y1, y2) === 2) || (diff(y1, y2) === 0 && diff(x1, x2) === 2)) {
+      const pos = util.pos2key([x1 + sx, y1 + sy]) as cg.Key;
+      // capture
+      if (pieces.has(pos) && pieces.get(pos)!.playerIndex === playerIndex) {
+        // can't capture where an own piece is currently in the way
+        return false;
+      }
+      return true;
+    }
+    if ((playerIndex === 'p1' && sy !== 1) || (playerIndex === 'p2' && sy !== -1)) {
+      return false;
+    }
+    let stepx = x1;
+    let stepy = y1;
+    for (;;) {
+      // Line move
+      stepx += sx;
+      stepy += sy;
+      if (stepx === x2 && stepy === y2) {
+        return true;
+      }
+      const pos = util.pos2key([stepx, stepy]) as cg.Key;
+      if (pieces.has(pos) && pieces.get(pos)!.playerIndex === playerIndex) {
+        continue;
+      } else {
+        return false;
+      }
+    }
+  };
+}
+
 function amazonsQueen(pieces: cg.Pieces): Mobility {
   return (x1, y1, x2, y2) => {
     if (x2 > x1 && y1 === y2) {
@@ -559,6 +594,16 @@ export function premove(
   let mobility: Mobility;
 
   switch (variant) {
+    case 'dameo':
+      switch (role) {
+        case 'm-piece':
+          mobility = dameoMan(pieces, playerIndex);
+          break;
+        case 'k-piece':
+          mobility = queen;
+          break;
+      }
+      break;
     case 'xiangqi':
     case 'manchu':
       switch (role) {
