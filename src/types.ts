@@ -346,6 +346,7 @@ export interface MultiPointState {
 
 export const chessVariants: Variant[] = [
   'chess',
+  'standard',
   'crazyhouse',
   'chess960',
   'kingOfTheHill',
