@@ -178,7 +178,7 @@ export function configure(state: HeadlessState, config: Config): void {
   // no need for such short animations
   if (!state.animation.duration || state.animation.duration < 100) state.animation.enabled = false;
 
-  if (!state.movable.rookCastle && state.movable.dests) {
+  if (cg.chessVariants.includes(state.variant) && !state.movable.rookCastle && state.movable.dests) {
     const rank = state.movable.playerIndex === 'p1' ? 1 : 8,
       kingStartPos = ('e' + rank) as cg.Key,
       dests = state.movable.dests.get(kingStartPos),
