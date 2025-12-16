@@ -344,6 +344,20 @@ export interface MultiPointState {
   p2: number;
 }
 
+export const chessVariants: Variant[] = [
+  'chess',
+  'crazyhouse',
+  'chess960',
+  'kingOfTheHill',
+  'threeCheck',
+  'fiveCheck',
+  'antichess',
+  'atomic',
+  'horde',
+  'racingKings',
+  'noCastling',
+  'monster',
+];
 export const shogiVariants: Variant[] = ['shogi', 'minishogi', 'kyotoshogi', 'dobutsu', 'gorogoro', 'torishogi'];
 export const xiangqiVariants: Variant[] = ['xiangqi', 'minixiangqi', 'manchu', 'janggi'];
 export const goVariants: Variant[] = ['go9x9', 'go13x13', 'go19x19'];
