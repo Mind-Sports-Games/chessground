@@ -1,5 +1,6 @@
 export type Variant =
   | 'chess'
+  | 'standard'
   | 'crazyhouse'
   | 'chess960'
   | 'kingOfTheHill'
