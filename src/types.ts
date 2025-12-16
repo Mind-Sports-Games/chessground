@@ -1,6 +1,7 @@
 export type Variant =
   | 'chess'
   | 'standard'
+  | 'fromPosition'
   | 'crazyhouse'
   | 'chess960'
   | 'kingOfTheHill'
@@ -348,6 +349,7 @@ export interface MultiPointState {
 export const chessVariants: Variant[] = [
   'chess',
   'standard',
+  'fromPosition',
   'crazyhouse',
   'chess960',
   'kingOfTheHill',
