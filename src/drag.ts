@@ -213,7 +213,13 @@ export function end(s: State, e: cg.MouchEvent): void {
     if (cur.newPiece) board.dropNewPiece(s, cur.orig, dest, cur.force);
     else {
       s.stats.ctrlKey = e.ctrlKey;
-      if (board.userMove(s, cur.orig, dest)) s.stats.dragged = true;
+      if (board.userMove(s, cur.orig, dest)) {
+        s.stats.dragged = true;
+        if (s.variant === 'dameo' && s.movable.captLen !== undefined && s.movable.captLen > 1) {
+          // if we can continue capturing, keep the piece selected
+          board.setSelected(s, dest);
+        }
+      }
     }
   } else if (cur.newPiece) {
     s.pieces.delete(cur.orig);
