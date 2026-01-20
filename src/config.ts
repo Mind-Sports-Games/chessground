@@ -16,7 +16,7 @@ export interface Config {
   captureLength?: number; //Amount of forced captures in this turn
   lastMove?: cg.Key[]; // squares part of the last move ["c3", "c4"]
   selected?: cg.Key; // square currently selected "a1"
-  coordinates?: boolean; // include coords attributes
+  coordinates?: cg.Coords; // display coordinates inside, outside or not at all // TODO: considering the parameter is optional, default it to Hidden
   boardScores?: boolean; //include board-scores attributes
   dice?: cg.Dice[]; // dice to display on the board
   doublingCube?: cg.DoublingCube; // doubling cube to display on the board

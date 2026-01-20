@@ -1,5 +1,5 @@
 import { HeadlessState } from './state';
-import { calculateBackgammonScores, setVisible, createEl, pos2key, NRanks, invNRanks } from './util';
+import { calculateBackgammonScores, setVisible, createEl, pos2key, NRanks, invNRanks, generateCoordinatesClass } from './util';
 import {
   orientations,
   files,
@@ -13,6 +13,7 @@ import {
   Notation,
   Dice,
   DoublingCube,
+  Coords,
 } from './types';
 import { createElement as createSVG, setAttributes } from './svg';
 
@@ -63,28 +64,33 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     container.appendChild(customSvg);
   }
 
-  if (s.coordinates) {
+  if (s.coordinates !== Coords.Hidden) {
+    const coordinatesContainer = createEl(
+      'cg-coords-container',
+      generateCoordinatesClass(s.variant, s.coordinates)
+    );
+
     const orientClass = ' ' + s.orientation;
     const shogi = shogiVariants.includes(s.variant);
     const xiangqi = xiangqiVariants.includes(s.variant);
     const go = goVariants.includes(s.variant);
     if (shogi) {
-      container.appendChild(renderCoords(ranks.slice(0, s.dimensions.height).reverse(), 'files' + orientClass));
-      container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'ranks' + orientClass));
+      coordinatesContainer.appendChild(renderCoords(ranks.slice(0, s.dimensions.height).reverse(), 'files' + orientClass));
+      coordinatesContainer.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'ranks' + orientClass));
     } else if (s.notation === Notation.JANGGI) {
-      container.appendChild(renderCoords(['0'].concat(ranks.slice(0, 9).reverse()), 'ranks' + orientClass));
-      container.appendChild(renderCoords(ranks.slice(0, 9), 'files' + orientClass));
+      coordinatesContainer.appendChild(renderCoords(['0'].concat(ranks.slice(0, 9).reverse()), 'ranks' + orientClass));
+      coordinatesContainer.appendChild(renderCoords(ranks.slice(0, 9), 'files' + orientClass));
     } else if (xiangqi) {
       if (s.orientation === 'p1') {
-        container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width).reverse(), 'files' + ' p1'));
-        container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
+        coordinatesContainer.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width).reverse(), 'files' + ' p1'));
+        coordinatesContainer.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
       } else {
-        container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width), 'files' + ' p1'));
-        container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width), 'files' + ' p2'));
+        coordinatesContainer.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width), 'files' + ' p1'));
+        coordinatesContainer.appendChild(renderCoords(ranks19.slice(0, s.dimensions.width), 'files' + ' p2'));
       }
     } else if (go) {
-      container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
-      container.appendChild(
+      coordinatesContainer.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
+      coordinatesContainer.appendChild(
         renderCoords(
           letters.slice(0, s.dimensions.width + 1).filter(x => x !== 'i'),
           'files' + orientClass,
@@ -96,19 +102,19 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       s.variant === 'antiflipello' ||
       s.variant === 'octagonflipello'
     ) {
-      container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height).reverse(), 'ranks' + orientClass));
-      container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
+      coordinatesContainer.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height).reverse(), 'ranks' + orientClass));
+      coordinatesContainer.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
     } else if (s.variant === 'oware') {
       if (s.orientation === 'p1') {
-        container.appendChild(
+        coordinatesContainer.appendChild(
           renderCoords(
             files.slice(0, s.dimensions.width).map(x => x.toUpperCase()),
             'files' + ' p1',
           ),
         );
-        container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + ' p2'));
+        coordinatesContainer.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + ' p2'));
       } else {
-        container.appendChild(
+        coordinatesContainer.appendChild(
           renderCoords(
             files
               .slice(0, s.dimensions.width)
@@ -117,33 +123,33 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
             'files' + ' p1',
           ),
         );
-        container.appendChild(renderCoords(files.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
+        coordinatesContainer.appendChild(renderCoords(files.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
       }
     } else if (s.variant === 'togyzkumalak' || s.variant === 'bestemshe') {
       if (s.orientation === 'p1') {
-        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width), 'files' + ' p1'));
-        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width), 'files' + ' p2'));
+        coordinatesContainer.appendChild(renderCoords(ranks.slice(0, s.dimensions.width), 'files' + ' p1'));
+        coordinatesContainer.appendChild(renderCoords(ranks.slice(0, s.dimensions.width), 'files' + ' p2'));
       } else {
-        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p1'));
-        container.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
+        coordinatesContainer.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p1'));
+        coordinatesContainer.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'files' + ' p2'));
       }
     } else if (s.variant === 'backgammon' || s.variant === 'hyper' || s.variant === 'nackgammon') {
       if (s.orientation === 'p1') {
         if (s.turnPlayerIndex === 'p1') {
-          container.appendChild(
+          coordinatesContainer.appendChild(
             renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p2'),
           );
-          container.appendChild(
+          coordinatesContainer.appendChild(
             renderCoords(
               ['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(),
               'files' + ' p1',
             ),
           );
         } else {
-          container.appendChild(
+          coordinatesContainer.appendChild(
             renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p1'),
           );
-          container.appendChild(
+          coordinatesContainer.appendChild(
             renderCoords(
               ['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(),
               'files' + ' p2',
@@ -152,55 +158,56 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         }
       } else {
         if (s.turnPlayerIndex === 'p1') {
-          container.appendChild(
+          coordinatesContainer.appendChild(
             renderCoords(
               ['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(),
               'files' + ' p1',
             ),
           );
-          container.appendChild(
+          coordinatesContainer.appendChild(
             renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p2'),
           );
         } else {
-          container.appendChild(
+          coordinatesContainer.appendChild(
             renderCoords(
               ['1', '2', '3', '4', '5', '6', '', '7', '8', '9', '10', '11', '12'].reverse(),
               'files' + ' p2',
             ),
           );
-          container.appendChild(
+          coordinatesContainer.appendChild(
             renderCoords(['13', '14', '15', '16', '17', '18', '', '19', '20', '21', '22', '23', '24'], 'files' + ' p1'),
           );
         }
       }
     } else if (s.variant === 'abalone') {
       if (s.orientation === 'p1') {
-        container.appendChild(renderCoords(ranks.slice(0, 5), 'files' + orientClass + ' rank-1'));
-        container.appendChild(renderCoords(['6'], 'files' + orientClass + ' rank-2'));
-        container.appendChild(renderCoords(['7'], 'files' + orientClass + ' rank-3'));
-        container.appendChild(renderCoords(['8'], 'files' + orientClass + ' rank-4'));
-        container.appendChild(renderCoords(['9'], 'files' + orientClass + ' rank-5'));
-        container.appendChild(renderCoords(['e'], 'ranks' + orientClass + ' file-1'));
-        container.appendChild(renderCoords(['d', 'f'], 'ranks' + orientClass + ' file-2'));
-        container.appendChild(renderCoords(['c', 'g'], 'ranks' + orientClass + ' file-3'));
-        container.appendChild(renderCoords(['b', '', 'h'], 'ranks' + orientClass + ' file-4'));
-        container.appendChild(renderCoords(['a', '', '', '', 'i'], 'ranks' + orientClass + ' file-5'));
+        coordinatesContainer.appendChild(renderCoords(ranks.slice(0, 5), 'files' + orientClass + ' rank-1'));
+        coordinatesContainer.appendChild(renderCoords(['6'], 'files' + orientClass + ' rank-2'));
+        coordinatesContainer.appendChild(renderCoords(['7'], 'files' + orientClass + ' rank-3'));
+        coordinatesContainer.appendChild(renderCoords(['8'], 'files' + orientClass + ' rank-4'));
+        coordinatesContainer.appendChild(renderCoords(['9'], 'files' + orientClass + ' rank-5'));
+        coordinatesContainer.appendChild(renderCoords(['e'], 'ranks' + orientClass + ' file-1'));
+        coordinatesContainer.appendChild(renderCoords(['d', 'f'], 'ranks' + orientClass + ' file-2'));
+        coordinatesContainer.appendChild(renderCoords(['c', 'g'], 'ranks' + orientClass + ' file-3'));
+        coordinatesContainer.appendChild(renderCoords(['b', '', 'h'], 'ranks' + orientClass + ' file-4'));
+        coordinatesContainer.appendChild(renderCoords(['a', '', '', '', 'i'], 'ranks' + orientClass + ' file-5'));
       } else {
-        container.appendChild(renderCoords(ranks.slice(0, 5), 'files' + orientClass + ' rank-1'));
-        container.appendChild(renderCoords(['6'], 'files' + orientClass + ' rank-2'));
-        container.appendChild(renderCoords(['7'], 'files' + orientClass + ' rank-3'));
-        container.appendChild(renderCoords(['8'], 'files' + orientClass + ' rank-4'));
-        container.appendChild(renderCoords(['9'], 'files' + orientClass + ' rank-5'));
-        container.appendChild(renderCoords(['e'], 'ranks' + orientClass + ' file-1'));
-        container.appendChild(renderCoords(['d', 'f'], 'ranks' + orientClass + ' file-2'));
-        container.appendChild(renderCoords(['c', 'g'], 'ranks' + orientClass + ' file-3'));
-        container.appendChild(renderCoords(['b', '', 'h'], 'ranks' + orientClass + ' file-4'));
-        container.appendChild(renderCoords(['a', '', '', '', 'i'], 'ranks' + orientClass + ' file-5'));
+        coordinatesContainer.appendChild(renderCoords(ranks.slice(0, 5), 'files' + orientClass + ' rank-1'));
+        coordinatesContainer.appendChild(renderCoords(['6'], 'files' + orientClass + ' rank-2'));
+        coordinatesContainer.appendChild(renderCoords(['7'], 'files' + orientClass + ' rank-3'));
+        coordinatesContainer.appendChild(renderCoords(['8'], 'files' + orientClass + ' rank-4'));
+        coordinatesContainer.appendChild(renderCoords(['9'], 'files' + orientClass + ' rank-5'));
+        coordinatesContainer.appendChild(renderCoords(['e'], 'ranks' + orientClass + ' file-1'));
+        coordinatesContainer.appendChild(renderCoords(['d', 'f'], 'ranks' + orientClass + ' file-2'));
+        coordinatesContainer.appendChild(renderCoords(['c', 'g'], 'ranks' + orientClass + ' file-3'));
+        coordinatesContainer.appendChild(renderCoords(['b', '', 'h'], 'ranks' + orientClass + ' file-4'));
+        coordinatesContainer.appendChild(renderCoords(['a', '', '', '', 'i'], 'ranks' + orientClass + ' file-5'));
       }
     } else {
-      container.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
-      container.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
+      coordinatesContainer.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
+      coordinatesContainer.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
     }
+    container.appendChild(coordinatesContainer);
   }
 
   if (s.boardScores) {
