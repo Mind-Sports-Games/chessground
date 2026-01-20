@@ -813,7 +813,7 @@ export const generateCoordinatesClass = (variant: cg.Variant, coords: cg.Coords)
     'backgammon',
     'hyper',
     'nackgammon',
-    'abalone'
+    'abalone',
   ];
   if (coords === cg.Coords.Inside) {
     if (forceOuterCoordsVariants.includes(variant)) return 'outer-coords';

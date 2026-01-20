@@ -366,7 +366,8 @@ export const shogiVariants: Variant[] = ['shogi', 'minishogi', 'kyotoshogi', 'do
 export const xiangqiVariants: Variant[] = ['xiangqi', 'minixiangqi', 'manchu', 'janggi'];
 export const goVariants: Variant[] = ['go9x9', 'go13x13', 'go19x19'];
 
-export enum Coords { // add "const" if you do not want to expose the enum at runtime
+export enum Coords {
+  // add "const" if you do not want to expose the enum at runtime
   Hidden = 0,
   Inside = 1,
   Outside = 2,

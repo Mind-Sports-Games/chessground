@@ -1,5 +1,13 @@
 import { HeadlessState } from './state';
-import { calculateBackgammonScores, setVisible, createEl, pos2key, NRanks, invNRanks, generateCoordinatesClass } from './util';
+import {
+  calculateBackgammonScores,
+  setVisible,
+  createEl,
+  pos2key,
+  NRanks,
+  invNRanks,
+  generateCoordinatesClass,
+} from './util';
 import {
   orientations,
   files,
@@ -65,18 +73,19 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
   }
 
   if (s.coordinates !== Coords.Hidden) {
-    const coordinatesContainer = createEl(
-      'cg-coords-container',
-      generateCoordinatesClass(s.variant, s.coordinates)
-    );
+    const coordinatesContainer = createEl('cg-coords-container', generateCoordinatesClass(s.variant, s.coordinates));
 
     const orientClass = ' ' + s.orientation;
     const shogi = shogiVariants.includes(s.variant);
     const xiangqi = xiangqiVariants.includes(s.variant);
     const go = goVariants.includes(s.variant);
     if (shogi) {
-      coordinatesContainer.appendChild(renderCoords(ranks.slice(0, s.dimensions.height).reverse(), 'files' + orientClass));
-      coordinatesContainer.appendChild(renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'ranks' + orientClass));
+      coordinatesContainer.appendChild(
+        renderCoords(ranks.slice(0, s.dimensions.height).reverse(), 'files' + orientClass),
+      );
+      coordinatesContainer.appendChild(
+        renderCoords(ranks.slice(0, s.dimensions.width).reverse(), 'ranks' + orientClass),
+      );
     } else if (s.notation === Notation.JANGGI) {
       coordinatesContainer.appendChild(renderCoords(['0'].concat(ranks.slice(0, 9).reverse()), 'ranks' + orientClass));
       coordinatesContainer.appendChild(renderCoords(ranks.slice(0, 9), 'files' + orientClass));
@@ -102,7 +111,9 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
       s.variant === 'antiflipello' ||
       s.variant === 'octagonflipello'
     ) {
-      coordinatesContainer.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height).reverse(), 'ranks' + orientClass));
+      coordinatesContainer.appendChild(
+        renderCoords(ranks19.slice(0, s.dimensions.height).reverse(), 'ranks' + orientClass),
+      );
       coordinatesContainer.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));
     } else if (s.variant === 'oware') {
       if (s.orientation === 'p1') {
