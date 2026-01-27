@@ -7,6 +7,7 @@ import { cancel as dragCancel, dragNewPiece } from './drag';
 import { DrawShape } from './draw';
 import explosion from './explosion';
 import * as cg from './types';
+import { Coords } from './types';
 
 export interface Api {
   // reconfigure the instance. Accepts all config options, except for viewOnly & drawable.visible.
@@ -92,6 +93,8 @@ export interface Api {
   // unbinds all events
   // (important for document-wide events like scroll and mousemove)
   destroy: cg.Unbind;
+
+  displayCoordinates(coords: Coords): void;
 }
 
 // see API types and documentations in dts/api.d.ts
@@ -231,6 +234,11 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
       board.stop(state);
       if (state.dom.unbind) state.dom.unbind();
       state.dom.destroyed = true;
+    },
+
+    displayCoordinates(coords: Coords): void {
+      state.coordinates = coords;
+      redrawAll();
     },
   };
 }

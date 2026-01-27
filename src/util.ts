@@ -790,3 +790,36 @@ export type Callback = (...args: any[]) => void;
 export function callUserFunction(f: Callback | undefined, ...args: any[]): void {
   if (f) setTimeout(() => f(...args), 1);
 }
+
+export const generateCoordinatesClass = (variant: cg.Variant, coords: cg.Coords) => {
+  if (coords === cg.Coords.Hidden) return 'hidden-coords';
+  const forceOuterCoordsVariants: cg.Variant[] = [
+    'xiangqi',
+    'shogi',
+    'minixiangqi',
+    'minishogi',
+    'oware',
+    'octagonflipello',
+    'go9x9',
+    'go13x13',
+    'go19x19',
+  ];
+  const forceInnerCoordsVariants: cg.Variant[] = [
+    'togyzkumalak',
+    'bestemshe',
+    'backgammon',
+    'hyper',
+    'nackgammon',
+    'abalone',
+  ];
+  if (coords === cg.Coords.Inside) {
+    if (forceOuterCoordsVariants.includes(variant)) return 'outer-coords';
+    return 'inner-coords';
+  }
+  if (coords === cg.Coords.Outside) {
+    if (forceInnerCoordsVariants.includes(variant)) return 'inner-coords';
+    return 'outer-coords';
+  }
+
+  return 'hidden-coords';
+};

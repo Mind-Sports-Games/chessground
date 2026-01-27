@@ -21,7 +21,7 @@ export interface HeadlessState {
   selected?: cg.Key; // square currently selected "a1"
   selectedPieces: cg.Pieces; // selected pieces when using selectOnly mode
   simpleGoScores?: cg.SimpleGoScores; // score for each player in go game (area + pieces)
-  coordinates: boolean; // include coords attributes
+  coordinates: cg.Coords; // include coords attributes
   boardScores: boolean; //include board-scores attributes
   dice: cg.Dice[]; // dice to display on the board
   doublingCube?: cg.DoublingCube; // doubling cube to display on the board (backgammon)
@@ -199,7 +199,7 @@ export function defaults(): HeadlessState {
     myPlayerIndex: 'p1',
     startPlayerIndex: 'p1',
     turnPlayerIndex: 'p1',
-    coordinates: true,
+    coordinates: cg.Coords.Inside,
     boardScores: false,
     dice: [],
     canUndo: false,
