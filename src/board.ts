@@ -307,7 +307,8 @@ export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key,
 function baseUserMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   const result = state.baseMove(state, orig, dest);
   if (result) {
-    if (state.variant !== 'dameo' || state.movable.captLen === undefined || state.movable.captLen < 2) state.movable.dests = undefined;
+    if (state.variant !== 'dameo' || state.movable.captLen === undefined || state.movable.captLen < 2)
+      state.movable.dests = undefined;
     state.dropmode.dropDests = undefined;
     state.liftable.liftDests = undefined;
     if (!(state.variant === 'backgammon' || state.variant === 'hyper' || state.variant === 'nackgammon')) {
