@@ -194,20 +194,6 @@ export function move(s: State, e: cg.MouchEvent): void {
 }
 
 export function end(s: State, e: cg.MouchEvent): void {
-  if (s.variant === 'dameo') {
-    const from: cg.Key | undefined = s.draggable.current?.orig || s.selected;
-    const to: cg.Key | undefined = util.eventPosition(e)
-      ? s.getKeyAtDomPos(util.eventPosition(e)!, s.orientation, s.dom.bounds(), s.dimensions, s.variant)
-      : undefined;
-    if (from && to && from !== to && board.canMove(s, from, to)) {
-      if (board.userMove(s, from, to)) {
-        s.stats.dragged = false;
-        board.setSelected(s, to);
-        return;
-      }
-    }
-  }
-
   const cur = s.draggable.current;
   if (!cur) return;
   // create no corresponding mouse event
