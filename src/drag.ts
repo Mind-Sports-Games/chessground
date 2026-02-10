@@ -195,17 +195,14 @@ export function move(s: State, e: cg.MouchEvent): void {
 
 export function end(s: State, e: cg.MouchEvent): void {
   if (s.variant === 'dameo') {
-    let orig1: cg.Key | undefined;
-    let dest1: cg.Key | undefined;
-
-    orig1 = s.draggable.current?.orig || s.selected;
-    dest1 = util.eventPosition(e)
+    const from: cg.Key | undefined = s.draggable.current?.orig || s.selected;
+    const to: cg.Key | undefined = util.eventPosition(e)
       ? s.getKeyAtDomPos(util.eventPosition(e)!, s.orientation, s.dom.bounds(), s.dimensions, s.variant)
       : undefined;
-    if (orig1 && dest1 && orig1 !== dest1 && board.canMove(s, orig1, dest1)) {
-      if (board.userMove(s, orig1, dest1)) {
+    if (from && to && from !== to && board.canMove(s, from, to)) {
+      if (board.userMove(s, from, to)) {
         s.stats.dragged = false;
-        board.setSelected(s, dest1);
+        board.setSelected(s, to);
         return;
       }
     }
