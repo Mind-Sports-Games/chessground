@@ -27,7 +27,10 @@ import * as T from './transformations';
 
 export function setOrientation(state: HeadlessState, o: cg.Orientation): void {
   state.orientation = o;
-  state.animation.current = state.draggable.current = state.selected = undefined;
+  state.animation.current = state.draggable.current = undefined;
+  if (state.variant !== 'dameo') {
+    state.selected = undefined;
+  }
 }
 
 export function toggleOrientation(state: HeadlessState): void {
@@ -304,7 +307,7 @@ export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key,
 function baseUserMove(state: HeadlessState, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
   const result = state.baseMove(state, orig, dest);
   if (result) {
-    state.movable.dests = undefined;
+    if (state.variant !== 'dameo' || state.movable.captLen === undefined || state.movable.captLen < 2) state.movable.dests = undefined;
     state.dropmode.dropDests = undefined;
     state.liftable.liftDests = undefined;
     if (!(state.variant === 'backgammon' || state.variant === 'hyper' || state.variant === 'nackgammon')) {
