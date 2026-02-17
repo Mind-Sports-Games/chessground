@@ -4,8 +4,9 @@ import { setSelected, setGoScore } from './board';
 import { read as fenRead, readPocket as fenReadPocket } from './fen';
 import { DrawShape, DrawBrush } from './draw';
 
-import { configure as abaloneConfigure } from './variants/abalone/config';
-import { configure as shogiConfigure } from './variants/shogi/config';
+import { configure as configureAbalone } from './variants/abalone/config';
+import { configure as configureBackgammon } from './variants/backgammon/config';
+import { configure as configureShogi } from './variants/shogi/config';
 
 export interface Config {
   fen?: cg.FEN; // chess position in Forsyth notation
@@ -197,10 +198,13 @@ export function configure(state: HeadlessState, config: Config): void {
 
   // configure variants
   if (state.variant === 'abalone') {
-    abaloneConfigure(state);
+    configureAbalone(state);
+  }
+  if (state.variant === 'backgammon' || state.variant === 'nackgammon' || state.variant === 'hyper') {
+    configureBackgammon(state, config);
   }
   if (state.variant === 'shogi' || state.variant === 'minishogi') {
-    shogiConfigure(state);
+    configureShogi(state);
   }
 }
 
