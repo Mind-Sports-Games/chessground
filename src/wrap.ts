@@ -288,7 +288,9 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     }
   }
   if (s.dice.length > 0) {
-    container.appendChild(renderDice(s.dice, s.turnPlayerIndex));
+    container.appendChild(
+      renderDice(s.dice, s.turnPlayerIndex + (s.myPlayerIndex === s.turnPlayerIndex ? ' ally' : ' enemy')),
+    );
     if (s.showUndoButton) {
       container.appendChild(renderUndoButton(s.canUndo, s.turnPlayerIndex + ' left'));
     }
