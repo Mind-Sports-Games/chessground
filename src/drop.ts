@@ -19,6 +19,7 @@ export function setDropMode(s: State, piece?: cg.Piece): void {
 }
 
 export function cancelDropMode(s: HeadlessState): void {
+  if (!s.dropmode.active) return;
   s.dropmode.active = false;
   util.callUserFunction(s.dropmode.events?.cancel);
 }
