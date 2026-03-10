@@ -81,6 +81,7 @@ export function unsetPredrop(state: HeadlessState): void {
 }
 
 function cancelDropMode(s: HeadlessState): void {
+  if (!s.dropmode.active) return;
   s.dropmode.active = false;
   callUserFunction(s.dropmode.events?.cancel);
 }

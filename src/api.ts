@@ -237,6 +237,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     displayCoordinates(coords: Coords): void {
+      if (state.coordinates === coords) return;
       state.coordinates = coords;
       redrawAll();
     },
