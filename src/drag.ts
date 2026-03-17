@@ -98,7 +98,7 @@ export function start(s: State, e: cg.MouchEvent): void {
   }
   const selectedChanged = s.selected !== previouslySelected;
   const dragStarted = !!s.draggable.current;
-  if (selectedChanged || dragStarted || hadPremove || hadPredrop) {
+  if (selectedChanged || dragStarted || hadPremove || hadPredrop || s.selectOnly) {
     s.dom.redraw();
   }
 }
