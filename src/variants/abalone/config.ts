@@ -4,7 +4,7 @@ import { baseMove, getKeyAtDomPos } from './board';
 import { processDrag } from './drag';
 import { validDestinations } from './premove';
 import { render } from './render';
-import { cellToPx, key2pos, pos2key, posToTranslateAbs, posToTranslateRel } from './util';
+import { cellToPx_shapes, key2pos, pos2key, posToTranslateAbs, posToTranslateRel } from './util';
 import { BoardDimensions, Key, Orientation, Pieces, Pos, Variant } from '../../types';
 
 export const configure = (state: HeadlessState): void => {
@@ -45,8 +45,7 @@ const getSnappedKeyAtDomPosBridge = (
   _d: BoardDimensions,
   variant: Variant,
 ) => getKeyAtDomPos(variant, bounds, pos, orientation); // In Abalone we do not snap arrows to valid moves
-const pos2pxBridge = (pos: Pos, bounds: ClientRect, _d: BoardDimensions, variant: Variant) =>
-  cellToPx(variant, bounds, pos);
+const pos2pxBridge = (pos: Pos, bounds: ClientRect, _d: BoardDimensions, variant: Variant, orientation: Orientation) => cellToPx_shapes(variant, bounds, pos, orientation);
 const premoveBridge = (
   pieces: Pieces,
   key: Key,

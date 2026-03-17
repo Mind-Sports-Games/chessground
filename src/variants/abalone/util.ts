@@ -217,8 +217,19 @@ export const cellrelToCell = (variant: Variant, pos: Pos): NumberPair => {
 	return [Math.round(res[0]), Math.round(res[1])];
 };
 
-///
-/// From Cell
+
+//
+// Cell
+export const cellToPx_shapes = (variant: Variant, bounds: ClientRect, pos: Pos, orientation: Orientation): NumberPair => {
+	const bd = getBoardSize(variant);
+	const originalPos: Pos = orientation === 'p2'
+		? [bd.width + 1 - pos[0], bd.height + 1 - pos[1]] as Pos
+		: pos;
+	let pxrel = cellToPxrel(variant, bounds, originalPos);
+	if (orientation === 'p2') pxrel = mult(-1, pxrel);
+	const d = getSquareDimensions_bounded(variant, bounds).width / 2;
+	return add(pxrelToPx(variant, bounds, pxrel), [d, d] as Pos);
+};
 export const cellToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
 	return cellrelToPx(variant, bounds, cellToCellrel(variant, pos));
 };
