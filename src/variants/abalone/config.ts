@@ -45,7 +45,8 @@ const getSnappedKeyAtDomPosBridge = (
   _d: BoardDimensions,
   variant: Variant,
 ) => getKeyAtDomPos(variant, bounds, pos, orientation); // In Abalone we do not snap arrows to valid moves
-const pos2pxBridge = (pos: Pos, bounds: ClientRect, _d: BoardDimensions, variant: Variant, orientation: Orientation) => cellToPx_shapes(variant, bounds, pos, orientation);
+const pos2pxBridge = (pos: Pos, bounds: ClientRect, _d: BoardDimensions, variant: Variant, orientation: Orientation) =>
+  cellToPx_shapes(variant, bounds, pos, orientation);
 const premoveBridge = (
   pieces: Pieces,
   key: Key,

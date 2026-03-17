@@ -371,7 +371,13 @@ function arrowMargin(bounds: ClientRect, shorten: boolean, bd: cg.BoardDimension
   return ((shorten ? 20 : 10) / (bd.width * 64)) * bounds.width;
 }
 
-export function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions, _variant?: cg.Variant, _orientation?: cg.Orientation): cg.NumberPair {
+export function pos2px(
+  pos: cg.Pos,
+  bounds: ClientRect,
+  bd: cg.BoardDimensions,
+  _variant?: cg.Variant,
+  _orientation?: cg.Orientation,
+): cg.NumberPair {
   return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
 

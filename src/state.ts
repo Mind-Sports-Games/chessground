@@ -172,7 +172,13 @@ export interface HeadlessState {
     bt: cg.BoardDimensions,
     v: cg.Variant,
   ) => cg.NumberPair;
-  pos2px: (pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions, variant: cg.Variant, orientation: cg.Orientation) => cg.NumberPair;
+  pos2px: (
+    pos: cg.Pos,
+    bounds: ClientRect,
+    bd: cg.BoardDimensions,
+    variant: cg.Variant,
+    orientation: cg.Orientation,
+  ) => cg.NumberPair;
   pos2key: (pos: cg.Pos, dimensions: cg.BoardDimensions) => cg.Key;
   premove: (
     pieces: cg.Pieces,
