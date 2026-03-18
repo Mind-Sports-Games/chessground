@@ -1,134 +1,145 @@
-import type * as cg from '../../types';
+import { Key, NumberPair, Pieces, PiecesDiff, Pos, Variant } from '../../types';
 
-import {
-  candidateLineDirs,
-  deducePotentialSideDirs,
-  move,
-  getDirectionString,
-  isMoveInLine,
-  DiagonalDirectionString,
-  inverseDirection,
-} from './directions';
+import { getDirectionString } from './directions';
 import type { MoveImpact, MoveVector } from './types';
+import {
+  add,
+  areEqual,
+  div,
+  getNeighVectors,
+  getNextCore,
+  getPrevCore,
+  includes,
+  isCell,
+  key2pos,
+  mult,
+  norm,
+  pos2key,
+  sub,
+} from './util';
 
-// compute the impact of a move on the board before it is made
-export const computeMoveImpact = (pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): MoveImpact | undefined => {
-  const directionString = getDirectionString(orig, dest);
-  if (!directionString) return undefined;
-  const isAMoveInLine = isMoveInLine(orig, dest, directionString);
-  const diff: cg.PiecesDiff = new Map(pieces);
+export const isInLineMove = (orig: Key, dest: Key): [NumberPair, number] | undefined => {
+  const from = key2pos(orig);
+  const to = key2pos(dest);
+  const vect = sub(to, from);
+  const n = norm(vect);
 
-  if (isAMoveInLine) {
-    diff.set(dest, pieces.get(orig));
-    diff.set(orig, undefined);
-    if (!pieces.get(dest)) {
-      // line move
-      return {
-        diff,
-        capture: false,
-        moveVector: {
-          directionString,
-          landingSquares: [dest],
-        },
-      };
-    }
-    // push move
-    const landingSquare1 = move(dest, directionString);
-    if (landingSquare1 === undefined)
-      // xxo\ xxxo\
-      return {
-        diff,
-        capture: true,
-        moveVector: {
-          directionString,
-          landingSquares: [dest],
-        },
-      };
-    if (!pieces.get(landingSquare1)) {
-      // xxo. xxxo.
-      diff.set(landingSquare1, pieces.get(dest));
-      return {
-        diff,
-        capture: false,
-        moveVector: {
-          directionString,
-          landingSquares: [dest, landingSquare1],
-        },
-      };
-    }
+  if (n > 0) {
+    const uvect = div(n, vect);
+    const neighVectors = getNeighVectors();
 
-    const landingSquare2 = move(landingSquare1, directionString);
-    if (landingSquare2 === undefined)
-      // xxxoo\
-      return {
-        diff,
-        capture: true,
-        moveVector: {
-          directionString,
-          landingSquares: [dest, landingSquare1],
-        },
-      };
-    if (!pieces.get(landingSquare2)) {
-      // xxxoo.
-      diff.set(landingSquare2, pieces.get(dest));
-      return {
-        diff,
-        capture: false,
-        moveVector: {
-          directionString,
-          landingSquares: [dest, landingSquare2],
-        },
-      };
+    if (includes(neighVectors, uvect)) {
+      return [uvect, n];
     }
   }
 
-  // side move
-  for (const lineDir of candidateLineDirs(directionString as DiagonalDirectionString)) {
-    const sideDirs = deducePotentialSideDirs(directionString as DiagonalDirectionString, lineDir);
-    const secondPos = move(orig, lineDir);
-    if (secondPos === undefined) continue;
-    for (const sideDir of sideDirs) {
-      const side2ndPos = move(secondPos, sideDir);
-      if (side2ndPos) {
-        const side1stPos = move(orig, sideDir);
-        if (side1stPos === undefined) continue;
-        if (side1stPos && pieces.get(secondPos)) {
-          if (side2ndPos === dest) {
-            diff.set(side1stPos, pieces.get(orig));
-            diff.set(orig, undefined);
-            diff.set(dest, pieces.get(secondPos));
-            diff.set(secondPos, undefined);
-            return {
-              diff,
-              capture: false,
-              moveVector: {
-                directionString: sideDir,
-                landingSquares: [side1stPos, dest],
-              },
-            };
-          } else {
-            // 3 marbles are moving
-            const thirdPos = move(secondPos, lineDir);
-            if (thirdPos === undefined) continue;
-            const side3rdPos = move(thirdPos, sideDir);
-            if (side3rdPos === undefined) continue;
-            if (pieces.get(thirdPos) && side3rdPos === dest) {
-              diff.set(side1stPos, pieces.get(orig));
-              diff.set(orig, undefined);
-              diff.set(side2ndPos, pieces.get(secondPos));
-              diff.set(secondPos, undefined);
-              diff.set(side3rdPos, pieces.get(thirdPos));
-              diff.set(thirdPos, undefined);
-              return {
-                diff,
-                capture: false,
-                moveVector: {
-                  directionString: sideDir,
-                  landingSquares: [side1stPos, side2ndPos, side3rdPos],
-                },
-              };
+  return undefined;
+};
+
+// Computes the effect of a move on the board before it is made
+export const computeMoveImpact = (variant: Variant, pieces: Pieces, orig: Key, dest: Key): MoveImpact | undefined => {
+  if (pieces.has(orig)) {
+    const from = key2pos(orig);
+    const to = key2pos(dest);
+    const vect = sub(to, from);
+    let n = norm(vect);
+
+    if (n > 0) {
+      let uvect = div(n, vect);
+      const ejection = pieces.has(dest);
+      if (ejection) n++;
+
+      const neighVectors = getNeighVectors();
+
+      if (includes(neighVectors, uvect)) {
+        // In-line move
+        const diff: PiecesDiff = new Map();
+        const dests = [];
+
+        let a = from;
+        let ka = orig;
+        let pa = pieces.get(ka);
+        let k = 0;
+        diff.set(ka, undefined);
+
+        while (k < n) {
+          a = add(from, mult(++k, uvect));
+          ka = pos2key(a);
+
+          if (k < n - 1 && !pieces.has(ka)) {
+            return undefined;
+          }
+
+          if (isCell(variant, a)) {
+            diff.set(ka, pa);
+            dests.push(ka);
+          } else if (!ejection) {
+            return undefined;
+          }
+
+          pa = pieces.get(ka);
+        }
+
+        return {
+          diff: diff,
+          capture: ejection,
+          landingSquares: dests,
+        } as MoveImpact;
+      } else if (!ejection && --n > 0) {
+        let found = false;
+        let vvect: Pos = [0, 0];
+        for (const _vect of neighVectors) {
+          const _nvect = mult(n, _vect);
+
+          if (pieces.get(pos2key(add(from, _nvect)))?.playerIndex === pieces.get(orig)?.playerIndex) {
+            vvect = getNextCore(neighVectors, _vect);
+
+            if (areEqual(add(_nvect, vvect), vect)) {
+              uvect = _vect;
+              found = true;
+              break;
+            } else {
+              vvect = getPrevCore(neighVectors, _vect);
+
+              if (areEqual(add(_nvect, vvect), vect)) {
+                uvect = _vect;
+                found = true;
+                break;
+              }
             }
           }
+        }
+
+        if (found) {
+          // Broadside move
+          const diff: PiecesDiff = new Map();
+          const dests = [];
+
+          let a = from;
+          let ka = orig;
+          let k = 0;
+
+          while (k <= n) {
+            if (!isCell(variant, a)) return undefined;
+
+            const b = add(a, vvect);
+            if (!isCell(variant, b)) return undefined;
+            const kb = pos2key(b);
+            if (pieces.has(kb)) return undefined;
+
+            diff.set(ka, undefined);
+            diff.set(kb, pieces.get(ka));
+            dests.push(kb);
+
+            a = add(from, mult(++k, uvect));
+            ka = pos2key(a);
+          }
+
+          return {
+            diff: diff,
+            capture: false,
+            landingSquares: dests,
+          } as MoveImpact;
         }
       }
     }
@@ -137,49 +148,88 @@ export const computeMoveImpact = (pieces: cg.Pieces, orig: cg.Key, dest: cg.Key)
   return undefined;
 };
 
-// compute a move vector after a move has been made
-export const computeMoveVectorPostMove = (pieces: cg.Pieces, orig: cg.Key, dest: cg.Key): MoveVector | undefined => {
-  const directionString = getDirectionString(dest, orig);
-  if (!directionString) return undefined;
-  const isAMoveInLine = isMoveInLine(dest, orig, directionString);
-  const inverseDirectionString = inverseDirection(directionString);
+// Computes a move vector after the move has been made
+export const computeMoveVectorPostMove = (pieces: Pieces, orig: Key, dest: Key): MoveVector | undefined => {
+  if (!pieces.has(orig) && pieces.has(dest)) {
+    const from = key2pos(orig);
+    const to = key2pos(dest);
+    const vect = sub(to, from);
+    let n = norm(vect);
 
-  if (isAMoveInLine) {
-    return {
-      directionString: inverseDirectionString,
-      landingSquares: [dest],
-    };
-  }
+    if (n > 0) {
+      let uvect = div(n, vect);
+      const neighVectors = getNeighVectors();
 
-  // side move
-  for (const lineDir of candidateLineDirs(directionString as DiagonalDirectionString)) {
-    const sideDirs = deducePotentialSideDirs(directionString as DiagonalDirectionString, lineDir);
-    const secondPos = move(dest, lineDir);
-    if (secondPos === undefined) continue;
-    for (const sideDir of sideDirs) {
-      const side2ndPos = move(secondPos, sideDir);
-      if (side2ndPos) {
-        const side1stPos = move(dest, sideDir);
-        if (side1stPos === undefined) continue;
-        if (side1stPos && pieces.get(secondPos)) {
-          if (side2ndPos === orig) {
-            return {
-              directionString: inverseDirection(sideDir),
-              landingSquares: [secondPos, dest],
-            };
-          } else {
-            // 3 marbles are moving
-            const thirdPos = move(secondPos, lineDir);
-            if (thirdPos === undefined) continue;
-            const side3rdPos = move(thirdPos, sideDir);
-            if (side3rdPos === undefined) continue;
-            if (pieces.get(thirdPos) && side3rdPos === orig) {
-              return {
-                directionString: inverseDirection(sideDir),
-                landingSquares: [secondPos, thirdPos, dest],
-              };
+      if (includes(neighVectors, uvect)) {
+        // In-line move
+        const dests: Key[] = [];
+
+        let a = to;
+        let ka = dest;
+        let k = 0;
+
+        while (k < n) {
+          dests.push(ka);
+
+          a = sub(to, mult(++k, uvect));
+          ka = pos2key(a);
+
+          if (k < n - 1 && !pieces.has(ka)) return undefined;
+        }
+
+        return {
+          directionString: getDirectionString(uvect),
+          landingSquares: dests,
+        } as MoveVector;
+      } else if (--n > 0) {
+        let found = false;
+        let vvect: Pos = [0, 0];
+        for (const _vect of neighVectors) {
+          const _nvect = mult(n, _vect);
+
+          if (!pieces.has(pos2key(add(from, _nvect)))) {
+            vvect = getNextCore(neighVectors, _vect);
+
+            if (areEqual(add(_nvect, vvect), vect)) {
+              uvect = _vect;
+              found = true;
+              break;
+            } else {
+              vvect = getPrevCore(neighVectors, _vect);
+
+              if (areEqual(add(_nvect, vvect), vect)) {
+                uvect = _vect;
+                found = true;
+                break;
+              }
             }
           }
+        }
+
+        if (found) {
+          // Broadside move
+          const dests: Key[] = [];
+
+          let a = from;
+          let ka = orig;
+          let k = 0;
+
+          while (k <= n) {
+            const b = add(a, vvect);
+            const kb = pos2key(b);
+            if (!pieces.has(kb)) return undefined;
+
+            dests.push(kb);
+
+            a = add(from, mult(++k, uvect));
+            ka = pos2key(a);
+            if (k < n - 1 && pieces.has(ka)) return undefined;
+          }
+
+          return {
+            directionString: getDirectionString(vvect),
+            landingSquares: dests,
+          } as MoveVector;
         }
       }
     }

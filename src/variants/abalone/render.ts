@@ -1,15 +1,14 @@
-import type * as cg from '../../types';
+import { Key, Orientation, Piece, PieceNode, Pieces, PlayerIndex, SquareNode } from '../../types';
 import type { PieceName, SquareClasses } from '../../render';
+import { appendValue, isPieceNode, isSquareNode, posZIndex, removeNodes } from '../../render';
 import { p1Pov } from '../../board';
 import { State } from '../../state';
-import { createEl, opposite } from '../../util';
+import { createEl } from '../../util';
 import { AnimCurrent, AnimFadings, AnimVector, AnimVectors } from '../../anim';
 import { DragCurrent } from '../../drag';
-import { appendValue, isPieceNode, isSquareNode, posZIndex, removeNodes } from '../../render';
 
 import { translateAbs, translateRel } from './util';
-import { computeMoveVectorPostMove } from './engine';
-import { getDirectionString, isMoveInLine } from './directions';
+import { computeMoveVectorPostMove, isInLineMove } from './engine';
 
 // @TODO: remove parts unrelated to Abalone
 export const render = (s: State): void => {
@@ -20,30 +19,30 @@ export const render = (s: State): void => {
       : s.posToTranslateAbsolute(s.dom.bounds(), s.dimensions, s.variant),
     translate = s.dom.relative ? translateRel : translateAbs,
     boardEl: HTMLElement = s.dom.elements.board,
-    pieces: cg.Pieces = s.pieces,
+    pieces: Pieces = s.pieces,
     curAnim: AnimCurrent | undefined = s.animation.current,
     anims: AnimVectors = curAnim ? curAnim.plan.anims : new Map(),
     fadings: AnimFadings = curAnim ? curAnim.plan.fadings : new Map(),
     curDrag: DragCurrent | undefined = s.draggable.current,
     squares: SquareClasses = computeSquareClasses(s),
-    samePieces: Set<cg.Key> = new Set(),
-    sameSquares: Set<cg.Key> = new Set(),
-    movedPieces: Map<PieceName, cg.PieceNode[]> = new Map(),
-    movedSquares: Map<string, cg.SquareNode[]> = new Map(); // by class name
+    samePieces: Set<Key> = new Set(),
+    sameSquares: Set<Key> = new Set(),
+    movedPieces: Map<PieceName, PieceNode[]> = new Map(),
+    movedSquares: Map<string, SquareNode[]> = new Map(); // by class name
 
-  let k: cg.Key,
-    el: cg.PieceNode | cg.SquareNode | undefined,
-    pieceAtKey: cg.Piece | undefined,
+  let k: Key,
+    el: PieceNode | SquareNode | undefined,
+    pieceAtKey: Piece | undefined,
     elPieceName: PieceName,
     anim: AnimVector | undefined,
-    fading: cg.Piece | undefined,
-    pMvdset: cg.PieceNode[] | undefined,
-    pMvd: cg.PieceNode | undefined,
-    sMvdset: cg.SquareNode[] | undefined,
-    sMvd: cg.SquareNode | undefined;
+    fading: Piece | undefined,
+    pMvdset: PieceNode[] | undefined,
+    pMvd: PieceNode | undefined,
+    sMvdset: SquareNode[] | undefined,
+    sMvd: SquareNode | undefined;
 
   // walk over all board dom elements, apply animations and flag moved pieces
-  el = boardEl.firstChild as cg.PieceNode | cg.SquareNode | undefined;
+  el = boardEl.firstChild as PieceNode | SquareNode | undefined;
 
   while (el) {
     k = el.cgKey;
@@ -103,7 +102,7 @@ export const render = (s: State): void => {
       else if (movedSquares.has(cn)) appendValue(movedSquares, cn, el);
       else movedSquares.set(cn, [el]);
     }
-    el = el.nextSibling as cg.PieceNode | cg.SquareNode | undefined;
+    el = el.nextSibling as PieceNode | SquareNode | undefined;
   }
 
   // walk over all squares in current set, apply dom changes to moved squares
@@ -117,7 +116,7 @@ export const render = (s: State): void => {
         sMvd.cgKey = sk;
         translate(sMvd, translation);
       } else {
-        const squareNode = createEl('square', className) as cg.SquareNode;
+        const squareNode = createEl('square', className) as SquareNode;
         squareNode.cgKey = sk;
         translate(squareNode, translation);
         boardEl.insertBefore(squareNode, boardEl.firstChild);
@@ -154,7 +153,7 @@ export const render = (s: State): void => {
       // assumes the new piece is not being dragged
       else {
         const pieceName = pieceNameOf(p, s.myPlayerIndex, s.orientation),
-          pieceNode = createEl('piece', pieceName) as cg.PieceNode,
+          pieceNode = createEl('piece', pieceName) as PieceNode,
           pos = s.key2pos(k); // used here to compute position
 
         pieceNode.cgPiece = pieceName;
@@ -178,61 +177,58 @@ export const render = (s: State): void => {
   for (const nodes of movedSquares.values()) removeNodes(s, nodes);
 };
 
-const pieceNameOf = (piece: cg.Piece, myPlayerIndex: cg.PlayerIndex, orientation: cg.Orientation): string => {
-  const side =
-    (piece.playerIndex === myPlayerIndex && orientation === myPlayerIndex) ||
-    (piece.playerIndex !== myPlayerIndex && orientation !== myPlayerIndex)
-      ? 'ally'
-      : 'enemy';
-
+const pieceNameOf = (piece: Piece, myPlayerIndex: PlayerIndex, orientation: Orientation): string => {
+  const side = (piece.playerIndex === myPlayerIndex) === (orientation === myPlayerIndex) ? 'ally' : 'enemy';
   return `${piece.playerIndex} ${piece.role} ${side}`;
 };
 
-const addSquare = (squares: SquareClasses, key: cg.Key, klass: string): void => {
+const addSquare = (squares: SquareClasses, key: Key, klass: string): void => {
   const classes = squares.get(key);
-  if (classes) squares.set(key, `${classes} ${klass}`);
-  else squares.set(key, klass);
+  squares.set(key, classes ? `${classes} ${klass}` : klass);
 };
 
 export const computeSquareClasses = (s: State): SquareClasses => {
-  const squares: SquareClasses = new Map();
+  const res: SquareClasses = new Map();
 
   // highlight.lastMove is false on board editor, so it makes sense to check for it
   if (s.highlight.lastMove && s.lastMove && s.lastMove.length === 2) {
-    const moveImpact = computeMoveVectorPostMove(s.pieces, s.lastMove[0], s.lastMove[1]);
-    const lastMovePlayer = s.pieces.get(s.lastMove[1])?.playerIndex || s.myPlayerIndex;
-    const player = opposite(lastMovePlayer);
-    moveImpact?.landingSquares.forEach(coordinates => {
-      addSquare(squares, coordinates, `last-move to ${player}${moveImpact.directionString}`);
+    const moveVector = computeMoveVectorPostMove(s.pieces, s.lastMove[0], s.lastMove[1]);
+
+    moveVector?.landingSquares.forEach(dest => {
+      const p = s.pieces.get(dest);
+
+      if (p) {
+        addSquare(res, dest, `last-move to ${p.playerIndex}${moveVector?.directionString}`);
+      }
     });
   }
 
   if (s.selected) {
     const orig = s.selected;
-    addSquare(squares, orig, 'selected');
+    addSquare(res, orig, 'selected');
+
     if (s.movable.showDests) {
       const dests = s.movable.dests?.get(orig);
-      if (dests)
+      if (dests && dests.length > 0) {
+        const classes = 'move-dest ' + (isInLineMove(orig, dests[0]) ? 'inline' : 'aside');
+
         for (const dest of dests) {
-          let classes = 'move-dest';
-          const directionString = getDirectionString(orig, dest);
-          if (!directionString) break;
-          if (isMoveInLine(orig, dest, directionString)) {
-            classes += ` inline`;
-          } else {
-            classes += ` aside`;
-          }
-          if (s.pieces.has(dest)) classes += ' oc';
-          addSquare(squares, dest, classes);
+          addSquare(res, dest, classes + (s.pieces.has(dest) ? ' oc' : ''));
         }
+      }
+
       const pDests = s.premovable.dests;
-      if (pDests)
+      if (pDests) {
         for (const k of pDests) {
-          addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
+          addSquare(res, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : ''));
         }
+      }
     }
   }
-  if (s.movable.showDests) s.premovable.current?.forEach(k => addSquare(squares, k, 'current-premove'));
 
-  return squares;
+  if (s.movable.showDests) {
+    s.premovable.current?.forEach(k => addSquare(res, k, 'current-premove'));
+  }
+
+  return res;
 };

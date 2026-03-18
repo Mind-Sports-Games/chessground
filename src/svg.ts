@@ -210,8 +210,9 @@ function renderShape(
         (arrowDests.get(shape.dest) || 0) > 1,
         bounds,
         state.dimensions,
+        state.variant,
       );
-    } else el = renderCircle(state, brushes[shape.brush!], orig, current, bounds, state.dimensions);
+    } else el = renderCircle(state, brushes[shape.brush!], orig, current, bounds, state.dimensions, state.variant);
   }
   el.setAttribute('cgHash', hash);
   return el;
@@ -242,8 +243,9 @@ function renderCircle(
   current: boolean,
   bounds: ClientRect,
   bd: cg.BoardDimensions,
+  variant: cg.Variant,
 ): SVGElement {
-  const o = state.pos2px(pos, bounds, bd),
+  const o = state.pos2px(pos, bounds, bd, variant, state.orientation),
     widths = circleWidth(bounds, bd),
     radius = (bounds.width + bounds.height) / (2 * (bd.height + bd.width));
   return setAttributes(createElement('circle'), {
@@ -266,10 +268,11 @@ function renderArrow(
   shorten: boolean,
   bounds: ClientRect,
   bd: cg.BoardDimensions,
+  variant: cg.Variant,
 ): SVGElement {
   const m = arrowMargin(bounds, shorten && !current, bd),
-    a = state.pos2px(orig, bounds, bd),
-    b = state.pos2px(dest, bounds, bd),
+    a = state.pos2px(orig, bounds, bd, variant, state.orientation),
+    b = state.pos2px(dest, bounds, bd, variant, state.orientation),
     dx = b[0] - a[0],
     dy = b[1] - a[1],
     angle = Math.atan2(dy, dx),
@@ -295,7 +298,7 @@ function renderPiece(
   piece: DrawShapePiece,
   bounds: ClientRect,
 ): SVGElement {
-  const o = state.pos2px(pos, bounds, state.dimensions),
+  const o = state.pos2px(pos, bounds, state.dimensions, state.variant, state.orientation),
     width = (bounds.width / state.dimensions.width) * (piece.scale || 1),
     height = (bounds.height / state.dimensions.height) * (piece.scale || 1),
     name = state.roleToSvgName(state, piece);
@@ -368,7 +371,13 @@ function arrowMargin(bounds: ClientRect, shorten: boolean, bd: cg.BoardDimension
   return ((shorten ? 20 : 10) / (bd.width * 64)) * bounds.width;
 }
 
-export function pos2px(pos: cg.Pos, bounds: ClientRect, bd: cg.BoardDimensions): cg.NumberPair {
+export function pos2px(
+  pos: cg.Pos,
+  bounds: ClientRect,
+  bd: cg.BoardDimensions,
+  _variant?: cg.Variant,
+  _orientation?: cg.Orientation,
+): cg.NumberPair {
   return [((pos[0] - 0.5) * bounds.width) / bd.width, ((bd.height + 0.5 - pos[1]) * bounds.height) / bd.height];
 }
 
@@ -386,6 +395,7 @@ export function roleToSvgName(state: State, piece: DrawShapePiece): string {
     case 'go13x13':
     case 'go19x19':
     case 'abalone':
+    case 'grandabalone':
       return (piece.playerIndex === 'p1' ? 'b' : 'w') + piece.role[0].toUpperCase();
     case 'oware':
     case 'togyzkumalak':

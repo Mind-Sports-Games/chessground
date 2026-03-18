@@ -191,29 +191,29 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
         }
       }
     } else if (s.variant === 'abalone') {
-      if (s.orientation === 'p1') {
-        coordinatesContainer.appendChild(renderCoords(ranks.slice(0, 5), 'files' + orientClass + ' rank-1'));
-        coordinatesContainer.appendChild(renderCoords(['6'], 'files' + orientClass + ' rank-2'));
-        coordinatesContainer.appendChild(renderCoords(['7'], 'files' + orientClass + ' rank-3'));
-        coordinatesContainer.appendChild(renderCoords(['8'], 'files' + orientClass + ' rank-4'));
-        coordinatesContainer.appendChild(renderCoords(['9'], 'files' + orientClass + ' rank-5'));
-        coordinatesContainer.appendChild(renderCoords(['e'], 'ranks' + orientClass + ' file-1'));
-        coordinatesContainer.appendChild(renderCoords(['d', 'f'], 'ranks' + orientClass + ' file-2'));
-        coordinatesContainer.appendChild(renderCoords(['c', 'g'], 'ranks' + orientClass + ' file-3'));
-        coordinatesContainer.appendChild(renderCoords(['b', '', 'h'], 'ranks' + orientClass + ' file-4'));
-        coordinatesContainer.appendChild(renderCoords(['a', '', '', '', 'i'], 'ranks' + orientClass + ' file-5'));
-      } else {
-        coordinatesContainer.appendChild(renderCoords(ranks.slice(0, 5), 'files' + orientClass + ' rank-1'));
-        coordinatesContainer.appendChild(renderCoords(['6'], 'files' + orientClass + ' rank-2'));
-        coordinatesContainer.appendChild(renderCoords(['7'], 'files' + orientClass + ' rank-3'));
-        coordinatesContainer.appendChild(renderCoords(['8'], 'files' + orientClass + ' rank-4'));
-        coordinatesContainer.appendChild(renderCoords(['9'], 'files' + orientClass + ' rank-5'));
-        coordinatesContainer.appendChild(renderCoords(['e'], 'ranks' + orientClass + ' file-1'));
-        coordinatesContainer.appendChild(renderCoords(['d', 'f'], 'ranks' + orientClass + ' file-2'));
-        coordinatesContainer.appendChild(renderCoords(['c', 'g'], 'ranks' + orientClass + ' file-3'));
-        coordinatesContainer.appendChild(renderCoords(['b', '', 'h'], 'ranks' + orientClass + ' file-4'));
-        coordinatesContainer.appendChild(renderCoords(['a', '', '', '', 'i'], 'ranks' + orientClass + ' file-5'));
-      }
+      coordinatesContainer.appendChild(renderCoords(ranks.slice(0, 5), 'files' + orientClass + ' rank-1'));
+      coordinatesContainer.appendChild(renderCoords(['6'], 'files' + orientClass + ' rank-2'));
+      coordinatesContainer.appendChild(renderCoords(['7'], 'files' + orientClass + ' rank-3'));
+      coordinatesContainer.appendChild(renderCoords(['8'], 'files' + orientClass + ' rank-4'));
+      coordinatesContainer.appendChild(renderCoords(['9'], 'files' + orientClass + ' rank-5'));
+      coordinatesContainer.appendChild(renderCoords(['e'], 'ranks' + orientClass + ' file-1'));
+      coordinatesContainer.appendChild(renderCoords(['d', 'f'], 'ranks' + orientClass + ' file-2'));
+      coordinatesContainer.appendChild(renderCoords(['c', 'g'], 'ranks' + orientClass + ' file-3'));
+      coordinatesContainer.appendChild(renderCoords(['b', '', 'h'], 'ranks' + orientClass + ' file-4'));
+      coordinatesContainer.appendChild(renderCoords(['a', '', '', '', 'i'], 'ranks' + orientClass + ' file-5'));
+    } else if (s.variant === 'grandabalone') {
+      coordinatesContainer.appendChild(renderCoords(ranks.slice(0, 6), 'files' + orientClass + ' rank-1'));
+      coordinatesContainer.appendChild(renderCoords(['7'], 'files' + orientClass + ' rank-2'));
+      coordinatesContainer.appendChild(renderCoords(['8'], 'files' + orientClass + ' rank-3'));
+      coordinatesContainer.appendChild(renderCoords(['9'], 'files' + orientClass + ' rank-4'));
+      coordinatesContainer.appendChild(renderCoords(['10'], 'files' + orientClass + ' rank-5'));
+      coordinatesContainer.appendChild(renderCoords(['11'], 'files' + orientClass + ' rank-6'));
+      coordinatesContainer.appendChild(renderCoords(['f'], 'ranks' + orientClass + ' file-1'));
+      coordinatesContainer.appendChild(renderCoords(['e', 'g'], 'ranks' + orientClass + ' file-2'));
+      coordinatesContainer.appendChild(renderCoords(['d', 'h'], 'ranks' + orientClass + ' file-3'));
+      coordinatesContainer.appendChild(renderCoords(['c', '', 'i'], 'ranks' + orientClass + ' file-4'));
+      coordinatesContainer.appendChild(renderCoords(['b', '', '', '', 'j'], 'ranks' + orientClass + ' file-5'));
+      coordinatesContainer.appendChild(renderCoords(['a', '', '', '', '', 'k'], 'ranks' + orientClass + ' file-6'));
     } else {
       coordinatesContainer.appendChild(renderCoords(ranks19.slice(0, s.dimensions.height), 'ranks' + orientClass));
       coordinatesContainer.appendChild(renderCoords(files.slice(0, s.dimensions.width), 'files' + orientClass));

@@ -1,32 +1,57 @@
 import type { HeadlessState } from '../../state';
-import type * as cg from '../../types';
 
-import { baseMove, getKeyAtDomPos, getSnappedKeyAtDomPos } from './board';
+import { baseMove, getKeyAtDomPos } from './board';
 import { processDrag } from './drag';
-import { premove } from './premove';
+import { validDestinations } from './premove';
 import { render } from './render';
-import { pos2px } from './svg';
-import { key2pos, posToTranslateAbs2 as posToTranslateAbs2Original, posToTranslateRel, pos2key } from './util';
+import { cellToPx_shapes, key2pos, pos2key, posToTranslateAbs, posToTranslateRel } from './util';
+import { BoardDimensions, Key, Orientation, Pieces, Pos, Variant } from '../../types';
 
 export const configure = (state: HeadlessState): void => {
   // HOF
   state.baseMove = baseMove;
-  state.getKeyAtDomPos = getKeyAtDomPos;
-  state.getSnappedKeyAtDomPos = getSnappedKeyAtDomPos;
+  state.getKeyAtDomPos = getKeyAtDomPosBridge;
+  state.getSnappedKeyAtDomPos = getSnappedKeyAtDomPosBridge;
   state.key2pos = key2pos;
   state.posToTranslateAbsolute = posToTranslateAbsBridge;
-  state.posToTranslateRelative = posToTranslateRel;
-  state.pos2px = pos2px;
+  state.posToTranslateRelative = posToTranslateRelBridge;
+  state.pos2px = pos2pxBridge;
   state.pos2key = pos2key;
-  state.premove = premove;
+  state.premove = premoveBridge;
   state.processDrag = processDrag;
-  state.render = render;
+  state.render = render; //TODO?
 
-  // these below could just have been overriden by a config object
+  // These below could just have been overriden by a config object
   state.animation.enabled = false;
 };
 
 const posToTranslateAbsBridge =
-  (bounds: ClientRect, _bt: cg.BoardDimensions, _variant: cg.Variant) =>
-  (pos: cg.Pos, orientation: 'p1' | 'p2' | 'left' | 'right' | 'p1vflip') =>
-    posToTranslateAbs2Original()(bounds, pos, orientation);
+  (bounds: ClientRect, _d: BoardDimensions, variant: Variant) => (pos: Pos, orientation: Orientation) =>
+    posToTranslateAbs(variant, bounds, pos, orientation);
+const posToTranslateRelBridge = (pos: Pos, _orientation: Orientation, _d: BoardDimensions, variant: Variant) =>
+  posToTranslateRel(variant, pos);
+const getKeyAtDomPosBridge = (
+  pos: Pos,
+  orientation: Orientation,
+  bounds: ClientRect,
+  _d: BoardDimensions,
+  variant: Variant,
+) => getKeyAtDomPos(variant, bounds, pos, orientation);
+const getSnappedKeyAtDomPosBridge = (
+  _orig: Key,
+  pos: Pos,
+  orientation: Orientation,
+  bounds: ClientRect,
+  _d: BoardDimensions,
+  variant: Variant,
+) => getKeyAtDomPos(variant, bounds, pos, orientation); // In Abalone we do not snap arrows to valid moves
+const pos2pxBridge = (pos: Pos, bounds: ClientRect, _d: BoardDimensions, variant: Variant, orientation: Orientation) =>
+  cellToPx_shapes(variant, bounds, pos, orientation);
+const premoveBridge = (
+  pieces: Pieces,
+  key: Key,
+  _canCastle: boolean,
+  _d: BoardDimensions,
+  variant: Variant,
+  _chess960: boolean,
+): Key[] => validDestinations(variant, pieces, key);
