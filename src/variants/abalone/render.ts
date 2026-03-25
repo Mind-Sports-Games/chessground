@@ -194,11 +194,13 @@ export const computeSquareClasses = (s: State): SquareClasses => {
   if (s.highlight.lastMove && s.lastMove && s.lastMove.length === 2) {
     const moveVector = computeMoveVectorPostMove(s.pieces, s.lastMove[0], s.lastMove[1]);
 
+    const dirStr = moveVector?.directionString;
+
     moveVector?.landingSquares.forEach(dest => {
       const p = s.pieces.get(dest);
 
       if (p) {
-        addSquare(res, dest, `last-move to ${p.playerIndex}${moveVector?.directionString}`);
+        addSquare(res, dest, `last-move to ${p.playerIndex}${dirStr}`);
       }
     });
   }

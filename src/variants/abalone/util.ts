@@ -83,8 +83,13 @@ export const key2pos = (k: Key): Pos => {
   return [parseInt(k.slice(1)) - 1, k.charCodeAt(0) - 97] as Pos;
 };
 
-export const posToTranslateRel = (variant: Variant, pos: Pos): NumberPair => {
-  return cellToPxmini(variant, pos);
+export const posToTranslateRel = (variant: Variant, pos: Pos, orientation: Orientation): NumberPair => {
+  const p = cellToP(variant, pos);
+  let pxrelmini = pToPxrelmini(variant, p);
+  if (orientation === 'p2') {
+    pxrelmini = mult(-1, pxrelmini);
+  }
+  return pxrelminiToPxmini(variant, pxrelmini);
 };
 
 export const translateAbs = (el: HTMLElement, pos: NumberPair): void => {

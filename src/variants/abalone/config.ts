@@ -19,7 +19,7 @@ export const configure = (state: HeadlessState): void => {
   state.pos2key = pos2key;
   state.premove = premoveBridge;
   state.processDrag = processDrag;
-  state.render = render; //TODO?
+  state.render = render;
 
   // These below could just have been overriden by a config object
   state.animation.enabled = false;
@@ -28,8 +28,8 @@ export const configure = (state: HeadlessState): void => {
 const posToTranslateAbsBridge =
   (bounds: ClientRect, _d: BoardDimensions, variant: Variant) => (pos: Pos, orientation: Orientation) =>
     posToTranslateAbs(variant, bounds, pos, orientation);
-const posToTranslateRelBridge = (pos: Pos, _orientation: Orientation, _d: BoardDimensions, variant: Variant) =>
-  posToTranslateRel(variant, pos);
+const posToTranslateRelBridge = (pos: Pos, orientation: Orientation, _d: BoardDimensions, variant: Variant) =>
+  posToTranslateRel(variant, pos, orientation);
 const getKeyAtDomPosBridge = (
   pos: Pos,
   orientation: Orientation,
