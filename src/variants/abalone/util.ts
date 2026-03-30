@@ -246,7 +246,8 @@ export const cellToPx_shapes = (
   let pxrel = cellToPxrel(variant, bounds, originalPos);
   if (orientation === 'p2') pxrel = mult(-1, pxrel);
   const d = getSquareDimensions_bounded(variant, bounds).width / 2;
-  return add(pxrelToPx(variant, bounds, pxrel), [d, d] as Pos);
+  const shapePos = add(pxrelToPx(variant, bounds, pxrel), [d, d] as Pos);
+  return [shapePos[0], shapePos[1] - 1];
 };
 export const cellToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
   return cellrelToPx(variant, bounds, cellToCellrel(variant, pos));
