@@ -1,136 +1,131 @@
-import type * as cg from '../../types';
+import { Key, Pieces, Pos, Variant } from '../../types';
+import {
+  add,
+  getMaxUsable,
+  getNeighVectors,
+  getNextCore,
+  getPrevCore,
+  isCell,
+  isEjectable,
+  isPushable,
+  isUsable,
+  key2pos,
+  pos2key,
+  sub,
+} from './util';
 
-import { DiagonalDirectionString, HorizontalDirectionString, listPotentialSideDirs, move } from './directions';
-import type { DirectionString } from './types';
+export const validDestinations = (variant: Variant, pieces: Pieces, orig: Key): Key[] => {
+  const res: Key[] = [];
 
-export const premove = (
-  pieces: cg.Pieces,
-  key: cg.Key,
-  _canCastle: boolean,
-  _bd: cg.BoardDimensions,
-  _variant: cg.Variant,
-  _chess960: boolean,
-): cg.Key[] => {
-  return validDestinations(pieces, key);
-};
+  const a = key2pos(orig);
+  const ap = pieces.get(orig);
 
-export const validDestinations = (pieces: cg.Pieces, orig: cg.Key): cg.Key[] => {
-  const dests: cg.Key[] = [];
-  const directions: DirectionString[] = [
-    ...Object.values(DiagonalDirectionString),
-    ...Object.values(HorizontalDirectionString),
-  ];
+  if (ap) {
+    const maxUsable = getMaxUsable(variant);
 
-  for (const direction of directions) {
-    const dest = move(orig, direction);
-    if (!dest) continue; // x\
+    if (!maxUsable || 0 < maxUsable) {
+      const player = ap.playerIndex; // Somewhat bad, but I have nothing better
+      const neighVectors = getNeighVectors();
 
-    if (!pieces.get(dest)) {
-      dests.push(dest); // x.
-      continue;
-    }
+      for (const vect of neighVectors) {
+        let b = add(a, vect);
+        let dest = pos2key(b);
+        let bp = pieces.get(dest);
 
-    if (pieces.get(dest)?.playerIndex !== pieces.get(orig)?.playerIndex) continue; // xo
+        let u = 1;
+        let max = false;
 
-    // xx
-    // side move of 2 marbles
-    const sideDirections = listPotentialSideDirs(direction);
-    for (const sideDir of sideDirections) {
-      const sideDestMarble1 = move(orig, sideDir);
-      const sideDestMarble2 = move(dest, sideDir);
-      if (sideDestMarble1 && !pieces.get(sideDestMarble1) && sideDestMarble2 && !pieces.get(sideDestMarble2)) {
-        dests.push(sideDestMarble2);
+        // In-line move
+        {
+          while (bp) {
+            if (!isUsable(variant, bp, player)) break;
+
+            u++;
+            if (maxUsable && u > maxUsable) {
+              max = true;
+              break;
+            }
+
+            b = add(b, vect);
+            dest = pos2key(b);
+            bp = pieces.get(dest);
+          }
+
+          if (!max) {
+            let p = 0;
+            while (bp) {
+              if (!isPushable(variant, bp, player)) break;
+
+              if (++p >= u) {
+                max = true;
+                break;
+              }
+
+              b = add(b, vect);
+              dest = pos2key(b);
+              bp = pieces.get(dest);
+            }
+
+            if (!max && !bp) {
+              // !bp <=> there is an immovable piece that blocks the line
+              if (isCell(variant, b)) {
+                res.push(dest);
+              } else {
+                b = sub(b, vect);
+                dest = pos2key(b);
+                bp = pieces.get(dest);
+
+                if (bp && isEjectable(variant, bp, player)) {
+                  res.push(dest);
+                }
+              }
+            }
+          }
+        }
+
+        // Broadside moves
+        {
+          const pvect = getPrevCore(neighVectors, vect);
+          const nvect = getNextCore(neighVectors, vect);
+
+          let pj = canJumpTo(variant, pieces, add(a, pvect));
+          let nj = canJumpTo(variant, pieces, add(a, nvect));
+
+          if (pj || nj) {
+            b = add(a, vect);
+            bp = pieces.get(pos2key(b));
+
+            u = 1;
+
+            while (bp) {
+              // Remark: when u = 1, the only possible moves are already accounted for as in-line
+              if (!isUsable(variant, bp, player) || (maxUsable && ++u > maxUsable)) break;
+
+              if (pj) {
+                const d = add(b, pvect);
+
+                if ((pj = canJumpTo(variant, pieces, d))) res.push(pos2key(d));
+              }
+              if (nj) {
+                const d = add(b, nvect);
+
+                if ((nj = canJumpTo(variant, pieces, d))) res.push(pos2key(d));
+              }
+
+              if (!pj && !nj) break;
+
+              b = add(b, vect);
+              bp = pieces.get(pos2key(b));
+            }
+          }
+        }
       }
-    }
-
-    // then now if the direction of the line is pointing toward a non existing square, we can continue with next directions
-    const dest2 = move(dest, direction);
-    if (!dest2) continue; // xx\
-
-    if (!pieces.get(dest2)) {
-      // xx.
-      dests.push(dest2);
-      continue;
-    }
-
-    const dest3 = move(dest2, direction); // xx_?
-    // push of 2 marbles
-    if (pieces.get(dest2) && pieces.get(dest2)?.playerIndex !== pieces.get(orig)?.playerIndex) {
-      // xxo
-      if (!dest3) {
-        // xxo\
-        dests.push(dest2);
-        continue;
-      }
-      if (!pieces.get(dest3)) {
-        // xxo.
-        dests.push(dest2);
-      }
-      continue; // we do not need to consider any further move as it's xxo
-    }
-
-    // we know we now have xxx, because we covered the cases of xx\ xx. xxo
-
-    // let's compute side moves
-    const sideDirs = listPotentialSideDirs(direction);
-    for (const sideDir of sideDirs) {
-      const sideDestMarble1 = move(orig, sideDir);
-      const sideDestMarble2 = move(dest, sideDir);
-      const sideDestMarble3 = move(dest2, sideDir);
-      if (
-        sideDestMarble1 &&
-        !pieces.get(sideDestMarble1) &&
-        sideDestMarble2 &&
-        !pieces.get(sideDestMarble2) &&
-        sideDestMarble3 &&
-        !pieces.get(sideDestMarble3)
-      ) {
-        dests.push(sideDestMarble3);
-      }
-    }
-
-    if (!dest3) continue; // xxx\
-
-    if (!pieces.get(dest3)) {
-      // xxx.
-      dests.push(dest3);
-      continue;
-    }
-
-    if (pieces.get(dest3)?.playerIndex === pieces.get(orig)?.playerIndex) {
-      // xxxx
-      continue;
-    }
-
-    // xxxo
-    const dest4 = move(dest3, direction);
-    if (!dest4) {
-      // xxxo\
-      dests.push(dest3);
-      continue;
-    }
-    if (!pieces.get(dest4)) {
-      // xxxo.
-      dests.push(dest3);
-      continue;
-    }
-    if (pieces.get(dest4)?.playerIndex === pieces.get(orig)?.playerIndex) {
-      // xxxox
-      continue;
-    }
-
-    // xxxoo
-    const dest5 = move(dest4, direction);
-    if (!dest5) {
-      // xxxoo\
-      dests.push(dest3);
-      continue;
-    }
-    if (!pieces.get(dest5)) {
-      // xxxoo.
-      dests.push(dest3);
     }
   }
 
-  return dests;
+  return res;
+};
+
+const canJumpTo = (variant: Variant, pieces: Pieces, a: Pos): boolean => {
+  return !pieces.get(pos2key(a)) && isCell(variant, a);
 };

@@ -1,229 +1,411 @@
-import type * as cg from '../../types';
-import { SquareDimensions, TranslateBase } from './types';
+import {
+  BoardDimensions,
+  files,
+  Key,
+  NumberPair,
+  Orientation,
+  Piece,
+  PlayerIndex,
+  Pos,
+  ranks19,
+  Variant,
+} from '../../types';
+import { SquareDimensions } from './types';
 
-export const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'] as const;
-const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9'] as const;
-
-export const pos2key = (pos: cg.Pos): cg.Key => {
-  return (files[pos[0]] + ranks[pos[1]]) as cg.Key;
+export const getBoardSize = (variant: Variant): BoardDimensions => {
+  switch (variant) {
+    default:
+    case 'abalone':
+      return { width: 9, height: 9 };
+    case 'grandabalone':
+      return { width: 11, height: 11 };
+  }
 };
 
-export const key2pos = (k: cg.Key): cg.Pos => {
-  const rank = parseInt(k.slice(1));
-  const file = k.charCodeAt(0) - 96;
-
-  return [file, rank] as cg.Pos;
+export const isUsable = (_variant: Variant, piece: Piece, player: PlayerIndex): boolean => {
+  return piece.playerIndex === player;
+};
+export const isPushable = (variant: Variant, piece: Piece, player: PlayerIndex): boolean => {
+  return isEjectable(variant, piece, player);
+};
+export const isEjectable = (_variant: Variant, piece: Piece, player: PlayerIndex): boolean => {
+  return piece.playerIndex !== player;
 };
 
-const computeShift = (k: cg.Key): cg.Pos => {
-  const rank = parseInt(k.slice(1));
-  const file = k.charCodeAt(0) - 96;
-  const xScale = 100;
-  const yScale = 100;
-  const bt = { width: 9, height: 9 };
-
-  if (rank == 1) {
-    // bottom left
-    return [(file + shift[rank - 1] - 1) * xScale, (bt.height - rank - 1) * yScale];
+export const getMaxUsable = (variant: Variant): number | undefined => {
+  switch (variant) {
+    default:
+      return undefined;
+    case 'abalone':
+      return 3;
+    case 'grandabalone':
+      return 4;
   }
-  if (rank == 2) {
-    return [(file + shift[rank - 1] - 1) * xScale, (bt.height - rank - 1) * yScale];
+};
+export const getWinningScore = (variant: Variant): number => {
+  switch (variant) {
+    default:
+    case 'abalone':
+      return 6;
+    case 'grandabalone':
+      return 10;
   }
-  if (rank == 3) {
-    return [(file + shift[rank - 1] - 1) * xScale, (bt.height - rank - 1) * yScale];
+};
+export const hasPrevPlayer = (variant: Variant): boolean => {
+  switch (variant) {
+    default:
+    case 'abalone':
+      return false;
+    case 'grandabalone':
+      return true;
   }
-  if (rank == 4) {
-    return [(file + shift[rank - 1] - 1) * xScale, (bt.height - rank - 1) * yScale];
-  }
-  if (rank == 5) {
-    return [(file + shift[rank - 1] - 1) * xScale, (bt.height - rank) * yScale];
-  }
-  if (rank == 6) {
-    return [(file + shift[rank - 1] - 1) * xScale, (bt.height - rank + 1) * yScale];
-  }
-  if (rank == 7) {
-    return [(file + shift[rank - 1] - 1) * xScale, (bt.height - rank + 1) * yScale];
-  }
-  if (rank == 8) {
-    return [(file + shift[rank - 1] - 1) * xScale, (bt.height - rank + 1) * yScale];
-  }
-  return [(file + shift[rank - 1] - 1) * xScale, (bt.height - rank + 1) * yScale * 10];
 };
 
-// from a key, determine a position
-export const key2posAlt = (k: cg.Key): cg.Pos => {
-  return computeShift(k);
+export const getCellList = (variant: Variant): Pos[] => {
+  const size = getBoardSize(variant);
+  const res: Pos[] = [];
+
+  for (let y = size.height - 1; y >= 0; y--) {
+    for (let x = 0; x < size.width; x++) {
+      const pos: Pos = [x, y];
+      if (isCellCore(size, pos)) res.push(pos);
+    }
+  }
+
+  return res;
 };
 
-// shift is used by analysis page and miniboards
-const shift = [2, 1.5, 1, 0.5, 0, -0.5, -1, -1.5, -2];
-
-// translateBase defines where the translation of a piece should be placed on the board.
-// It is used to render the piece at the correct place.
-const createTranslateBase = (): Record<cg.Orientation, cg.TranslateBase> => {
-  const squareWidth = 102.5;
-  const squareHeight = 88;
-  const bottomLeft = [295, 854];
-  const shift = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4];
-
-  return {
-    p1: (pos: cg.Pos, _xScale: number, _yScale: number, _bt: cg.BoardDimensions) => {
-      if (pos[1] < 6) {
-        return [
-          bottomLeft[0] + squareWidth * pos[0] - (shift[pos[1] - 1] + 1) * squareWidth,
-          bottomLeft[1] - (pos[1] - 1) * squareHeight,
-        ];
-      }
-      return [
-        bottomLeft[0] + squareWidth * pos[0] - (shift[pos[1] - 1] + 1) * squareWidth,
-        bottomLeft[1] - (pos[1] - 1) * squareHeight,
-      ];
-    },
-    p2: (pos: cg.Pos, _xScale: number, _yScale: number, _bt: cg.BoardDimensions) => {
-      if (pos[1] < 6) {
-        return [
-          bottomLeft[0] + squareWidth * pos[0] - (shift[pos[1] - 1] + 1) * squareWidth,
-          bottomLeft[1] - (pos[1] - 1) * squareHeight,
-        ];
-      }
-      return [
-        bottomLeft[0] + squareWidth * pos[0] - (shift[pos[1] - 1] + 1) * squareWidth,
-        bottomLeft[1] - (pos[1] - 1) * squareHeight,
-      ];
-    },
-    right: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[1] - 1) * xScale, (pos[0] - 1) * yScale],
-    left: (pos: cg.Pos, xScale: number, yScale: number, bt: cg.BoardDimensions) => [
-      (bt.width - pos[0]) * xScale,
-      (pos[1] - 1) * yScale,
-    ],
-    p1vflip: (pos: cg.Pos, xScale: number, yScale: number, _) => [(pos[0] - 1) * xScale, (pos[1] - 1) * yScale],
-  };
+export const pos2key = (pos: Pos): Key => {
+  return (files[pos[1]] + ranks19[pos[0]]) as Key;
 };
 
-const translateBase = createTranslateBase();
-
-export const posToTranslateRel = (
-  pos: cg.Pos,
-  orientation: cg.Orientation,
-  _bt: cg.BoardDimensions,
-  _v: cg.Variant,
-): cg.NumberPair => {
-  return translateBase[orientation](pos, 100, 100, { width: 9, height: 9 });
+export const key2pos = (k: Key): Pos => {
+  return [parseInt(k.slice(1)) - 1, k.charCodeAt(0) - 97] as Pos;
 };
 
-export const translateAbs = (el: HTMLElement, pos: cg.NumberPair): void => {
+export const posToTranslateRel = (variant: Variant, pos: Pos, orientation: Orientation): NumberPair => {
+  const p = cellToP(variant, pos);
+  let pxrelmini = pToPxrelmini(variant, p);
+  if (orientation === 'p2') {
+    pxrelmini = mult(-1, pxrelmini);
+  }
+  return pxrelminiToPxmini(variant, pxrelmini);
+};
+
+export const translateAbs = (el: HTMLElement, pos: NumberPair): void => {
   el.style.transform = `translate(${pos[0]}px,${pos[1]}px)`;
 };
 
-export const translateRel = (el: HTMLElement, percents: cg.NumberPair): void => {
+export const translateRel = (el: HTMLElement, percents: NumberPair): void => {
   el.style.transform = `translate(${percents[0]}%,${percents[1]}%)`;
 };
 
-const getFile = (n: number) => {
-  return files.slice(0, n);
-};
-
-const getRank = (n: number) => {
-  return ranks.slice(0, n);
-};
-
-const allKeys = (bd: cg.BoardDimensions = { width: 9, height: 9 }): cg.Key[] => {
-  return Array.prototype.concat(...getFile(bd.width).map(c => getRank(bd.height).map(r => c + r)));
-};
-
-export const allPos = (bd: cg.BoardDimensions): cg.Pos[] => allKeys(bd).map(key2posAlt);
-
-const posToTranslateBase2 = (bounds: ClientRect, pos: cg.Pos, orientation: cg.Orientation): cg.NumberPair => {
-  return translateBase2[orientation](pos, bounds);
-};
-export const posToTranslateAbs2 = (): ((
+export const posToTranslateAbs = (
+  variant: Variant,
   bounds: ClientRect,
-  pos: cg.Pos,
-  orientation: cg.Orientation,
-) => cg.NumberPair) => {
-  return (bounds, pos, orientation) => posToTranslateBase2(bounds, pos, orientation);
-};
-const translateBase2: Record<cg.Orientation, TranslateBase> = {
-  p1: (pos: cg.Pos, bounds: ClientRect) => {
-    const height = bounds.height;
-    const width = bounds.width;
-    const squareDimensions = getSquareDimensions(bounds);
+  pos: Pos,
+  orientation: Orientation,
+): NumberPair => {
+  let res = cellToPxrel(variant, bounds, pos);
 
-    const computedHeight = height * 0.4546 + squareDimensions.height * (5 - pos[1]);
-    let computedWidth = width * 0.4546 + squareDimensions.width * (5 - pos[0]);
-
-    if (pos[1] > 5) {
-      computedWidth =
-        width * 0.4546 + squareDimensions.width * (pos[0] - 5) - 0.5 * (pos[1] - 5) * squareDimensions.width;
-    } else if (pos[1] < 5) {
-      computedWidth =
-        width * 0.4546 - squareDimensions.width * (5 - pos[0]) + 0.5 * (5 - pos[1]) * squareDimensions.width;
-    } else {
-      if (pos[0] >= 5) {
-        computedWidth = width * 0.4546 + squareDimensions.width * (pos[0] - 5);
-      } else if (pos[0] < 5) {
-        computedWidth = width * 0.4546 - squareDimensions.width * (5 - pos[0]);
-      }
-    }
-    return [computedWidth, computedHeight];
-  },
-  p2: (pos: cg.Pos, bounds: ClientRect) => {
-    const height = bounds.height;
-    const width = bounds.width;
-    const squareDimensions = getSquareDimensions(bounds);
-
-    const computedHeight = height * 0.4546 + squareDimensions.height * (pos[1] - 5);
-    let computedWidth = width * 0.4546 + squareDimensions.width * (5 - pos[0]);
-
-    if (pos[1] < 5) {
-      computedWidth =
-        width * 0.4546 + squareDimensions.width * (5 - pos[0]) - 0.5 * (5 - pos[1]) * squareDimensions.width;
-    } else if (pos[1] > 5) {
-      computedWidth =
-        width * 0.4546 - squareDimensions.width * (pos[0] - 5) + 0.5 * (pos[1] - 5) * squareDimensions.width;
-    } else {
-      if (pos[0] <= 5) {
-        computedWidth = width * 0.4546 + squareDimensions.width * (5 - pos[0]);
-      } else if (pos[0] > 5) {
-        computedWidth = width * 0.4546 - squareDimensions.width * (pos[0] - 5);
-      }
-    }
-    return [computedWidth, computedHeight];
-  },
-  right: (pos: cg.Pos, bounds: ClientRect) => [(pos[1] - 1) * bounds.x, (pos[0] - 1) * bounds.x],
-  left: (pos: cg.Pos, bounds: ClientRect) => [(pos[1] - 1) * bounds.x, (pos[0] - 1) * bounds.x],
-  p1vflip: (pos: cg.Pos, bounds: ClientRect) => [(pos[1] - 1) * bounds.x, (pos[0] - 1) * bounds.x],
-};
-
-export const getSquareDimensions = (bounds: ClientRect): SquareDimensions => ({
-  width: bounds.width * 0.093,
-  height: bounds.height * 0.081,
-});
-
-export const getCoordinates = (x: number, y: number, orientation: cg.Orientation): cg.Key | undefined => {
-  const file = files[x] as cg.File;
-  const rank = ranks[y] as cg.Rank;
-
-  const key = (file + rank) as cg.Key;
-  if (!isValidKey(key)) {
-    return undefined;
+  if (orientation === 'p2') {
+    res = mult(-1, res);
   }
 
-  if (orientation === 'p1') {
-    return key;
+  return pxrelToPx(variant, bounds, res);
+};
+
+export const getSquareDimensions_bounded = (_variant: Variant, bounds: ClientRect): SquareDimensions => {
+  const res = getSquareDimensions(_variant);
+  return {
+    width: res.width * bounds.width,
+    height: res.height * bounds.height,
+  };
+};
+export const getSquareDimensions = (_variant: Variant): SquareDimensions => {
+  return {
+    width: 1.028 * 0.091,
+    height: 1.02 * 0.0788,
+  };
+};
+export const getSquareDimensions_normed = (_variant: Variant): SquareDimensions => {
+  return {
+    width: 1,
+    height: sr3 / 2,
+  };
+};
+
+const getFactor = (variant: Variant): number => {
+  return variant === 'grandabalone' ? 0.865 : 1;
+};
+
+//
+// Cell (-> Cellrel) -> P -> Pxrelmini -> Pxmini (from the board array to the drawn mini-board)
+const centrePxmini = [500, 500] as Pos;
+
+///
+/// To Pxmini (same Pxrelmini, translated to have the centre in the proper position)
+/** Translation to properly pace the centre. */
+const pxrelminiToPxmini = (variant: Variant, pos: Pos): NumberPair => {
+  return add(div(getFactor(variant), centrePxmini), pos);
+};
+const pToPxmini = (variant: Variant, pos: Pos): NumberPair => {
+  return pxrelminiToPxmini(variant, pToPxrelmini(variant, pos));
+};
+export const cellToPxmini = (variant: Variant, pos: Pos): NumberPair => {
+  return pToPxmini(variant, cellToP(variant, pos));
+};
+
+///
+/// To pxrelmini (same as P, scaled)
+const pToPxrelmini = (variant: Variant, pos: Pos): NumberPair => {
+  const d = getSquareDimensions_normed(variant),
+    f = 102.5;
+  return mult2(d.width * f, d.height * f, pos);
+};
+
+//
+// Cell <-> Cellrel <-> P <-> Pxrel <-> Px (from the board array to the drawn board)
+///
+/// From Px (same as Pxrel, translated to have the centre properly placed)
+export const pxToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  const d = getSquareDimensions_bounded(variant, bounds).width / 2;
+  return sub(add(pos, [d, d]), div(2, [bounds.width, bounds.height]));
+};
+export const pxToP = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  return pxrelToP(variant, bounds, pxToPxrel(variant, bounds, pos));
+};
+export const pxToCellrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  return pxrelToCellrel(variant, bounds, pxToPxrel(variant, bounds, pos));
+};
+export const pxToCell = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  return pxrelToCell(variant, bounds, pxToPxrel(variant, bounds, pos));
+};
+
+///
+/// From Pxrel (same as P, scaled horizontally & vertically)
+export const pxrelToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  const d = getSquareDimensions_bounded(variant, bounds).width / 2;
+  return sub(add(div(2, [bounds.width, bounds.height]), pos), [d, d]);
+};
+export const pxrelToP = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  const d = getSquareDimensions_bounded(variant, bounds);
+  const f = getFactor(variant);
+  return div2(d.width * f, d.height * f, pos);
+};
+export const pxrelToCellrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  return pToCellrel(variant, pxrelToP(variant, bounds, pos));
+};
+export const pxrelToCell = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  return pToCell(variant, pxrelToP(variant, bounds, pos));
+};
+
+///
+/// From P (same as Cellrel, but along the triangular grid - albeit without the vertical compression factor of sr3/2)
+export const pToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  return pxrelToPx(variant, bounds, pToPxrel(variant, bounds, pos));
+};
+export const pToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  const d = getSquareDimensions_bounded(variant, bounds);
+  const f = getFactor(variant);
+  return mult2(d.width * f, d.height * f, pos);
+};
+export const pToCellrel = (variant: Variant, pos: Pos): NumberPair => {
+  return cellrelToP(variant, pos); // Involution
+};
+export const pToCell = (variant: Variant, pos: Pos): NumberPair => {
+  return cellrelToCell(variant, pToCellrel(variant, pos));
+};
+
+///
+/// From Cellrel (same as Cell, but with the board centre for origin)
+export const cellrelToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  return pToPx(variant, bounds, cellrelToP(variant, pos));
+};
+export const cellrelToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  return pToPxrel(variant, bounds, cellrelToP(variant, pos));
+};
+export const cellrelToP = (_variant: Variant, pos: Pos): NumberPair => {
+  return [pos[0] - pos[1] / 2, -pos[1]];
+};
+export const cellrelToCell = (variant: Variant, pos: Pos): NumberPair => {
+  const res = add(pos, getCentre(variant));
+  return [Math.round(res[0]), Math.round(res[1])];
+};
+
+//
+// Cell
+export const cellToPx_shapes = (
+  variant: Variant,
+  bounds: ClientRect,
+  pos: Pos,
+  orientation: Orientation,
+): NumberPair => {
+  const bd = getBoardSize(variant);
+  const originalPos: Pos = orientation === 'p2' ? ([bd.width + 1 - pos[0], bd.height + 1 - pos[1]] as Pos) : pos;
+  let pxrel = cellToPxrel(variant, bounds, originalPos);
+  if (orientation === 'p2') pxrel = mult(-1, pxrel);
+  const d = getSquareDimensions_bounded(variant, bounds).width / 2;
+  const shapePos = add(pxrelToPx(variant, bounds, pxrel), [d, d] as Pos);
+  return [shapePos[0], shapePos[1] - 1];
+};
+export const cellToPx = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  return cellrelToPx(variant, bounds, cellToCellrel(variant, pos));
+};
+export const cellToPxrel = (variant: Variant, bounds: ClientRect, pos: Pos): NumberPair => {
+  return cellrelToPxrel(variant, bounds, cellToCellrel(variant, pos));
+};
+export const cellToP = (variant: Variant, pos: Pos): NumberPair => {
+  return cellrelToP(variant, cellToCellrel(variant, pos));
+};
+export const cellToCellrel = (variant: Variant, pos: Pos): NumberPair => {
+  return sub(pos, getCentre(variant));
+};
+
+//
+//
+export const sr3 = Math.sqrt(3);
+
+export const getCentre = (variant: Variant): Pos => {
+  return getCentreCore(getBoardSize(variant));
+};
+export const getCentreCore = (d: BoardDimensions): Pos => {
+  return [Math.floor(d.width / 2), Math.floor(d.height / 2)];
+};
+
+export const isCell = (variant: Variant, pos: Pos): boolean => {
+  return isCellCore(getBoardSize(variant), pos);
+};
+const isCellCore = (d: BoardDimensions, pos: Pos): boolean => {
+  const centre = getCentreCore(d);
+  return dist(centre, pos) <= centre[0];
+};
+
+//
+// Geometry
+export const add = (a: Pos, b: Pos): Pos => {
+  return [a[0] + b[0], a[1] + b[1]];
+};
+export const sub = (a: Pos, b: Pos): Pos => {
+  return add(a, mult(-1, b));
+};
+export const mult = (n: number, a: Pos): Pos => {
+  return mult2(n, n, a);
+};
+export const mult2 = (n: number, p: number, a: Pos): Pos => {
+  return [n * a[0], p * a[1]];
+};
+export const div = (n: number, a: Pos): Pos => {
+  return mult(1 / n, a);
+};
+export const div2 = (n: number, p: number, a: Pos): Pos => {
+  return mult2(1 / n, 1 / p, a);
+};
+
+export const areEqual = (a: Pos, b: Pos): boolean => {
+  return a[0] === b[0] && a[1] === b[1];
+};
+export const round = (a: Pos): Pos => {
+  return [Math.round(a[0]), Math.round(a[1])];
+};
+export const vectTo3 = (a: Pos): Pos => {
+  return [a[0] - a[1] / 2, (a[1] * sr3) / 2];
+};
+export const vectFrom3 = (a: Pos): Pos => {
+  return [a[0] + a[1] / sr3, (a[1] * 2) / sr3];
+};
+export const cross = (a: Pos, b: Pos): number => {
+  return a[0] * b[1] - a[1] * b[0];
+};
+
+export const getRotated = (a: Pos, deg: number): Pos => {
+  const rot = (deg * Math.PI) / 180;
+  const cos = Math.cos(rot);
+  const sin = Math.sin(rot);
+  return [cos * a[0] - sin * a[1], sin * a[0] + cos * a[1]];
+};
+export const getRotatedKeepNorm = (a: Pos, deg: number): Pos => {
+  const p = round(vectFrom3(getRotated(vectTo3(a), deg)));
+
+  let n = norm(p);
+  if (n > 0) {
+    n = norm(a) / n;
   }
 
-  return rotate180(file, rank) as cg.Key;
+  return mult(n, p);
+};
+export const getPrev = (vect: Pos): Pos => {
+  return getPrevCore(getNeighVectors(), vect);
+};
+export const getPrevCore = (neighVectors: Pos[], vect: Pos): Pos => {
+  return getRotatedKeepNorm(vect, -360 / neighVectors.length);
+};
+export const getNext = (vect: Pos): Pos => {
+  return getNextCore(getNeighVectors(), vect);
+};
+export const getNextCore = (neighVectors: Pos[], vect: Pos): Pos => {
+  return getRotatedKeepNorm(vect, 360 / neighVectors.length);
 };
 
-const rotate180 = (file: string, rank: string): string => {
-  const files = 'abcdefghi';
-  const ranks = '123456789';
-  const rotatedFile = files[files.length - 1 - files.indexOf(file)];
-  const rotatedRank = ranks[ranks.length - 1 - ranks.indexOf(rank)];
-  return rotatedFile + rotatedRank;
+export const getAngle = (a: Pos): number => {
+  return (Math.atan2(a[1], a[0]) * 180) / Math.PI;
+};
+export const getAngle360 = (a: Pos): number => {
+  return rest(getAngle(a), 360);
+};
+export const rest = (todiv: number, divby: number): number => {
+  let res = todiv % divby;
+
+  if (res < 0) res += divby > 0 ? divby : -divby;
+  //if (res === -0) res = 0;
+  if (res < 0) res = 0;
+
+  return res;
+};
+export const divint = (todiv: number, divby: number): number => {
+  let res = todiv / divby;
+  if (todiv < 0 && todiv % divby !== 0) res += divby > 0 ? -1 : 1;
+
+  return res;
 };
 
-export const isValidKey = (key: cg.Key): boolean => {
-  return /^(a[1-5]|b[1-6]|c[1-7]|d[1-8]|e[1-9]|f[2-9]|g[3-9]|h[4-9]|i[5-9])$/.test(key);
+export const dist = (pos0: Pos, pos1: Pos): number => {
+  return normCore(pos0[0] - pos1[0], pos0[1] - pos1[1]);
+};
+export const norm = (pos: Pos): number => {
+  return normCore(pos[0], pos[1]);
+};
+export const normCore = (x: number, y: number): number => {
+  return x * y < 0 ? Math.abs(x) + Math.abs(y) : Math.max(Math.abs(x), Math.abs(y));
+};
+
+export const dist2 = (pos0: Pos, pos1: Pos): number => {
+  return norm2Core(pos0[0] - pos1[0], pos0[1] - pos1[1]);
+};
+export const norm2 = (pos: Pos): number => {
+  return norm2Core(pos[0], pos[1]);
+};
+export const norm2Core = (x: number, y: number): number => {
+  return Math.sqrt(x * x + y * y);
+};
+
+const normRadius = 1;
+export const getNeighVectors = (): Pos[] => {
+  const res = [];
+
+  for (let i = -normRadius; i <= normRadius; i++) {
+    for (let j = -normRadius; j <= normRadius; j++) {
+      if (normCore(i, j) === 1) {
+        res.push([i, j] as Pos);
+      }
+    }
+  }
+
+  return res;
+};
+export const includes = (positions: Pos[], pos: Pos): boolean => {
+  for (const p of positions) {
+    if (p[0] === pos[0] && p[1] === pos[1]) return true;
+  }
+  return false;
 };

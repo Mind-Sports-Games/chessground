@@ -18,7 +18,7 @@ function letters(role: cg.Role) {
 }
 
 export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Variant): cg.Pieces {
-  if (variant === 'abalone') return abaloneRead(fen, dimensions);
+  if (variant === 'abalone' || variant === 'grandabalone') return abaloneRead(variant, fen);
   if (variant === 'dameo') return dameoRead(fen);
   if (fen === 'start') fen = initial;
   if (fen.indexOf('[') !== -1) fen = fen.slice(0, fen.indexOf('['));

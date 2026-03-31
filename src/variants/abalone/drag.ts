@@ -2,7 +2,7 @@ import { cancel } from '../../drag';
 import { State } from '../../state';
 import { distanceSq, samePiece } from '../../util';
 
-import { translateAbs } from './util';
+import { add, sub, translateAbs } from './util';
 
 export const processDrag = (s: State): void => {
   requestAnimationFrame(() => {
@@ -25,13 +25,15 @@ export const processDrag = (s: State): void => {
           cur.element = found;
         }
 
-        cur.pos = [cur.epos[0] - cur.rel[0], cur.epos[1] - cur.rel[1]];
+        cur.pos = sub(cur.epos, cur.rel);
 
         // move piece
-        const translation = s.posToTranslateAbsolute(s.dom.bounds(), s.dimensions, 'chess')(cur.origPos, s.orientation);
-        translation[0] += cur.pos[0];
-        translation[1] += cur.pos[1];
-        translateAbs(cur.element, translation);
+        const translation = s.posToTranslateAbsolute(
+          s.dom.bounds(),
+          s.dimensions,
+          s.variant,
+        )(cur.origPos, s.orientation);
+        translateAbs(cur.element, add(translation, cur.pos));
       }
     }
     s.processDrag(s);
