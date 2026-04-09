@@ -5,7 +5,7 @@ import { DragCurrent, processDrag } from './drag';
 import { premove } from './premove';
 import { render } from './render';
 import { key2pos, posToTranslateAbs, posToTranslateRel, pos2key, timer } from './util';
-import { pos2px, roleToSvgName } from './svg';
+import { pos2px, circleWidth, circleRadius, roleToSvgName } from './svg';
 import * as cg from './types';
 import type { DrawShapePiece, Drawable } from './draw';
 
@@ -146,6 +146,8 @@ export interface HeadlessState {
   onlyDropsVariant: boolean;
   singleClickMoveVariant: boolean;
   baseMove: (state: HeadlessState, orig: cg.Key, dest: cg.Key) => cg.Piece | boolean;
+  circleWidth: (bounds: ClientRect, bd: cg.BoardDimensions) => [number, number];
+  circleRadius: (bounds: ClientRect, bd: cg.BoardDimensions) => number;
   getKeyAtDomPos: (
     pos: cg.NumberPair,
     orientation: cg.Orientation,
@@ -305,6 +307,8 @@ export function defaults(): HeadlessState {
     onlyDropsVariant: false,
     singleClickMoveVariant: false,
     baseMove,
+    circleWidth,
+    circleRadius,
     getKeyAtDomPos,
     getSnappedKeyAtDomPos,
     key2pos,

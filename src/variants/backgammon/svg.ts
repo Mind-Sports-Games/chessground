@@ -9,6 +9,17 @@ function stackCount(pieces: cg.Pieces, pos: cg.Pos): number {
   return m ? Math.min(parseInt(m[1]), 5) : 1;
 }
 
+export function circleWidth(bounds: ClientRect): [number, number] {
+  const colWidth = bounds.width / 15;
+  const stroke = colWidth / 15;
+  return [stroke * 0.75, stroke];
+}
+
+export function circleRadius(bounds: ClientRect, widths: [number, number]): number {
+  const colWidth = bounds.width / 15;
+  return colWidth / 2 - widths[1] / 2 + colWidth / 8;
+}
+
 export function pos2px(
   pos: cg.Pos,
   bounds: ClientRect,
@@ -21,8 +32,8 @@ export function pos2px(
   const row = pos[1];
 
   const colWidth = bounds.width / 15;
-  const vUnit = bounds.height / 60;
-  const yBottomBase = bounds.height - bounds.height / 15;
+  const borderHeight = bounds.height / 15;
+  const pieceRadius = colWidth / 2;
 
   const slot = col <= 6 ? col + 1 : col + 2;
   const x = (slot - 0.5) * colWidth;
@@ -32,10 +43,10 @@ export function pos2px(
   const isBottom = orientation === 'p1' ? row === 1 : row === 2;
   const isFlipped = orientation !== 'p1';
 
-  // perfect pos for top for stackSize=1 : (6 * vUnit)
-  // perfect pos for bottom for stackSize=1 : yBottomBase
-  const yBottom = yBottomBase - vUnit * 2 - (stackSize - 1) * vUnit * 4;
-  const yTop = 6 * vUnit + (stackSize - 1) * vUnit * 4;
+  const halfPlayHeight = (bounds.height - 2 * borderHeight) / 2;
+  const stackSpacing = (halfPlayHeight - 5.22 * pieceRadius) / 4;
+  const yBottom = bounds.height - borderHeight - pieceRadius - (stackSize - 1) * stackSpacing;
+  const yTop = borderHeight + pieceRadius + (stackSize - 1) * stackSpacing;
 
   const y = (isBottom && !isFlipped) || (!isBottom && isFlipped) ? yBottom : yTop;
 
