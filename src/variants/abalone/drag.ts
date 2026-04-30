@@ -28,12 +28,18 @@ export const processDrag = (s: State): void => {
         cur.pos = sub(cur.epos, cur.rel);
 
         // move piece
-        const translation = s.posToTranslateAbsolute(
-          s.dom.bounds(),
-          s.dimensions,
-          s.variant,
-        )(cur.origPos, s.orientation);
-        translateAbs(cur.element, add(translation, cur.pos));
+        if (cur.newPiece) {
+          // board editor spare piece: follow mouse directly, without snapping to cells
+          const bounds = s.dom.bounds();
+          translateAbs(cur.element, [cur.epos[0] - bounds.left + cur.dec[0], cur.epos[1] - bounds.top + cur.dec[1]]);
+        } else {
+          const translation = s.posToTranslateAbsolute(
+            s.dom.bounds(),
+            s.dimensions,
+            s.variant,
+          )(cur.origPos, s.orientation);
+          translateAbs(cur.element, add(translation, cur.pos));
+        }
       }
     }
     s.processDrag(s);
