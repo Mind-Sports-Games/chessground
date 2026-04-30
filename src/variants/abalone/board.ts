@@ -83,6 +83,8 @@ export const baseMove = (state: HeadlessState, orig: Key, dest: Key): Piece | bo
     if (!piece) return false;
     state.pieces.delete(orig);
     state.pieces.set(dest, piece);
+    state.lastMove = [orig, dest];
+    callUserFunction(state.events.change);
     return true;
   }
 

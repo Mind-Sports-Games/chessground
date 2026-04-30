@@ -1,7 +1,7 @@
 import { pos2key, NRanks, invNRanks } from './util';
 import * as cg from './types';
 
-import { read as abaloneRead } from './variants/abalone/fen';
+import { read as abaloneRead, write as abaloneWrite } from './variants/abalone/fen';
 import { read as dameoRead } from './variants/dameo/fen';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
@@ -149,6 +149,7 @@ export function readPocket(fen: cg.FEN, variant: cg.Variant): cg.Piece[] {
 }
 
 export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Variant): cg.FEN {
+  if (variant === 'abalone' || variant === 'grandabalone') return abaloneWrite(variant, pieces);
   const fen = invNRanks
     .slice(-bd.height)
     .map(y =>
