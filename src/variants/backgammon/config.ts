@@ -4,7 +4,9 @@ import { getKeyAtDomPos } from '../../board';
 import { circleRadius, circleWidth, pos2px } from './svg';
 
 export const configure = (state: HeadlessState, config: Config): void => {
-  state.liftable.liftDests = config.liftable?.liftDests || [];
+  if (config.liftable !== undefined) {
+    state.liftable.liftDests = config.liftable.liftDests ?? [];
+  }
   state.highlight.lastMove = false;
   if (config.drawable !== undefined && config.drawable.enabled !== true) state.drawable.enabled = false;
   state.circleRadius = (bounds, _bd) => circleRadius(bounds, circleWidth(bounds));

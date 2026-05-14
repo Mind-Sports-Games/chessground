@@ -290,7 +290,9 @@ export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key,
     if (force) state.pieces.delete(key);
     else return false;
   }
-  callUserFunction(state.events.dropNewPiece, piece, key);
+  const capturedPiece = state.pieces.get(key);
+  const captured = capturedPiece?.playerIndex !== piece.playerIndex ? capturedPiece : undefined;
+  callUserFunction(state.events.dropNewPiece, piece, key, captured);
   setDropVariantState(state, piece, key);
 
   state.lastMove = [key];

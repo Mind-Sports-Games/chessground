@@ -129,7 +129,7 @@ export interface HeadlessState {
     // move is called after a piece has been moved.
     // capturedPiece is undefined or like {playerIndex: 'p1'; 'role': 'queen'}
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
-    dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
+    dropNewPiece?: (piece: cg.Piece, key: cg.Key, captured?: cg.Piece) => void;
     select?: (key: cg.Key) => void; // called when a square is selected
     insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
     selectDice?: (dice: cg.Dice[]) => void; //when the dice have been selected (to swap order)

@@ -2,6 +2,37 @@ import { getCellList, pos2key } from './util';
 import { roles } from '../../fen';
 import { FEN, Pieces, PlayerIndex, Pos, Variant } from '../../types';
 
+export const write = (variant: Variant, pieces: Pieces): FEN => {
+  const cells = getCellList(variant);
+  let fen = '';
+  let empty = 0;
+  let prevY: number | undefined = undefined;
+  for (const pos of cells) {
+    const [, y] = pos;
+    if (prevY !== undefined && y !== prevY) {
+      if (empty > 0) {
+        fen += empty;
+        empty = 0;
+      }
+      fen += '/';
+    }
+    prevY = y;
+    const piece = pieces.get(pos2key(pos));
+    if (piece) {
+      if (empty > 0) {
+        fen += empty;
+        empty = 0;
+      }
+      const letter = piece.role.charAt(0);
+      fen += piece.playerIndex === 'p1' ? letter.toUpperCase() : letter;
+    } else {
+      empty++;
+    }
+  }
+  if (empty > 0) fen += empty;
+  return fen;
+};
+
 export const read = (variant: Variant, fen: FEN): Pieces => {
   const res: Pieces = new Map();
   const cells: Pos[] = getCellList(variant);
