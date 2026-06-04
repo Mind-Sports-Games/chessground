@@ -10,6 +10,7 @@ import {
   containsX,
   callUserFunction,
   calculatePieceGroup,
+  calculatePieceGroupsInArea,
   calculateGoScores,
   calculateGoCaptures,
   calculateBackgammonDropChanges,
@@ -449,7 +450,9 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
   if (state.selectOnly) {
     const piece = state.pieces.get(key);
     if (piece) {
-      const pieceGroup = calculatePieceGroup(key, state.pieces, state.dimensions);
+      const pieceGroup = cg.goVariants.includes(state.variant)
+        ? calculatePieceGroupsInArea(key, state.pieces, state.dimensions)
+        : calculatePieceGroup(key, state.pieces, state.dimensions);
       if (state.selectedPieces.has(key)) {
         for (const k of pieceGroup) {
           state.selectedPieces.delete(k);

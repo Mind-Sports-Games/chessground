@@ -7,6 +7,7 @@ import {
   calculateAreas,
   calculatePlayerEmptyAreas,
   calculatePieceGroup,
+  calculatePieceGroupsInArea,
   calculateGoScores,
   calculateBackgammonScores,
 } from './util.js';
@@ -462,5 +463,71 @@ describe('calculateBackgammonScores() test', () => {
 
     expect(expected.p1).toEqual(backgammonScores.p1);
     expect(expected.p2).toEqual(backgammonScores.p2);
+  });
+});
+
+describe('calculatePieceGroupsInArea() test', () => {
+  const p1Piece = { role: 's-piece', playerIndex: 'p1' } as cg.Piece;
+  const p2Piece = { role: 's-piece', playerIndex: 'p2' } as cg.Piece;
+
+  it('single enclosed group returns only that group (same as calculatePieceGroup)', () => {
+    // 3x3: p1 stone at b2, surrounded on all 4 sides by p2
+    const pieces = new Map<cg.Key, cg.Piece>([
+      ['b2', p1Piece],
+      ['a2', p2Piece],
+      ['c2', p2Piece],
+      ['b1', p2Piece],
+      ['b3', p2Piece],
+    ]);
+    const bd = { height: 3, width: 3 };
+    const result = calculatePieceGroupsInArea('b2', pieces, bd);
+    expect(result.length).toEqual(1);
+    expect(result).toContain('b2');
+  });
+
+  it('two disconnected same-color groups in the same opponent-bounded area are both selected', () => {
+    // 4x4: p2 wall around the perimeter, two isolated p1 stones inside at b2 and c1
+    // path between them: b2 -> b1(empty) -> c1, and b2 -> c2(empty) -> c1
+    const pieces = new Map<cg.Key, cg.Piece>();
+    pieces.set('b2', p1Piece);
+    pieces.set('c1', p1Piece);
+    (['a1', 'a2', 'a3', 'a4', 'b4', 'c4', 'd4', 'd3', 'd2', 'd1'] as cg.Key[]).forEach(k => pieces.set(k, p2Piece));
+    const bd = { height: 4, width: 4 };
+    const result = calculatePieceGroupsInArea('b2', pieces, bd);
+    expect(result.length).toEqual(2);
+    expect(result).toContain('b2');
+    expect(result).toContain('c1');
+  });
+
+  it('stone in own open territory selects all reachable same-color stones', () => {
+    // 3x3: two isolated p1 stones, no p2 boundary — whole board is one reachable area
+    const pieces = new Map<cg.Key, cg.Piece>([
+      ['a2', p1Piece],
+      ['c2', p1Piece],
+    ]);
+    const bd = { height: 3, width: 3 };
+    const result = calculatePieceGroupsInArea('a2', pieces, bd);
+    expect(result.length).toEqual(2);
+    expect(result).toContain('a2');
+    expect(result).toContain('c2');
+  });
+
+  it('board edge acts as a boundary alongside p2 stones', () => {
+    // 3x3: p2 on left column + b3, two isolated p1 stones in the right portion
+    //   a3=p2, b3=p2, a2=p2, b2=p1, a1=p2, c1=p1
+    // b2 and c1 are in the same corner area bounded by p2 + board edge
+    const pieces = new Map<cg.Key, cg.Piece>([
+      ['b2', p1Piece],
+      ['c1', p1Piece],
+      ['a3', p2Piece],
+      ['b3', p2Piece],
+      ['a2', p2Piece],
+      ['a1', p2Piece],
+    ]);
+    const bd = { height: 3, width: 3 };
+    const result = calculatePieceGroupsInArea('b2', pieces, bd);
+    expect(result.length).toEqual(2);
+    expect(result).toContain('b2');
+    expect(result).toContain('c1');
   });
 });

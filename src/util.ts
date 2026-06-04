@@ -307,6 +307,23 @@ export function calculatePieceGroup(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.
   return assignNextWave([pieceKey]);
 }
 
+export function calculatePieceGroupsInArea(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
+  const playerIndex = pieces.get(pieceKey)?.playerIndex;
+  if (!playerIndex) return [];
+
+  function flood(visited: cg.Key[]): cg.Key[] {
+    const border = calculateBorder(visited, bd);
+    const newKeys = [...new Set(border)].filter(k => {
+      const piece = pieces.get(k);
+      return !piece || piece.playerIndex === playerIndex;
+    });
+    if (newKeys.length > 0) return flood(visited.concat(newKeys));
+    return visited;
+  }
+
+  return flood([pieceKey]).filter(k => pieces.get(k)?.playerIndex === playerIndex);
+}
+
 export function calculateGoCaptures(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
   const borderKeys = calculateBorder([pieceKey], bd);
   const enemyKeys = borderKeys.filter(
