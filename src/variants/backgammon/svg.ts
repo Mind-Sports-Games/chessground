@@ -20,6 +20,14 @@ export function circleRadius(bounds: ClientRect, widths: [number, number]): numb
   return colWidth / 2 - widths[1] / 2 + colWidth / 8;
 }
 
+// cy of the topmost visible checker in each piece image (viewBox 0 0 321 2046).
+// Index 0 = 1 checker, index 4 = 5 checkers (images cap at 5 visible).
+// Bottom pieces (w{N}b.svg): stack grows upward from the bottom border.
+const BOTTOM_CHECKER_CY = [1885.5, 1580.5, 1275.5, 970.5, 665.5];
+// Top pieces (w{N}t.svg): stack grows downward from the top border.
+const TOP_CHECKER_CY = [160.5, 466.5, 772.5, 1078.5, 1384.5];
+const IMAGE_HEIGHT = 2046;
+
 export function pos2px(
   pos: cg.Pos,
   bounds: ClientRect,
@@ -27,28 +35,34 @@ export function pos2px(
   _variant: cg.Variant,
   orientation: cg.Orientation,
   pieces: cg.Pieces,
+  extraStack = 0,
 ): cg.NumberPair {
   const col = pos[0];
   const row = pos[1];
 
   const colWidth = bounds.width / 15;
-  const borderHeight = bounds.height / 15;
-  const pieceRadius = colWidth / 2;
 
-  const slot = col <= 6 ? col + 1 : col + 2;
+  // For p1/p1vflip: cols 1-6 are left of the bar (slot = col+1), cols 7-12 right (slot = col+2).
+  // For p2: the board is horizontally mirrored, so display cols 1-6 end up on the RIGHT side
+  // of the bar (they are P1's right-half pieces with margin-left=2*W/15 → slot = col+2),
+  // and display cols 7-12 are on the LEFT side (slot = col+1).
+  const rightOfBar = orientation === 'p2' ? col <= 6 : col > 6;
+  const slot = rightOfBar ? col + 2 : col + 1;
   const x = (slot - 0.5) * colWidth;
 
   const p1Pos: cg.Pos = T.mapToP1[orientation](pos, bd);
-  const stackSize = stackCount(pieces, p1Pos);
+  const rawStack = stackCount(pieces, p1Pos) + extraStack;
+  const stackSize = Math.max(Math.min(rawStack, 5), 1);
   const isBottom = orientation === 'p1' ? row === 1 : row === 2;
   const isFlipped = orientation !== 'p1';
+  const visuallyBottom = (isBottom && !isFlipped) || (!isBottom && isFlipped);
 
-  const halfPlayHeight = (bounds.height - 2 * borderHeight) / 2;
-  const stackSpacing = (halfPlayHeight - 5.22 * pieceRadius) / 4;
-  const yBottom = bounds.height - borderHeight - pieceRadius - (stackSize - 1) * stackSpacing;
-  const yTop = borderHeight + pieceRadius + (stackSize - 1) * stackSpacing;
-
-  const y = (isBottom && !isFlipped) || (!isBottom && isFlipped) ? yBottom : yTop;
+  // Piece element height = bounds.height * 6.5/15 (CSS calc(100% * 6.5/15)).
+  // Translate-y for visually-bottom pieces = H/2; for visually-top = 0 + margin-top (W/15).
+  const pieceHeight = (bounds.height * 6.5) / 15;
+  const pieceTranslateY = visuallyBottom ? bounds.height / 2 : bounds.width / 15;
+  const cy = (visuallyBottom ? BOTTOM_CHECKER_CY : TOP_CHECKER_CY)[stackSize - 1];
+  const y = pieceTranslateY + (cy * pieceHeight) / IMAGE_HEIGHT;
 
   return [x, y];
 }

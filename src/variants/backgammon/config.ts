@@ -13,5 +13,6 @@ export const configure = (state: HeadlessState, config: Config): void => {
   state.circleWidth = (bounds, _bd) => circleWidth(bounds);
   state.getSnappedKeyAtDomPos = (_orig, pos, orientation, bounds, bd, variant) =>
     getKeyAtDomPos(pos, orientation, bounds, bd, variant);
-  state.pos2px = (pos, bounds, bd, variant, orientation) => pos2px(pos, bounds, bd, variant, orientation, state.pieces);
+  state.pos2px = (pos, bounds, bd, variant, orientation, stackOffset) =>
+    pos2px(pos, bounds, bd, variant, orientation, state.pieces, stackOffset);
 };

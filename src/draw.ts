@@ -10,6 +10,10 @@ export interface DrawShape {
   modifiers?: DrawModifiers;
   piece?: DrawShapePiece;
   customSvg?: string;
+  // Vertical stack offset at orig (for circles and arrow tails on stacked pieces).
+  stackOffset?: number;
+  // Vertical stack offset at dest (for arrow tips landing on top of existing pieces).
+  destStackOffset?: number;
 }
 
 export interface DrawShapePiece {

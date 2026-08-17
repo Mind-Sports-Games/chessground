@@ -139,7 +139,7 @@ function syncShapes(
 }
 
 function shapeHash(
-  { orig, dest, brush, piece, modifiers, customSvg }: DrawShape,
+  { orig, dest, brush, piece, modifiers, customSvg, stackOffset, destStackOffset }: DrawShape,
   arrowDests: ArrowDests,
   current: boolean,
   bounds: ClientRect,
@@ -155,6 +155,8 @@ function shapeHash(
     piece && pieceHash(piece),
     modifiers && modifiersHash(modifiers),
     customSvg && customSvgHash(customSvg),
+    stackOffset,
+    destStackOffset,
   ]
     .filter(x => x)
     .join(',');
@@ -211,8 +213,20 @@ function renderShape(
         bounds,
         state.dimensions,
         state.variant,
+        shape.stackOffset,
+        shape.destStackOffset,
       );
-    } else el = renderCircle(state, brushes[shape.brush!], orig, current, bounds, state.dimensions, state.variant);
+    } else
+      el = renderCircle(
+        state,
+        brushes[shape.brush!],
+        orig,
+        current,
+        bounds,
+        state.dimensions,
+        state.variant,
+        shape.stackOffset,
+      );
   }
   el.setAttribute('cgHash', hash);
   return el;
@@ -244,8 +258,9 @@ function renderCircle(
   bounds: ClientRect,
   bd: cg.BoardDimensions,
   variant: cg.Variant,
+  stackOffset?: number,
 ): SVGElement {
-  const o = state.pos2px(pos, bounds, bd, variant, state.orientation),
+  const o = state.pos2px(pos, bounds, bd, variant, state.orientation, stackOffset),
     widths = state.circleWidth(bounds, bd),
     radius = state.circleRadius(bounds, bd);
   return setAttributes(createElement('circle'), {
@@ -269,10 +284,13 @@ function renderArrow(
   bounds: ClientRect,
   bd: cg.BoardDimensions,
   variant: cg.Variant,
+  stackOffset?: number,
+  destStackOffset?: number,
 ): SVGElement {
+  const isBackgammon = variant === 'backgammon' || variant === 'hyper' || variant === 'nackgammon';
   const m = arrowMargin(bounds, shorten && !current, bd),
-    a = state.pos2px(orig, bounds, bd, variant, state.orientation),
-    b = state.pos2px(dest, bounds, bd, variant, state.orientation),
+    a = state.pos2px(orig, bounds, bd, variant, state.orientation, isBackgammon ? stackOffset : undefined),
+    b = state.pos2px(dest, bounds, bd, variant, state.orientation, isBackgammon ? destStackOffset : undefined),
     dx = b[0] - a[0],
     dy = b[1] - a[1],
     angle = Math.atan2(dy, dx),
