@@ -181,6 +181,7 @@ export interface HeadlessState {
     bd: cg.BoardDimensions,
     variant: cg.Variant,
     orientation: cg.Orientation,
+    stackOffset?: number,
   ) => cg.NumberPair;
   pos2key: (pos: cg.Pos, dimensions: cg.BoardDimensions) => cg.Key;
   premove: (
