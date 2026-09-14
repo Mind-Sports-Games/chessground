@@ -66,6 +66,7 @@ export type Variant =
   | 'minibreakthroughtroyka'
   | 'abalone'
   | 'grandabalone'
+  | 'entropy'
   | undefined;
 export type PlayerIndex = (typeof playerIndexs)[number];
 export type Letter = (typeof letters)[number];

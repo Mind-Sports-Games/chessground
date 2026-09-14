@@ -150,6 +150,10 @@ export default function predrop(
     case 'backgammon':
       mobility = noSquares; // dont allow predrop for backgammon
       break;
+
+    case 'entropy':
+      mobility = emptysquares(pieces); // cant drop on current pieces (either side) as they cant move
+      break;
     default:
       console.warn('Unknown drop variant', variant);
   }
