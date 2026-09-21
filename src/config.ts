@@ -6,6 +6,7 @@ import { DrawShape, DrawBrush } from './draw';
 
 import { configure as configureAbalone } from './variants/abalone/config';
 import { configure as configureBackgammon } from './variants/backgammon/config';
+import { configure as configureEntropy } from './variants/entropy/config';
 import { configure as configureRacingKings } from './variants/chess/racingKings/config';
 import { configure as configureShogi } from './variants/shogi/config';
 
@@ -203,6 +204,9 @@ export function configure(state: HeadlessState, config: Config): void {
   }
   if (state.variant === 'backgammon' || state.variant === 'nackgammon' || state.variant === 'hyper') {
     configureBackgammon(state, config);
+  }
+  if (state.variant === 'entropy') {
+    configureEntropy(state);
   }
   if (state.variant === 'racingKings') {
     configureRacingKings(state);
