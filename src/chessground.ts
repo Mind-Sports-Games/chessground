@@ -6,6 +6,7 @@ import * as events from './events';
 import { updateBounds } from './render';
 import * as svg from './svg';
 import * as util from './util';
+import { renderPatterns } from './variants/entropy/patternsView';
 
 export function Chessground(element: HTMLElement, config?: Config): Api {
   const maybeState: State | HeadlessState = defaults();
@@ -20,6 +21,7 @@ export function Chessground(element: HTMLElement, config?: Config): Api {
       redrawNow = (skipSvg?: boolean): void => {
         maybeState.render(state);
         if (!skipSvg && elements.svg) svg.renderSvg(state, elements.svg, elements.customSvg!);
+        if (!skipSvg && elements.patterns) renderPatterns(state, elements.patterns);
       },
       boundsUpdated = (): void => {
         bounds.clear();

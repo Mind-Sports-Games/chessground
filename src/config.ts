@@ -6,6 +6,7 @@ import { DrawShape, DrawBrush } from './draw';
 
 import { configure as configureAbalone } from './variants/abalone/config';
 import { configure as configureBackgammon } from './variants/backgammon/config';
+import { configure as configureEntropy } from './variants/entropy/config';
 import { configure as configureRacingKings } from './variants/chess/racingKings/config';
 import { configure as configureShogi } from './variants/shogi/config';
 
@@ -20,6 +21,7 @@ export interface Config {
   selected?: cg.Key; // square currently selected "a1"
   coordinates?: cg.Coords; // display coordinates inside, outside or not at all
   boardScores?: boolean; //include board-scores attributes
+  showPatterns?: cg.ShowPatterns; // annotate the scoring patterns on the board (entropy)
   dice?: cg.Dice[]; // dice to display on the board
   doublingCube?: cg.DoublingCube; // doubling cube to display on the board
   cubeActions?: cg.CubeAction[]; // actions to display on the doubling cube related options
@@ -203,6 +205,9 @@ export function configure(state: HeadlessState, config: Config): void {
   }
   if (state.variant === 'backgammon' || state.variant === 'nackgammon' || state.variant === 'hyper') {
     configureBackgammon(state, config);
+  }
+  if (state.variant === 'entropy') {
+    configureEntropy(state);
   }
   if (state.variant === 'racingKings') {
     configureRacingKings(state);

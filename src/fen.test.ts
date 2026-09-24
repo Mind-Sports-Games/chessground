@@ -280,3 +280,17 @@ describe('fen.readPocket() test', () => {
     expect('p1').toEqual(pocketPieces[1].playerIndex);
   });
 });
+
+describe('fen.read() entropy test', () => {
+  it('reads each colour of counter from the fen, case marking the owner', () => {
+    const fenString = 'wkygrbp/7/7/7/7/7/WKYGRBP[] w 0 0 1 1';
+    const bd: BoardDimensions = { width: 7, height: 7 };
+
+    const pieces = read(fenString, bd, 'entropy');
+
+    expect(pieces.get('a1')).toEqual({ role: 'w-piece', playerIndex: 'p1' });
+    expect(pieces.get('b1')).toEqual({ role: 'k-piece', playerIndex: 'p1' });
+    expect(pieces.get('g7')).toEqual({ role: 'p-piece', playerIndex: 'p2' });
+    expect(pieces.size).toEqual(14);
+  });
+});
