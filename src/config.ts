@@ -21,6 +21,7 @@ export interface Config {
   selected?: cg.Key; // square currently selected "a1"
   coordinates?: cg.Coords; // display coordinates inside, outside or not at all
   boardScores?: boolean; //include board-scores attributes
+  showPatterns?: cg.ShowPatterns; // annotate the scoring patterns on the board (entropy)
   dice?: cg.Dice[]; // dice to display on the board
   doublingCube?: cg.DoublingCube; // doubling cube to display on the board
   cubeActions?: cg.CubeAction[]; // actions to display on the doubling cube related options

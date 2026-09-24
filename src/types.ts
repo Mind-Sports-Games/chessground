@@ -116,7 +116,11 @@ export interface Elements {
   ghost?: HTMLElement;
   svg?: SVGElement;
   customSvg?: SVGElement;
+  patterns?: SVGElement;
 }
+
+// when to annotate the board with the patterns that make up the score (entropy)
+export type ShowPatterns = 'never' | 'full' | 'always';
 export interface Dom {
   elements: Elements;
   bounds: Memo<ClientRect>;

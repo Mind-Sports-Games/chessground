@@ -62,6 +62,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
 
   let svg: SVGElement | undefined;
   let customSvg: SVGElement | undefined;
+  let patterns: SVGElement | undefined;
   if (s.drawable.visible && !relative) {
     svg = setAttributes(createSVG('svg'), { class: 'cg-shapes' });
     svg.appendChild(createSVG('defs'));
@@ -70,6 +71,11 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     customSvg.appendChild(createSVG('g'));
     container.appendChild(svg);
     container.appendChild(customSvg);
+  }
+
+  if (s.variant === 'entropy' && !relative) {
+    patterns = setAttributes(createSVG('svg'), { class: 'cg-patterns' });
+    container.appendChild(patterns);
   }
 
   if (s.coordinates !== Coords.Hidden) {
@@ -270,6 +276,7 @@ export function renderWrap(element: HTMLElement, s: HeadlessState, relative: boo
     ghost,
     svg,
     customSvg,
+    patterns,
   };
 }
 

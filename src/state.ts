@@ -23,6 +23,7 @@ export interface HeadlessState {
   simpleGoScores?: cg.SimpleGoScores; // score for each player in go game (area + pieces)
   coordinates: cg.Coords; // include coords attributes
   boardScores: boolean; //include board-scores attributes
+  showPatterns: cg.ShowPatterns; // annotate the scoring patterns on the board (entropy)
   dice: cg.Dice[]; // dice to display on the board
   doublingCube?: cg.DoublingCube; // doubling cube to display on the board (backgammon)
   cubeActions?: cg.CubeAction[]; // actions to display on the doubling cube related options (backgammon)
@@ -211,6 +212,7 @@ export function defaults(): HeadlessState {
     turnPlayerIndex: 'p1',
     coordinates: cg.Coords.Inside,
     boardScores: false,
+    showPatterns: 'never',
     dice: [],
     canUndo: false,
     showUndoButton: false,
