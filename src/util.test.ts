@@ -8,6 +8,8 @@ import {
   calculatePlayerEmptyAreas,
   calculatePieceGroup,
   calculatePieceGroupsInArea,
+  calculateGoCaptures,
+  allKeys,
   calculateGoScores,
   calculateBackgammonScores,
 } from './util.js';
@@ -529,5 +531,49 @@ describe('calculatePieceGroupsInArea() test', () => {
     expect(result.length).toEqual(2);
     expect(result).toContain('b2');
     expect(result).toContain('c1');
+  });
+});
+
+describe('go group calculations on a full 19x19 board', () => {
+  const p1Piece = { role: 's-piece', playerIndex: 'p1' } as cg.Piece;
+  const p2Piece = { role: 's-piece', playerIndex: 'p2' } as cg.Piece;
+  const bd = { height: 19, width: 19 };
+
+  it('calculatePieceGroup returns each stone of a solid group once', () => {
+    const pieces = new Map<cg.Key, cg.Piece>(allKeys(bd).map(k => [k, p1Piece]));
+    pieces.delete('s19');
+    const pieceGroup = calculatePieceGroup('a1', pieces, bd);
+    expect(pieceGroup.length).toEqual(360);
+    expect(new Set(pieceGroup).size).toEqual(360);
+  });
+
+  it('calculateGoCaptures captures a solid group with no liberties once', () => {
+    const pieces = new Map<cg.Key, cg.Piece>(allKeys(bd).map(k => [k, p2Piece]));
+    pieces.set('j10', p1Piece);
+    const captures = calculateGoCaptures('j10', pieces, bd);
+    expect(captures.length).toEqual(360);
+    expect(new Set(captures).size).toEqual(360);
+  });
+
+  it('calculateGoCaptures does not capture a solid group with a liberty', () => {
+    const pieces = new Map<cg.Key, cg.Piece>(allKeys(bd).map(k => [k, p2Piece]));
+    pieces.set('j10', p1Piece);
+    pieces.delete('s19');
+    expect(calculateGoCaptures('j10', pieces, bd)).toEqual([]);
+  });
+
+  it('calculateAreas returns an empty board as one area', () => {
+    const areas = calculateAreas(allKeys(bd), bd);
+    expect(areas.length).toEqual(1);
+    expect(new Set(areas[0]).size).toEqual(361);
+  });
+
+  it('calculatePieceGroupsInArea selects every stone across an open board', () => {
+    const pieces = new Map<cg.Key, cg.Piece>(
+      allKeys(bd)
+        .filter((_, i) => i % 2 === 0)
+        .map(k => [k, p1Piece]),
+    );
+    expect(calculatePieceGroupsInArea('a1', pieces, bd).length).toEqual(pieces.size);
   });
 });

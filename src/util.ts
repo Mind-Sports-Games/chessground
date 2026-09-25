@@ -251,7 +251,7 @@ export function calculatePlayerEmptyAreas(
     const surroundingPlayers = new Set(borderKeys.map(k => piecesToConsider.get(k)?.playerIndex));
     if (surroundingPlayers.size === 1) {
       for (const k of area) {
-        if (!Array.from(deadStones.keys()).includes(k)) {
+        if (!deadStones.has(k)) {
           playerAreas.set(k, surroundingPlayers.has('p1') ? 'p1' : 'p2');
         }
       }
@@ -262,78 +262,72 @@ export function calculatePlayerEmptyAreas(
 }
 
 export function calculateBorder(squares: cg.Key[], bd: cg.BoardDimensions): cg.Key[] {
-  return squares.flatMap(k => adjacentKeys(bd, k)).filter(k => !squares.includes(k));
+  const squareSet = new Set(squares);
+  const border = new Set<cg.Key>();
+  for (const square of squares) {
+    for (const k of adjacentKeys(bd, square)) {
+      if (!squareSet.has(k)) border.add(k);
+    }
+  }
+  return [...border];
+}
+
+function floodFill(start: cg.Key, bd: cg.BoardDimensions, canEnter: (k: cg.Key) => boolean): cg.Key[] {
+  const visited = new Set<cg.Key>([start]);
+  const queue: cg.Key[] = [start];
+  for (let i = 0; i < queue.length; i++) {
+    for (const k of adjacentKeys(bd, queue[i])) {
+      if (!visited.has(k) && canEnter(k)) {
+        visited.add(k);
+        queue.push(k);
+      }
+    }
+  }
+  return queue;
 }
 
 export function calculateAreas(emptySquares: cg.Key[], bd: cg.BoardDimensions): cg.Key[][] {
-  function assignNextWave(squaresToBeAssigned: cg.Key[], emptyAreas: cg.Key[][]): cg.Key[][] {
-    const emptySquaresToAdd = squaresToBeAssigned.filter(stba =>
-      emptyAreas
-        .slice(0, 1)
-        .flat()
-        .flatMap(s => adjacentKeys(bd, s))
-        .includes(stba),
-    );
-    const updatedEmptyAreas =
-      emptySquaresToAdd.length === 0
-        ? [squaresToBeAssigned.slice(0, 1)].concat(emptyAreas)
-        : [emptyAreas.slice(0, 1).flat().concat(emptySquaresToAdd)].concat(emptyAreas.slice(1));
-
-    const updatedSquaresToBeAssigned = squaresToBeAssigned.filter(s => !updatedEmptyAreas.flat().includes(s));
-
-    if (updatedSquaresToBeAssigned.length > 0) {
-      return assignNextWave(updatedSquaresToBeAssigned, updatedEmptyAreas);
-    } else {
-      return updatedEmptyAreas;
-    }
+  const unassigned = new Set(emptySquares);
+  const areas: cg.Key[][] = [];
+  for (const square of emptySquares) {
+    if (!unassigned.has(square)) continue;
+    const area = floodFill(square, bd, k => unassigned.has(k));
+    for (const k of area) unassigned.delete(k);
+    areas.unshift(area);
   }
-
-  return assignNextWave(emptySquares.slice(1), [emptySquares.slice(0, 1)]);
+  return areas;
 }
 
 export function calculatePieceGroup(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
-  function assignNextWave(pieceGroup: cg.Key[]): cg.Key[] {
-    const borderKeys = calculateBorder(pieceGroup, bd);
-    const newKeys = borderKeys.filter(
-      k => pieces.get(k) && pieces.get(k)?.playerIndex === pieces.get(pieceKey)?.playerIndex,
-    );
-    if (newKeys.length > 0) {
-      return assignNextWave(pieceGroup.concat(newKeys));
-    } else {
-      return pieceGroup;
-    }
-  }
-
-  return assignNextWave([pieceKey]);
+  const playerIndex = pieces.get(pieceKey)?.playerIndex;
+  return floodFill(pieceKey, bd, k => pieces.get(k)?.playerIndex === playerIndex);
 }
 
 export function calculatePieceGroupsInArea(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
   const playerIndex = pieces.get(pieceKey)?.playerIndex;
   if (!playerIndex) return [];
 
-  function flood(visited: cg.Key[]): cg.Key[] {
-    const border = calculateBorder(visited, bd);
-    const newKeys = [...new Set(border)].filter(k => {
-      const piece = pieces.get(k);
-      return !piece || piece.playerIndex === playerIndex;
-    });
-    if (newKeys.length > 0) return flood(visited.concat(newKeys));
-    return visited;
-  }
-
-  return flood([pieceKey]).filter(k => pieces.get(k)?.playerIndex === playerIndex);
+  const area = floodFill(pieceKey, bd, k => {
+    const piece = pieces.get(k);
+    return !piece || piece.playerIndex === playerIndex;
+  });
+  return area.filter(k => pieces.get(k)?.playerIndex === playerIndex);
 }
 
 export function calculateGoCaptures(pieceKey: cg.Key, pieces: cg.Pieces, bd: cg.BoardDimensions): cg.Key[] {
-  const borderKeys = calculateBorder([pieceKey], bd);
-  const enemyKeys = borderKeys.filter(
-    k => pieces.get(k) && pieces.get(k)?.playerIndex !== pieces.get(pieceKey)?.playerIndex,
-  );
-  const enemyPieces = enemyKeys.map(k => calculatePieceGroup(k, pieces, bd));
-  const capturedPieces = enemyPieces.filter(
-    enemyGroup => calculateBorder(enemyGroup, bd).filter(k => !pieces.has(k)).length === 0,
-  );
-  return [...new Set(capturedPieces.flat())];
+  const playerIndex = pieces.get(pieceKey)?.playerIndex;
+  const captured = new Set<cg.Key>();
+  const checked = new Set<cg.Key>();
+  for (const k of adjacentKeys(bd, pieceKey)) {
+    const piece = pieces.get(k);
+    if (!piece || piece.playerIndex === playerIndex || checked.has(k)) continue;
+    const enemyGroup = calculatePieceGroup(k, pieces, bd);
+    for (const g of enemyGroup) checked.add(g);
+    if (calculateBorder(enemyGroup, bd).every(b => pieces.has(b))) {
+      for (const g of enemyGroup) captured.add(g);
+    }
+  }
+  return [...captured];
 }
 
 export function calculateGoScores(deadStones: cg.Pieces, pieces: cg.Pieces, bd: cg.BoardDimensions): cg.SimpleGoScores {
