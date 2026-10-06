@@ -15,6 +15,7 @@ const LINE_SCORE_SIZE = 0.28;
 const LINE_SCORE_INSET = 0.06;
 const DIGIT_ADVANCE = 0.57;
 const LINE_SCORE_RANK_X = LINE_SCORE_INSET + LINE_SCORE_SIZE * DIGIT_ADVANCE;
+const LINE_SCORE_RANK_DY = '0.35em';
 
 export function renderPatterns(s: State, el: SVGElement): void {
   const annotating = isAnnotating(s);
@@ -44,16 +45,24 @@ function renderLineScores(s: State, patterns: Pattern[]): SVGElement[] {
   });
   scores.ranks.forEach((score, i) => {
     const [, y] = toBoardPos([1, i + 1], s.orientation, bd);
-    marks.push(renderLineScore(score, LINE_SCORE_RANK_X, y, 'middle', 'middle'));
+    marks.push(renderLineScore(score, LINE_SCORE_RANK_X, y, 'middle', 'alphabetic', LINE_SCORE_RANK_DY));
   });
   return marks;
 }
 
-function renderLineScore(score: number, x: number, y: number, anchor: string, baseline: string): SVGElement {
+function renderLineScore(
+  score: number,
+  x: number,
+  y: number,
+  anchor: string,
+  baseline: string,
+  dy?: string,
+): SVGElement {
   const el = setAttributes(createSVG('text'), {
     class: 'line-score',
     x,
     y,
+    ...(dy ? { dy } : {}),
     'font-size': LINE_SCORE_SIZE,
     'text-anchor': anchor,
     'dominant-baseline': baseline,
