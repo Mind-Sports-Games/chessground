@@ -2,6 +2,7 @@ import { describe, expect, it } from '@jest/globals';
 import { configure } from './config.js';
 import { State, defaults } from './state.js';
 import { premove } from './premove.js';
+import predrop from './predrop.js';
 
 describe('premove() test', () => {
   it('chess p1 king', () => {
@@ -315,5 +316,49 @@ describe('premove() test', () => {
       state.chess960,
     );
     expect(premoves).toEqual(expected);
+  });
+});
+
+describe('entropy premove() and predrop() test', () => {
+  it('entropy counters premove like a rook over empty squares only', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions: { width: 7, height: 7 }, variant: 'entropy', fen: '7/7/3r3/7/1K1W3/7/7' });
+
+    const expected = ['c3', 'd1', 'd2', 'd4', 'e3', 'f3', 'g3'];
+    const premoves = premove(
+      state.pieces,
+      'd3',
+      state.premovable.castle,
+      state.dimensions,
+      state.variant,
+      state.chess960,
+    );
+    expect([...premoves].sort()).toEqual(expected);
+  });
+
+  it('entropy counters premove the same whatever their colour', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions: { width: 7, height: 7 }, variant: 'entropy', fen: '7/7/7/7/7/7/K6' });
+
+    const expected = ['a2', 'a3', 'a4', 'a5', 'a6', 'a7', 'b1', 'c1', 'd1', 'e1', 'f1', 'g1'];
+    const premoves = premove(
+      state.pieces,
+      'a1',
+      state.premovable.castle,
+      state.dimensions,
+      state.variant,
+      state.chess960,
+    );
+    expect([...premoves].sort()).toEqual(expected);
+  });
+
+  it('entropy counters can only be predropped on empty squares', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions: { width: 7, height: 7 }, variant: 'entropy', fen: '7/7/7/7/7/7/Wr5' });
+
+    const drops = predrop(state.pieces, { role: 'g-piece', playerIndex: 'p2' }, state.dimensions, state.variant);
+    expect(drops).toHaveLength(47);
+    expect(drops).not.toContain('a1');
+    expect(drops).not.toContain('b1');
   });
 });

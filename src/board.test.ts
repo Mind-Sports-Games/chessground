@@ -1,5 +1,7 @@
 import { describe, expect, it } from '@jest/globals';
-import { getKeyAtDomPos, getSnappedKeyAtDomPos } from './board.js';
+import { baseNewPiece, getKeyAtDomPos, getSnappedKeyAtDomPos } from './board.js';
+import { configure } from './config.js';
+import { State, defaults } from './state.js';
 import { NumberPair, BoardDimensions } from './types.js';
 
 describe('getSnappedKeyAtDomPos() test', () => {
@@ -550,5 +552,16 @@ describe('getKeyAtDomPos() backgammon test', () => {
     const expected = 'k1';
     const key = getKeyAtDomPos(bpos, orientation, bounds, bd, 'backgammon');
     expect(expected).toEqual(key);
+  });
+});
+
+describe('baseNewPiece() entropy test', () => {
+  it('a dropped counter changes owner as it lands', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions: { width: 7, height: 7 }, variant: 'entropy', fen: '7/7/7/7/7/7/7' });
+
+    baseNewPiece(state, { role: 'r-piece', playerIndex: 'p1' }, 'd4');
+
+    expect(state.pieces.get('d4')).toEqual({ role: 'r-piece', playerIndex: 'p2' });
   });
 });

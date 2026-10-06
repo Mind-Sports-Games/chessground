@@ -146,6 +146,10 @@ function setDropVariantState(state: HeadlessState, piece: cg.Piece, key: cg.Key)
       updatePocketPieces(state, opposite(piece.playerIndex), true, capture);
       break;
     }
+    case 'entropy':
+      // a counter changes owner as it lands, from Chaos to Order, so that Order may slide it
+      state.pieces.set(key, { ...piece, playerIndex: opposite(piece.playerIndex) });
+      break;
     default:
       state.pieces.set(key, piece);
   }

@@ -509,6 +509,12 @@ function dameoMan(pieces: cg.Pieces, playerIndex: cg.PlayerIndex): Mobility {
   };
 }
 
+function entropyCounter(pieces: cg.Pieces): Mobility {
+  const unblocked = amazonsQueen(pieces);
+  const emptyDest = emptysquares(pieces);
+  return (x1, y1, x2, y2) => rook(x1, y1, x2, y2) && unblocked(x1, y1, x2, y2) && emptyDest(x1, y1, x2, y2);
+}
+
 function amazonsQueen(pieces: cg.Pieces): Mobility {
   return (x1, y1, x2, y2) => {
     if (x2 > x1 && y1 === y2) {
@@ -1190,6 +1196,10 @@ export function premove(
     case 'breakthroughtroyka':
     case 'minibreakthroughtroyka':
       mobility = breakthroughtroykaPawn(pieces, playerIndex);
+      break;
+
+    case 'entropy':
+      mobility = entropyCounter(pieces);
       break;
 
     // Variants using standard pieces and additional fairy pieces like S-chess, Capablanca, etc.
