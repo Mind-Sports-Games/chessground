@@ -3,6 +3,7 @@ import * as cg from './types';
 
 import { read as abaloneRead, write as abaloneWrite } from './variants/abalone/fen';
 import { read as dameoRead } from './variants/dameo/fen';
+import { assignOwners, blackSeatFromFen } from './variants/fiveinarow/stones';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 const commaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'];
@@ -20,6 +21,12 @@ function letters(role: cg.Role) {
 export function read(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Variant): cg.Pieces {
   if (variant === 'abalone' || variant === 'grandabalone') return abaloneRead(variant, fen);
   if (variant === 'dameo') return dameoRead(fen);
+  if (cg.fiveInARowVariants.includes(variant))
+    return assignOwners(readBoard(fen, dimensions, variant), blackSeatFromFen(fen));
+  return readBoard(fen, dimensions, variant);
+}
+
+function readBoard(fen: cg.FEN, dimensions: cg.BoardDimensions, variant: cg.Variant): cg.Pieces {
   if (fen === 'start') fen = initial;
   if (fen.indexOf('[') !== -1) fen = fen.slice(0, fen.indexOf('['));
   const pieces: cg.Pieces = new Map();
@@ -160,7 +167,10 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
             if (!commaFenVariants.includes(variant)) {
               const letter: string =
                 letters(piece.role) + (piece.promoted && letters(piece.role).charAt(0) !== '+' ? '~' : '');
-              return piece.playerIndex === 'p1' ? letter.toUpperCase() : letter;
+              // a five in a row stone's letter is its colour, whichever seat owns it
+              return piece.playerIndex === 'p1' || cg.fiveInARowVariants.includes(variant)
+                ? letter.toUpperCase()
+                : letter;
             } else {
               const letter = piece.role.charAt(0);
               const roleLetter = mancalaFenVariants.includes(variant)

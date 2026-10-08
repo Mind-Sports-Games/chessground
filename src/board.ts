@@ -22,6 +22,7 @@ import {
 } from './util';
 import { queen, knight } from './premove';
 import predrop from './predrop';
+import { blackSeatOnBoard, seatOf } from './variants/fiveinarow/stones';
 import * as cg from './types';
 import * as T from './transformations';
 
@@ -150,6 +151,12 @@ function setDropVariantState(state: HeadlessState, piece: cg.Piece, key: cg.Key)
       // a counter changes owner as it lands, from Chaos to Order, so that Order may slide it
       state.pieces.set(key, { ...piece, playerIndex: opposite(piece.playerIndex) });
       break;
+    case 'gomoku': {
+      // in the opening a seat drops stones of both colours; each belongs to the seat playing its colour
+      const blackSeat = blackSeatOnBoard(state.pieces) ?? seatOf(piece.role, piece.playerIndex);
+      state.pieces.set(key, { ...piece, playerIndex: seatOf(piece.role, blackSeat) });
+      break;
+    }
     default:
       state.pieces.set(key, piece);
   }

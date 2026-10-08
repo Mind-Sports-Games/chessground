@@ -565,3 +565,35 @@ describe('baseNewPiece() entropy test', () => {
     expect(state.pieces.get('d4')).toEqual({ role: 'r-piece', playerIndex: 'p2' });
   });
 });
+
+describe('baseNewPiece() gomoku test', () => {
+  const dimensions = { width: 15, height: 15 };
+
+  it('a white stone dropped by p1 in the opening belongs to the white seat', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions, variant: 'gomoku', fen: '15/15/15/15/15/15/15/7B7/15/15/15/15/15/15/15 b 1 o 1' });
+
+    baseNewPiece(state, { role: 'w-piece', playerIndex: 'p1' }, 'h9');
+
+    expect(state.pieces.get('h9')).toEqual({ role: 'w-piece', playerIndex: 'p2' });
+  });
+
+  it('a stone dropped after a swap belongs to the seat now playing its colour', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions, variant: 'gomoku', fen: '15/15/15/15/15/15/15/6BW7/15/15/15/15/15/15/15 b 2 - 2' });
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p2' }, 'h9');
+
+    expect(state.pieces.get('h9')).toEqual({ role: 'b-piece', playerIndex: 'p2' });
+    expect(state.pieces.get('g8')).toEqual({ role: 'b-piece', playerIndex: 'p2' });
+  });
+
+  it('the first stone keeps the seat that dropped it', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions, variant: 'gomoku', fen: '15/15/15/15/15/15/15/15/15/15/15/15/15/15/15 b 1 o 1' });
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p1' }, 'h8');
+
+    expect(state.pieces.get('h8')).toEqual({ role: 'b-piece', playerIndex: 'p1' });
+  });
+});

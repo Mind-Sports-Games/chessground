@@ -294,3 +294,27 @@ describe('fen.read() entropy test', () => {
     expect(pieces.size).toEqual(14);
   });
 });
+
+describe('fen.read() and fen.write() gomoku test', () => {
+  const bd: BoardDimensions = { width: 15, height: 15 };
+
+  it('gives each stone to the seat playing its colour', () => {
+    const pieces = read('15/15/15/15/15/15/15/6BW7/15/15/15/15/15/15/15 w 1 c 1', bd, 'gomoku');
+
+    expect(pieces.get('g8')).toEqual({ role: 'b-piece', playerIndex: 'p1' });
+    expect(pieces.get('h8')).toEqual({ role: 'w-piece', playerIndex: 'p2' });
+  });
+
+  it('gives black stones to p2 once the seats have swapped', () => {
+    const pieces = read('15/15/15/15/15/15/15/6BW7/15/15/15/15/15/15/15 w 2 - 2', bd, 'gomoku');
+
+    expect(pieces.get('g8')).toEqual({ role: 'b-piece', playerIndex: 'p2' });
+    expect(pieces.get('h8')).toEqual({ role: 'w-piece', playerIndex: 'p1' });
+  });
+
+  it('writes stones by colour whichever seat owns them', () => {
+    const board = '15/15/15/15/15/15/15/6BW7/15/15/15/15/15/15/15';
+
+    expect(write(read(`${board} w 2 - 2`, bd, 'gomoku'), bd, 'gomoku')).toEqual(board);
+  });
+});

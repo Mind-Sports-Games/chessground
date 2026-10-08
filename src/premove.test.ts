@@ -362,3 +362,32 @@ describe('entropy premove() and predrop() test', () => {
     expect(drops).not.toContain('b1');
   });
 });
+
+describe('gomoku premove() and predrop() test', () => {
+  const dimensions = { width: 15, height: 15 };
+
+  it('gomoku stones never premove', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions, variant: 'gomoku', fen: '15/15/15/15/15/15/15/7B7/15/15/15/15/15/15/15 w 1 - 1' });
+
+    const premoves = premove(
+      state.pieces,
+      'h8',
+      state.premovable.castle,
+      state.dimensions,
+      state.variant,
+      state.chess960,
+    );
+    expect(premoves).toEqual([]);
+  });
+
+  it('gomoku stones can only be predropped on empty points', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions, variant: 'gomoku', fen: '15/15/15/15/15/15/15/6BW7/15/15/15/15/15/15/15 b 1 - 2' });
+
+    const drops = predrop(state.pieces, { role: 'b-piece', playerIndex: 'p1' }, state.dimensions, state.variant);
+    expect(drops).toHaveLength(223);
+    expect(drops).not.toContain('g8');
+    expect(drops).not.toContain('h8');
+  });
+});

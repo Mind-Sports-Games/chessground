@@ -1202,6 +1202,10 @@ export function premove(
       mobility = entropyCounter(pieces);
       break;
 
+    case 'gomoku':
+      mobility = () => false; // stones never move once placed
+      break;
+
     // Variants using standard pieces and additional fairy pieces like S-chess, Capablanca, etc.
     default:
       switch (role) {

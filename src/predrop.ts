@@ -152,6 +152,7 @@ export default function predrop(
       break;
 
     case 'entropy':
+    case 'gomoku':
       mobility = emptysquares(pieces); // cant drop on current pieces (either side) as they cant move
       break;
     default:
