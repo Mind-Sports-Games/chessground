@@ -261,18 +261,10 @@ function computeSquareClasses(s: State): SquareClasses {
     for (const k of s.lastMove) {
       if (k !== 'a0') {
         if (first) {
-          addSquare(
-            squares,
-            k,
-            'last-move from' + variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
-          );
+          addSquare(squares, k, 'last-move from' + variantSpecificHighlightClass(s, k));
           first = false;
         } else {
-          addSquare(
-            squares,
-            k,
-            'last-move to' + variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
-          );
+          addSquare(squares, k, 'last-move to' + variantSpecificHighlightClass(s, k));
         }
       } else {
         first = false;
@@ -293,33 +285,17 @@ function computeSquareClasses(s: State): SquareClasses {
     }
   }
   if (s.selected) {
-    addSquare(
-      squares,
-      s.selected,
-      'selected' + variantSpecificHighlightClass(s.variant, s.selected, s.orientation, s.turnPlayerIndex),
-    );
+    addSquare(squares, s.selected, 'selected' + variantSpecificHighlightClass(s, s.selected));
     if (s.movable.showDests) {
       const dests = s.movable.dests?.get(s.selected);
       if (dests)
         for (const k of dests) {
-          addSquare(
-            squares,
-            k,
-            'move-dest' +
-              (s.pieces.has(k) ? ' oc' : '') +
-              variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
-          );
+          addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : '') + variantSpecificHighlightClass(s, k));
         }
       const pDests = s.premovable.dests;
       if (pDests)
         for (const k of pDests) {
-          addSquare(
-            squares,
-            k,
-            'premove-dest' +
-              (s.pieces.has(k) ? ' oc' : '') +
-              variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
-          );
+          addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : '') + variantSpecificHighlightClass(s, k));
         }
     }
   } else if (s.dropmode.active || s.draggable.current?.orig === 'a0') {
@@ -368,13 +344,9 @@ export function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {
   else map.set(key, [value]);
 }
 
-function variantSpecificHighlightClass(
-  variant: cg.Variant,
-  k: cg.Key,
-  orientation: cg.Orientation,
-  turnPlayerIndex: cg.PlayerIndex,
-): string {
-  switch (variant) {
+function variantSpecificHighlightClass(s: State, k: cg.Key): string {
+  const { orientation, turnPlayerIndex } = s;
+  switch (s.variant) {
     case 'togyzkumalak':
     case 'bestemshe':
       return k[1] === '1' ? ' p1' : ' p2';
@@ -386,6 +358,11 @@ function variantSpecificHighlightClass(
     case 'go13x13':
     case 'go19x19':
       return turnPlayerIndex === 'p1' ? ' p2' : ' p1';
+    case 'gomoku': {
+      // a stone's seat changes with a swap, so the marker follows the colour of the stone itself
+      const role = s.pieces.get(k)?.role;
+      return role === 'b-piece' ? ' black-stone' : role === 'w-piece' ? ' white-stone' : '';
+    }
     default:
       return '';
   }
