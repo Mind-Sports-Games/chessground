@@ -1203,6 +1203,8 @@ export function premove(
       break;
 
     case 'gomoku':
+    case 'pente':
+    case 'renju':
       mobility = () => false; // stones never move once placed
       break;
 

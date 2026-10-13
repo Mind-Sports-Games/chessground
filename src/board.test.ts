@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { baseNewPiece, getKeyAtDomPos, getSnappedKeyAtDomPos } from './board.js';
+import { baseNewPiece, getKeyAtDomPos, getSnappedKeyAtDomPos, selectSquare } from './board.js';
 import { configure } from './config.js';
 import { State, defaults } from './state.js';
 import { NumberPair, BoardDimensions } from './types.js';
@@ -595,5 +595,75 @@ describe('baseNewPiece() gomoku test', () => {
     baseNewPiece(state, { role: 'b-piece', playerIndex: 'p1' }, 'h8');
 
     expect(state.pieces.get('h8')).toEqual({ role: 'b-piece', playerIndex: 'p1' });
+  });
+});
+
+describe('baseNewPiece() pente test', () => {
+  const dimensions = { width: 19, height: 19 };
+
+  it('a stone closing off two of the other colour takes them', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions,
+      variant: 'pente',
+      fen: '19/19/19/19/19/19/19/19/19/7BWW9/19/19/19/19/19/19/19/19/19 b 1 - 0 0 3',
+    });
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p1' }, 'k10');
+
+    expect(state.pieces.has('i10')).toBe(false);
+    expect(state.pieces.has('j10')).toBe(false);
+    expect(state.pieces.get('h10')).toEqual({ role: 'b-piece', playerIndex: 'p1' });
+    expect(state.pieces.get('k10')).toEqual({ role: 'b-piece', playerIndex: 'p1' });
+  });
+
+  it('a stone dropped between two of the other colour is safe', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions,
+      variant: 'pente',
+      fen: '19/19/19/19/19/19/19/19/19/7W1BW8/19/19/19/19/19/19/19/19/19 b 1 - 0 0 3',
+    });
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p1' }, 'i10');
+
+    expect(state.pieces.size).toEqual(4);
+  });
+
+  it('three of the other colour in a line are never taken', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions,
+      variant: 'pente',
+      fen: '19/19/19/19/19/19/19/19/19/7BWWW8/19/19/19/19/19/19/19/19/19 b 1 - 0 0 3',
+    });
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p1' }, 'l10');
+
+    expect(state.pieces.size).toEqual(5);
+  });
+});
+
+describe('selectSquare() renju test', () => {
+  const fen = '15/15/15/15/15/15/6B8/7W7/6BW7/15/15/15/15/15/b1b12 w 1 k 3';
+
+  it('white picks exactly one offered stone', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions: { width: 15, height: 15 }, variant: 'renju', fen, selectOnly: true });
+
+    selectSquare(state, 'a1');
+    selectSquare(state, 'c1');
+
+    expect([...state.selectedPieces.keys()]).toEqual(['c1']);
+    expect(state.simpleGoScores).toBeUndefined();
+  });
+
+  it('a stone on the board cannot be picked', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions: { width: 15, height: 15 }, variant: 'renju', fen, selectOnly: true });
+
+    selectSquare(state, 'g9');
+
+    expect(state.selectedPieces.size).toEqual(0);
   });
 });

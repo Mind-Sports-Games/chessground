@@ -3,7 +3,7 @@ import * as cg from './types';
 
 import { read as abaloneRead, write as abaloneWrite } from './variants/abalone/fen';
 import { read as dameoRead } from './variants/dameo/fen';
-import { assignOwners, blackSeatFromFen } from './variants/fiveinarow/stones';
+import { assignOwners, blackSeatFromFen, isOffered } from './variants/fiveinarow/stones';
 
 export const initial: cg.FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 const commaFenVariants: cg.Variant[] = ['oware', 'togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'];
@@ -168,9 +168,8 @@ export function write(pieces: cg.Pieces, bd: cg.BoardDimensions, variant: cg.Var
               const letter: string =
                 letters(piece.role) + (piece.promoted && letters(piece.role).charAt(0) !== '+' ? '~' : '');
               // a five in a row stone's letter is its colour, whichever seat owns it
-              return piece.playerIndex === 'p1' || cg.fiveInARowVariants.includes(variant)
-                ? letter.toUpperCase()
-                : letter;
+              if (cg.fiveInARowVariants.includes(variant)) return isOffered(piece) ? 'b' : letter.toUpperCase();
+              return piece.playerIndex === 'p1' ? letter.toUpperCase() : letter;
             } else {
               const letter = piece.role.charAt(0);
               const roleLetter = mancalaFenVariants.includes(variant)

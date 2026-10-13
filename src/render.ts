@@ -358,10 +358,12 @@ function variantSpecificHighlightClass(s: State, k: cg.Key): string {
     case 'go13x13':
     case 'go19x19':
       return turnPlayerIndex === 'p1' ? ' p2' : ' p1';
-    case 'gomoku': {
+    case 'gomoku':
+    case 'pente':
+    case 'renju': {
       // a stone's seat changes with a swap, so the marker follows the colour of the stone itself
       const role = s.pieces.get(k)?.role;
-      return role === 'b-piece' ? ' black-stone' : role === 'w-piece' ? ' white-stone' : '';
+      return role === 'w-piece' ? ' white-stone' : role ? ' black-stone' : '';
     }
     default:
       return '';
