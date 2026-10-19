@@ -54,6 +54,32 @@ describe('getSnappedKeyAtDomPos() test', () => {
   });
 });
 
+describe('getSnappedKeyAtDomPos() variant defaults', () => {
+  const bounds = {
+    height: 15,
+    width: 15,
+    x: 0,
+    y: 0,
+    bottom: 15,
+    left: 0,
+    right: 15,
+    top: 0,
+    toJSON(): any {
+      return 'None';
+    },
+  };
+  const bd: BoardDimensions = { width: 15, height: 15 };
+  const bpos: NumberPair = [2.5, 0.5];
+
+  it('snaps to a chess move for chess variants', () => {
+    expect(getSnappedKeyAtDomPos('a1', bpos, 'p1', bounds, bd, 'chess')).not.toEqual('c15');
+  });
+
+  it('snaps to any square for non-chess variants', () => {
+    expect(getSnappedKeyAtDomPos('a1', bpos, 'p1', bounds, bd, 'gomoku')).toEqual('c15');
+  });
+});
+
 describe('getKeyAtDomPos() test', () => {
   it('testing a8 squares p1', () => {
     const bpos: NumberPair = [0.5, 0.5];

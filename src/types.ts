@@ -376,6 +376,7 @@ export const xiangqiVariants: Variant[] = ['xiangqi', 'minixiangqi', 'manchu', '
 export const goVariants: Variant[] = ['go9x9', 'go13x13', 'go19x19'];
 export const abaloneVariants: Variant[] = ['abalone', 'grandabalone'];
 export const fiveInARowVariants: Variant[] = ['gomoku', 'pente', 'renju'];
+export const chessSnapArrowVariants: Variant[] = [...chessVariants, ...shogiVariants, ...xiangqiVariants];
 
 export enum Coords {
   // add "const" if you do not want to expose the enum at runtime

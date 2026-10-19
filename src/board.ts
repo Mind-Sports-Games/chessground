@@ -901,6 +901,19 @@ export function getSnappedKeyAtDomPos(
   orientation: cg.Orientation,
   bounds: ClientRect,
   bd: cg.BoardDimensions,
+  variant: cg.Variant = 'chess',
+): cg.Key | undefined {
+  return cg.chessSnapArrowVariants.includes(variant)
+    ? getChessSnappedKeyAtDomPos(orig, pos, orientation, bounds, bd)
+    : getKeyAtDomPos(pos, orientation, bounds, bd, variant);
+}
+
+function getChessSnappedKeyAtDomPos(
+  orig: cg.Key,
+  pos: cg.NumberPair,
+  orientation: cg.Orientation,
+  bounds: ClientRect,
+  bd: cg.BoardDimensions,
 ): cg.Key | undefined {
   const origPos = key2pos(orig);
   const validSnapPos = allPos(bd).filter(pos2 => {
