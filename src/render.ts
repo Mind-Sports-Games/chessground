@@ -323,8 +323,13 @@ function computeSquareClasses(s: State): SquareClasses {
     }
   }
   const premove = s.premovable.current;
-  if (premove) for (const k of premove) addSquare(squares, k, 'current-premove');
-  else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
+  if (premove) for (const k of premove) addSquare(squares, k, 'current-premove' + variantSpecificHighlightClass(s, k));
+  else if (s.predroppable.current)
+    addSquare(
+      squares,
+      s.predroppable.current.key,
+      'current-premove' + variantSpecificHighlightClass(s, s.predroppable.current.key),
+    );
 
   const o = s.exploding;
   if (o) for (const k of o.keys) addSquare(squares, k, 'exploding' + o.stage);
@@ -358,6 +363,8 @@ function variantSpecificHighlightClass(s: State, k: cg.Key): string {
     case 'go13x13':
     case 'go19x19':
       return turnPlayerIndex === 'p1' ? ' p2' : ' p1';
+    case 'entropy':
+      return s.pieces.has(k) ? ' counter' : '';
     case 'gomoku':
     case 'pente':
     case 'renju': {
