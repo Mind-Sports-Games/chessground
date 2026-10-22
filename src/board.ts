@@ -22,6 +22,7 @@ import {
 } from './util';
 import { queen, knight } from './premove';
 import predrop from './predrop';
+import { blackSeatOnBoard, isOffered, penteCaptures, seatOf } from './variants/fiveinarow/stones';
 import * as cg from './types';
 import * as T from './transformations';
 
@@ -150,6 +151,16 @@ function setDropVariantState(state: HeadlessState, piece: cg.Piece, key: cg.Key)
       // a counter changes owner as it lands, from Chaos to Order, so that Order may slide it
       state.pieces.set(key, { ...piece, playerIndex: opposite(piece.playerIndex) });
       break;
+    case 'gomoku':
+    case 'pente':
+    case 'renju': {
+      // in the opening a seat drops stones of both colours; each belongs to the seat playing its colour
+      const blackSeat = blackSeatOnBoard(state.pieces) ?? seatOf(piece.role, piece.playerIndex);
+      state.pieces.set(key, { ...piece, playerIndex: seatOf(piece.role, blackSeat) });
+      if (state.variant === 'pente')
+        penteCaptures(state.pieces, key, state.dimensions).forEach(k => state.pieces.delete(k));
+      break;
+    }
     default:
       state.pieces.set(key, piece);
   }
@@ -441,7 +452,7 @@ export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, f
 }
 
 export function setGoScore(state: HeadlessState): void {
-  if (state.selectOnly) {
+  if (state.selectOnly && cg.goVariants.includes(state.variant)) {
     state.simpleGoScores = calculateGoScores(state.selectedPieces, state.pieces, state.dimensions);
   } else {
     state.simpleGoScores = undefined;
@@ -450,6 +461,12 @@ export function setGoScore(state: HeadlessState): void {
 
 export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean): void {
   callUserFunction(state.events.select, key);
+  if (state.selectOnly && state.variant === 'renju') {
+    // white picks exactly one of the stones black offered
+    const piece = state.pieces.get(key);
+    if (isOffered(piece)) state.selectedPieces = new Map([[key, piece!]]);
+    return;
+  }
   if (state.selectOnly) {
     const piece = state.pieces.get(key);
     if (piece) {
@@ -879,6 +896,19 @@ export function p1Pov(s: HeadlessState): boolean {
 }
 
 export function getSnappedKeyAtDomPos(
+  orig: cg.Key,
+  pos: cg.NumberPair,
+  orientation: cg.Orientation,
+  bounds: ClientRect,
+  bd: cg.BoardDimensions,
+  variant: cg.Variant = 'chess',
+): cg.Key | undefined {
+  return cg.chessSnapArrowVariants.includes(variant)
+    ? getChessSnappedKeyAtDomPos(orig, pos, orientation, bounds, bd)
+    : getKeyAtDomPos(pos, orientation, bounds, bd, variant);
+}
+
+function getChessSnappedKeyAtDomPos(
   orig: cg.Key,
   pos: cg.NumberPair,
   orientation: cg.Orientation,
