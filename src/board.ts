@@ -302,7 +302,8 @@ export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key,
     state.pieces.has(key) &&
     !(state.variant === 'backgammon' || state.variant === 'hyper' || state.variant === 'nackgammon')
   ) {
-    if (force) state.pieces.delete(key);
+    // renju: white drops black's fifth stone on one of the offered stones
+    if (force || (state.variant === 'renju' && isOffered(state.pieces.get(key)))) state.pieces.delete(key);
     else return false;
   }
   const capturedPiece = state.pieces.get(key);
@@ -461,12 +462,6 @@ export function setGoScore(state: HeadlessState): void {
 
 export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean): void {
   callUserFunction(state.events.select, key);
-  if (state.selectOnly && state.variant === 'renju') {
-    // white picks exactly one of the stones black offered
-    const piece = state.pieces.get(key);
-    if (isOffered(piece)) state.selectedPieces = new Map([[key, piece!]]);
-    return;
-  }
   if (state.selectOnly) {
     const piece = state.pieces.get(key);
     if (piece) {
@@ -557,6 +552,7 @@ function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
     !!piece &&
     (orig === dest ||
       !state.pieces.has(dest) ||
+      (state.variant === 'renju' && isOffered(state.pieces.get(dest))) ||
       state.variant === 'backgammon' ||
       state.variant === 'hyper' ||
       state.variant === 'nackgammon') &&

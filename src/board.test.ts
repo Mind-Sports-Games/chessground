@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals';
-import { baseNewPiece, getKeyAtDomPos, getSnappedKeyAtDomPos, selectSquare } from './board.js';
+import { baseNewPiece, getKeyAtDomPos, getSnappedKeyAtDomPos } from './board.js';
 import { configure } from './config.js';
 import { State, defaults } from './state.js';
 import { NumberPair, BoardDimensions } from './types.js';
@@ -670,26 +670,22 @@ describe('baseNewPiece() pente test', () => {
   });
 });
 
-describe('selectSquare() renju test', () => {
+describe('baseNewPiece() renju test', () => {
   const fen = '15/15/15/15/15/15/6B8/7W7/6BW7/15/15/15/15/15/b1b12 w 1 k 3';
 
-  it('white picks exactly one offered stone', () => {
+  it("white drops black's fifth stone on an offered stone", () => {
     const state = defaults() as State;
-    configure(state, { dimensions: { width: 15, height: 15 }, variant: 'renju', fen, selectOnly: true });
+    configure(state, { dimensions: { width: 15, height: 15 }, variant: 'renju', fen });
 
-    selectSquare(state, 'a1');
-    selectSquare(state, 'c1');
+    expect(baseNewPiece(state, { role: 'b-piece', playerIndex: 'p2' }, 'c1')).toBe(true);
 
-    expect([...state.selectedPieces.keys()]).toEqual(['c1']);
-    expect(state.simpleGoScores).toBeUndefined();
+    expect(state.pieces.get('c1')?.role).toEqual('b-piece');
   });
 
-  it('a stone on the board cannot be picked', () => {
+  it('a stone on the board cannot be dropped on', () => {
     const state = defaults() as State;
-    configure(state, { dimensions: { width: 15, height: 15 }, variant: 'renju', fen, selectOnly: true });
+    configure(state, { dimensions: { width: 15, height: 15 }, variant: 'renju', fen });
 
-    selectSquare(state, 'g9');
-
-    expect(state.selectedPieces.size).toEqual(0);
+    expect(baseNewPiece(state, { role: 'b-piece', playerIndex: 'p2' }, 'g9')).toBe(false);
   });
 });
