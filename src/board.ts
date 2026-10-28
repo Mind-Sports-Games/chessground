@@ -22,6 +22,7 @@ import {
 } from './util';
 import { queen, knight } from './premove';
 import predrop from './predrop';
+import { blackSeatOnBoard, isOffered, penteCaptures, removeOffered, seatOf } from './variants/fiveinarow/stones';
 import * as cg from './types';
 import * as T from './transformations';
 
@@ -150,6 +151,16 @@ function setDropVariantState(state: HeadlessState, piece: cg.Piece, key: cg.Key)
       // a counter changes owner as it lands, from Chaos to Order, so that Order may slide it
       state.pieces.set(key, { ...piece, playerIndex: opposite(piece.playerIndex) });
       break;
+    case 'gomoku':
+    case 'pente':
+    case 'renju': {
+      // in the opening a seat drops stones of both colours; each belongs to the seat playing its colour
+      const blackSeat = blackSeatOnBoard(state.pieces) ?? seatOf(piece.role, piece.playerIndex);
+      state.pieces.set(key, { ...piece, playerIndex: seatOf(piece.role, blackSeat) });
+      if (state.variant === 'pente')
+        penteCaptures(state.pieces, key, piece, state.dimensions).forEach(k => state.pieces.delete(k));
+      break;
+    }
     default:
       state.pieces.set(key, piece);
   }
@@ -286,15 +297,25 @@ function isCapture(variant: cg.Variant, pieces: cg.Pieces, orig: cg.Key, dest: c
   }
 }
 
+// go and pente take stones around the drop rather than on it
+function dropCaptures(state: HeadlessState, piece: cg.Piece, key: cg.Key): cg.Key[] {
+  if (cg.goVariants.includes(state.variant))
+    return calculateGoCaptures(key, new Map(state.pieces).set(key, piece), state.dimensions);
+  if (state.variant === 'pente') return penteCaptures(state.pieces, key, piece, state.dimensions);
+  return [];
+}
+
 export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key, force?: boolean): boolean {
   if (
     state.pieces.has(key) &&
     !(state.variant === 'backgammon' || state.variant === 'hyper' || state.variant === 'nackgammon')
   ) {
-    if (force) state.pieces.delete(key);
+    // renju: white drops black's fifth stone on one of the offered stones
+    if (state.variant === 'renju' && isOffered(state.pieces.get(key))) removeOffered(state.pieces);
+    else if (force) state.pieces.delete(key);
     else return false;
   }
-  const capturedPiece = state.pieces.get(key);
+  const capturedPiece = state.pieces.get(dropCaptures(state, piece, key)[0] ?? key);
   const captured = capturedPiece?.playerIndex !== piece.playerIndex ? capturedPiece : undefined;
   callUserFunction(state.events.dropNewPiece, piece, key, captured);
   setDropVariantState(state, piece, key);
@@ -441,7 +462,7 @@ export function dropNewPiece(state: HeadlessState, orig: cg.Key, dest: cg.Key, f
 }
 
 export function setGoScore(state: HeadlessState): void {
-  if (state.selectOnly) {
+  if (state.selectOnly && cg.goVariants.includes(state.variant)) {
     state.simpleGoScores = calculateGoScores(state.selectedPieces, state.pieces, state.dimensions);
   } else {
     state.simpleGoScores = undefined;
@@ -453,7 +474,9 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
   if (state.selectOnly) {
     const piece = state.pieces.get(key);
     if (piece) {
-      const pieceGroup = calculatePieceGroup(key, state.pieces, state.dimensions);
+      const pieceGroup = cg.goVariants.includes(state.variant)
+        ? calculatePieceGroup(key, state.pieces, state.dimensions)
+        : [key];
       if (state.selectedPieces.has(key)) {
         for (const k of pieceGroup) {
           state.selectedPieces.delete(k);
@@ -463,7 +486,7 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
           state.selectedPieces.set(k, piece);
         }
       }
-      state.simpleGoScores = calculateGoScores(state.selectedPieces, state.pieces, state.dimensions);
+      setGoScore(state);
     }
     return;
   } else {
@@ -540,6 +563,7 @@ function canDrop(state: HeadlessState, orig: cg.Key, dest: cg.Key): boolean {
     !!piece &&
     (orig === dest ||
       !state.pieces.has(dest) ||
+      (state.variant === 'renju' && isOffered(state.pieces.get(dest))) ||
       state.variant === 'backgammon' ||
       state.variant === 'hyper' ||
       state.variant === 'nackgammon') &&
@@ -879,6 +903,19 @@ export function p1Pov(s: HeadlessState): boolean {
 }
 
 export function getSnappedKeyAtDomPos(
+  orig: cg.Key,
+  pos: cg.NumberPair,
+  orientation: cg.Orientation,
+  bounds: ClientRect,
+  bd: cg.BoardDimensions,
+  variant: cg.Variant = 'chess',
+): cg.Key | undefined {
+  return cg.chessSnapArrowVariants.includes(variant)
+    ? getChessSnappedKeyAtDomPos(orig, pos, orientation, bounds, bd)
+    : getKeyAtDomPos(pos, orientation, bounds, bd, variant);
+}
+
+function getChessSnappedKeyAtDomPos(
   orig: cg.Key,
   pos: cg.NumberPair,
   orientation: cg.Orientation,

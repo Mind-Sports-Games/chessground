@@ -261,18 +261,10 @@ function computeSquareClasses(s: State): SquareClasses {
     for (const k of s.lastMove) {
       if (k !== 'a0') {
         if (first) {
-          addSquare(
-            squares,
-            k,
-            'last-move from' + variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
-          );
+          addSquare(squares, k, 'last-move from' + variantSpecificHighlightClass(s, k));
           first = false;
         } else {
-          addSquare(
-            squares,
-            k,
-            'last-move to' + variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
-          );
+          addSquare(squares, k, 'last-move to' + variantSpecificHighlightClass(s, k));
         }
       } else {
         first = false;
@@ -285,7 +277,7 @@ function computeSquareClasses(s: State): SquareClasses {
       addSquare(squares, key, 'selected');
     }
     //area highlight for go games
-    if (s.variant && ['go9x9', 'go13x13', 'go19x19'].includes(s.variant)) {
+    if (cg.goVariants.includes(s.variant)) {
       const areas = calculatePlayerEmptyAreas(s.pieces, s.dimensions, s.selectedPieces);
       for (const [s, p] of areas) {
         addSquare(squares, s, 'area ' + p);
@@ -293,33 +285,17 @@ function computeSquareClasses(s: State): SquareClasses {
     }
   }
   if (s.selected) {
-    addSquare(
-      squares,
-      s.selected,
-      'selected' + variantSpecificHighlightClass(s.variant, s.selected, s.orientation, s.turnPlayerIndex),
-    );
+    addSquare(squares, s.selected, 'selected' + variantSpecificHighlightClass(s, s.selected));
     if (s.movable.showDests) {
       const dests = s.movable.dests?.get(s.selected);
       if (dests)
         for (const k of dests) {
-          addSquare(
-            squares,
-            k,
-            'move-dest' +
-              (s.pieces.has(k) ? ' oc' : '') +
-              variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
-          );
+          addSquare(squares, k, 'move-dest' + (s.pieces.has(k) ? ' oc' : '') + variantSpecificHighlightClass(s, k));
         }
       const pDests = s.premovable.dests;
       if (pDests)
         for (const k of pDests) {
-          addSquare(
-            squares,
-            k,
-            'premove-dest' +
-              (s.pieces.has(k) ? ' oc' : '') +
-              variantSpecificHighlightClass(s.variant, k, s.orientation, s.turnPlayerIndex),
-          );
+          addSquare(squares, k, 'premove-dest' + (s.pieces.has(k) ? ' oc' : '') + variantSpecificHighlightClass(s, k));
         }
     }
   } else if (s.dropmode.active || s.draggable.current?.orig === 'a0') {
@@ -347,8 +323,13 @@ function computeSquareClasses(s: State): SquareClasses {
     }
   }
   const premove = s.premovable.current;
-  if (premove) for (const k of premove) addSquare(squares, k, 'current-premove');
-  else if (s.predroppable.current) addSquare(squares, s.predroppable.current.key, 'current-premove');
+  if (premove) for (const k of premove) addSquare(squares, k, 'current-premove' + variantSpecificHighlightClass(s, k));
+  else if (s.predroppable.current)
+    addSquare(
+      squares,
+      s.predroppable.current.key,
+      'current-premove' + variantSpecificHighlightClass(s, s.predroppable.current.key),
+    );
 
   const o = s.exploding;
   if (o) for (const k of o.keys) addSquare(squares, k, 'exploding' + o.stage);
@@ -368,13 +349,9 @@ export function appendValue<K, V>(map: Map<K, V[]>, key: K, value: V): void {
   else map.set(key, [value]);
 }
 
-function variantSpecificHighlightClass(
-  variant: cg.Variant,
-  k: cg.Key,
-  orientation: cg.Orientation,
-  turnPlayerIndex: cg.PlayerIndex,
-): string {
-  switch (variant) {
+function variantSpecificHighlightClass(s: State, k: cg.Key): string {
+  const { orientation, turnPlayerIndex } = s;
+  switch (s.variant) {
     case 'togyzkumalak':
     case 'bestemshe':
       return k[1] === '1' ? ' p1' : ' p2';
@@ -386,6 +363,15 @@ function variantSpecificHighlightClass(
     case 'go13x13':
     case 'go19x19':
       return turnPlayerIndex === 'p1' ? ' p2' : ' p1';
+    case 'entropy':
+      return s.pieces.has(k) ? ' counter' : '';
+    case 'gomoku':
+    case 'pente':
+    case 'renju': {
+      // a stone's seat changes with a swap, so the marker follows the colour of the stone itself
+      const role = s.pieces.get(k)?.role;
+      return role === 'w-piece' ? ' white-stone' : role ? ' black-stone' : '';
+    }
     default:
       return '';
   }
