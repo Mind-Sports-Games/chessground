@@ -18,6 +18,7 @@ import {
   buttonPressed,
 } from './board';
 import { Piece } from './types';
+import { isOffered } from './variants/fiveinarow/stones';
 
 type MouchBind = (e: cg.MouchEvent) => void;
 type StateMouchBind = (d: State, e: cg.MouchEvent) => void;
@@ -186,6 +187,7 @@ function startDragOrDraw(s: State): MouchBind {
         if (
           s.dropmode.active &&
           (undefined === squareOccupied(s, e) ||
+            (s.variant === 'renju' && isOffered(squareOccupied(s, e))) ||
             s.variant === 'backgammon' ||
             s.variant === 'hyper' ||
             s.variant === 'nackgammon')
