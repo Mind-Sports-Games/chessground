@@ -277,7 +277,7 @@ function computeSquareClasses(s: State): SquareClasses {
       addSquare(squares, key, 'selected');
     }
     //area highlight for go games
-    if (s.variant && ['go9x9', 'go13x13', 'go19x19'].includes(s.variant)) {
+    if (cg.goVariants.includes(s.variant)) {
       const areas = calculatePlayerEmptyAreas(s.pieces, s.dimensions, s.selectedPieces);
       for (const [s, p] of areas) {
         addSquare(squares, s, 'area ' + p);

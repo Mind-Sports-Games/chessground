@@ -22,7 +22,7 @@ import {
 } from './util';
 import { queen, knight } from './premove';
 import predrop from './predrop';
-import { blackSeatOnBoard, isOffered, penteCaptures, seatOf } from './variants/fiveinarow/stones';
+import { blackSeatOnBoard, isOffered, penteCaptures, removeOffered, seatOf } from './variants/fiveinarow/stones';
 import * as cg from './types';
 import * as T from './transformations';
 
@@ -158,7 +158,7 @@ function setDropVariantState(state: HeadlessState, piece: cg.Piece, key: cg.Key)
       const blackSeat = blackSeatOnBoard(state.pieces) ?? seatOf(piece.role, piece.playerIndex);
       state.pieces.set(key, { ...piece, playerIndex: seatOf(piece.role, blackSeat) });
       if (state.variant === 'pente')
-        penteCaptures(state.pieces, key, state.dimensions).forEach(k => state.pieces.delete(k));
+        penteCaptures(state.pieces, key, piece, state.dimensions).forEach(k => state.pieces.delete(k));
       break;
     }
     default:
@@ -297,16 +297,25 @@ function isCapture(variant: cg.Variant, pieces: cg.Pieces, orig: cg.Key, dest: c
   }
 }
 
+// go and pente take stones around the drop rather than on it
+function dropCaptures(state: HeadlessState, piece: cg.Piece, key: cg.Key): cg.Key[] {
+  if (cg.goVariants.includes(state.variant))
+    return calculateGoCaptures(key, new Map(state.pieces).set(key, piece), state.dimensions);
+  if (state.variant === 'pente') return penteCaptures(state.pieces, key, piece, state.dimensions);
+  return [];
+}
+
 export function baseNewPiece(state: HeadlessState, piece: cg.Piece, key: cg.Key, force?: boolean): boolean {
   if (
     state.pieces.has(key) &&
     !(state.variant === 'backgammon' || state.variant === 'hyper' || state.variant === 'nackgammon')
   ) {
     // renju: white drops black's fifth stone on one of the offered stones
-    if (force || (state.variant === 'renju' && isOffered(state.pieces.get(key)))) state.pieces.delete(key);
+    if (state.variant === 'renju' && isOffered(state.pieces.get(key))) removeOffered(state.pieces);
+    else if (force) state.pieces.delete(key);
     else return false;
   }
-  const capturedPiece = state.pieces.get(key);
+  const capturedPiece = state.pieces.get(dropCaptures(state, piece, key)[0] ?? key);
   const captured = capturedPiece?.playerIndex !== piece.playerIndex ? capturedPiece : undefined;
   callUserFunction(state.events.dropNewPiece, piece, key, captured);
   setDropVariantState(state, piece, key);
@@ -465,7 +474,9 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
   if (state.selectOnly) {
     const piece = state.pieces.get(key);
     if (piece) {
-      const pieceGroup = calculatePieceGroup(key, state.pieces, state.dimensions);
+      const pieceGroup = cg.goVariants.includes(state.variant)
+        ? calculatePieceGroup(key, state.pieces, state.dimensions)
+        : [key];
       if (state.selectedPieces.has(key)) {
         for (const k of pieceGroup) {
           state.selectedPieces.delete(k);
@@ -475,7 +486,7 @@ export function selectSquare(state: HeadlessState, key: cg.Key, force?: boolean)
           state.selectedPieces.set(k, piece);
         }
       }
-      state.simpleGoScores = calculateGoScores(state.selectedPieces, state.pieces, state.dimensions);
+      setGoScore(state);
     }
     return;
   } else {

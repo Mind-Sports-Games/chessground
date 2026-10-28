@@ -28,6 +28,11 @@ export const assignOwners = (pieces: cg.Pieces, blackSeat: cg.PlayerIndex): cg.P
 
 export const isOffered = (piece: cg.Piece | undefined): boolean => piece?.role === offeredRole;
 
+// renju: once white picks the fifth stone, the stones black offered but white passed over leave the board
+export const removeOffered = (pieces: cg.Pieces): void => {
+  for (const [key, stone] of pieces) if (isOffered(stone)) pieces.delete(key);
+};
+
 const directions: cg.NumberPair[] = [
   [1, 0],
   [-1, 0],
@@ -40,9 +45,7 @@ const directions: cg.NumberPair[] = [
 ];
 
 // pente: a stone closing off exactly two of the other colour's stones in a line takes them
-export const penteCaptures = (pieces: cg.Pieces, key: cg.Key, bd: cg.BoardDimensions): cg.Key[] => {
-  const dropped = pieces.get(key);
-  if (!dropped) return [];
+export const penteCaptures = (pieces: cg.Pieces, key: cg.Key, dropped: cg.Piece, bd: cg.BoardDimensions): cg.Key[] => {
   const [x, y] = key2pos(key);
   const colourAt = (step: number, [dx, dy]: cg.NumberPair): boolean | undefined => {
     const [px, py] = [x + dx * step, y + dy * step];
