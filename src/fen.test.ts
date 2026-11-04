@@ -294,3 +294,52 @@ describe('fen.read() entropy test', () => {
     expect(pieces.size).toEqual(14);
   });
 });
+
+describe('fen.read() and fen.write() gomoku test', () => {
+  const bd: BoardDimensions = { width: 15, height: 15 };
+
+  it('gives each stone to the seat playing its colour', () => {
+    const pieces = read('15/15/15/15/15/15/15/6BW7/15/15/15/15/15/15/15 w 1 c 1', bd, 'gomoku');
+
+    expect(pieces.get('g8')).toEqual({ role: 'b-piece', playerIndex: 'p1' });
+    expect(pieces.get('h8')).toEqual({ role: 'w-piece', playerIndex: 'p2' });
+  });
+
+  it('gives black stones to p2 once the seats have swapped', () => {
+    const pieces = read('15/15/15/15/15/15/15/6BW7/15/15/15/15/15/15/15 w 2 - 2', bd, 'gomoku');
+
+    expect(pieces.get('g8')).toEqual({ role: 'b-piece', playerIndex: 'p2' });
+    expect(pieces.get('h8')).toEqual({ role: 'w-piece', playerIndex: 'p1' });
+  });
+
+  it('writes stones by colour whichever seat owns them', () => {
+    const board = '15/15/15/15/15/15/15/6BW7/15/15/15/15/15/15/15';
+
+    expect(write(read(`${board} w 2 - 2`, bd, 'gomoku'), bd, 'gomoku')).toEqual(board);
+  });
+});
+
+describe('fen.read() and fen.write() pente and renju test', () => {
+  it('reads a pente fen, its captures fields after the step, on 19x19', () => {
+    const bd: BoardDimensions = { width: 19, height: 19 };
+    const board = '19/19/19/19/19/19/19/19/19/8BW9/19/19/19/19/19/19/19/19/19';
+
+    const pieces = read(`${board} w 2 - 2 4 3`, bd, 'pente');
+
+    expect(pieces.get('i10')).toEqual({ role: 'b-piece', playerIndex: 'p2' });
+    expect(pieces.get('j10')).toEqual({ role: 'w-piece', playerIndex: 'p1' });
+    expect(write(pieces, bd, 'pente')).toEqual(board);
+  });
+
+  it('reads the stones black offered in renju as black stones apart from the board', () => {
+    const bd: BoardDimensions = { width: 15, height: 15 };
+    const board = '15/15/15/15/15/15/6B8/7W7/6BW7/15/15/15/15/15/b1b12';
+
+    const pieces = read(`${board} w 1 k 3`, bd, 'renju');
+
+    expect(pieces.get('a1')).toEqual({ role: 'o-piece', playerIndex: 'p1' });
+    expect(pieces.get('c1')).toEqual({ role: 'o-piece', playerIndex: 'p1' });
+    expect(pieces.get('g9')).toEqual({ role: 'b-piece', playerIndex: 'p1' });
+    expect(write(pieces, bd, 'renju')).toEqual(board);
+  });
+});

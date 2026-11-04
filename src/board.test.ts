@@ -1,8 +1,8 @@
 import { describe, expect, it } from '@jest/globals';
-import { baseNewPiece, getKeyAtDomPos, getSnappedKeyAtDomPos } from './board.js';
+import { baseNewPiece, getKeyAtDomPos, getSnappedKeyAtDomPos, selectSquare } from './board.js';
 import { configure } from './config.js';
 import { State, defaults } from './state.js';
-import { NumberPair, BoardDimensions } from './types.js';
+import { NumberPair, BoardDimensions, Piece } from './types.js';
 
 describe('getSnappedKeyAtDomPos() test', () => {
   it('testing a8 squares p1', () => {
@@ -51,6 +51,32 @@ describe('getSnappedKeyAtDomPos() test', () => {
     const expected = 'h1';
     const snappedKey = getSnappedKeyAtDomPos('h1', bpos, orientation, bounds, bd);
     expect(expected).toEqual(snappedKey);
+  });
+});
+
+describe('getSnappedKeyAtDomPos() variant defaults', () => {
+  const bounds = {
+    height: 15,
+    width: 15,
+    x: 0,
+    y: 0,
+    bottom: 15,
+    left: 0,
+    right: 15,
+    top: 0,
+    toJSON(): any {
+      return 'None';
+    },
+  };
+  const bd: BoardDimensions = { width: 15, height: 15 };
+  const bpos: NumberPair = [2.5, 0.5];
+
+  it('snaps to a chess move for chess variants', () => {
+    expect(getSnappedKeyAtDomPos('a1', bpos, 'p1', bounds, bd, 'chess')).not.toEqual('c15');
+  });
+
+  it('snaps to any square for non-chess variants', () => {
+    expect(getSnappedKeyAtDomPos('a1', bpos, 'p1', bounds, bd, 'gomoku')).toEqual('c15');
   });
 });
 
@@ -563,5 +589,165 @@ describe('baseNewPiece() entropy test', () => {
     baseNewPiece(state, { role: 'r-piece', playerIndex: 'p1' }, 'd4');
 
     expect(state.pieces.get('d4')).toEqual({ role: 'r-piece', playerIndex: 'p2' });
+  });
+});
+
+describe('baseNewPiece() gomoku test', () => {
+  const dimensions = { width: 15, height: 15 };
+
+  it('a white stone dropped by p1 in the opening belongs to the white seat', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions, variant: 'gomoku', fen: '15/15/15/15/15/15/15/7B7/15/15/15/15/15/15/15 b 1 o 1' });
+
+    baseNewPiece(state, { role: 'w-piece', playerIndex: 'p1' }, 'h9');
+
+    expect(state.pieces.get('h9')).toEqual({ role: 'w-piece', playerIndex: 'p2' });
+  });
+
+  it('a stone dropped after a swap belongs to the seat now playing its colour', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions, variant: 'gomoku', fen: '15/15/15/15/15/15/15/6BW7/15/15/15/15/15/15/15 b 2 - 2' });
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p2' }, 'h9');
+
+    expect(state.pieces.get('h9')).toEqual({ role: 'b-piece', playerIndex: 'p2' });
+    expect(state.pieces.get('g8')).toEqual({ role: 'b-piece', playerIndex: 'p2' });
+  });
+
+  it('the first stone keeps the seat that dropped it', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions, variant: 'gomoku', fen: '15/15/15/15/15/15/15/15/15/15/15/15/15/15/15 b 1 o 1' });
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p1' }, 'h8');
+
+    expect(state.pieces.get('h8')).toEqual({ role: 'b-piece', playerIndex: 'p1' });
+  });
+});
+
+describe('baseNewPiece() pente test', () => {
+  const dimensions = { width: 19, height: 19 };
+
+  it('a stone closing off two of the other colour takes them', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions,
+      variant: 'pente',
+      fen: '19/19/19/19/19/19/19/19/19/7BWW9/19/19/19/19/19/19/19/19/19 b 1 - 0 0 3',
+    });
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p1' }, 'k10');
+
+    expect(state.pieces.has('i10')).toBe(false);
+    expect(state.pieces.has('j10')).toBe(false);
+    expect(state.pieces.get('h10')).toEqual({ role: 'b-piece', playerIndex: 'p1' });
+    expect(state.pieces.get('k10')).toEqual({ role: 'b-piece', playerIndex: 'p1' });
+  });
+
+  it('a capture is reported to the drop event', async () => {
+    const state = defaults() as State;
+    const captured = new Promise<Piece | undefined>(resolve =>
+      configure(state, {
+        dimensions,
+        variant: 'pente',
+        fen: '19/19/19/19/19/19/19/19/19/7BWW9/19/19/19/19/19/19/19/19/19 b 1 - 0 0 3',
+        events: { dropNewPiece: (_piece, _key, c) => resolve(c) },
+      }),
+    );
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p1' }, 'k10');
+
+    expect((await captured)?.role).toEqual('w-piece');
+  });
+
+  it('a stone dropped between two of the other colour is safe', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions,
+      variant: 'pente',
+      fen: '19/19/19/19/19/19/19/19/19/7W1BW8/19/19/19/19/19/19/19/19/19 b 1 - 0 0 3',
+    });
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p1' }, 'i10');
+
+    expect(state.pieces.size).toEqual(4);
+  });
+
+  it('three of the other colour in a line are never taken', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions,
+      variant: 'pente',
+      fen: '19/19/19/19/19/19/19/19/19/7BWWW8/19/19/19/19/19/19/19/19/19 b 1 - 0 0 3',
+    });
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p1' }, 'l10');
+
+    expect(state.pieces.size).toEqual(5);
+  });
+});
+
+describe('baseNewPiece() renju test', () => {
+  const fen = '15/15/15/15/15/15/6B8/7W7/6BW7/15/15/15/15/15/b1b12 w 1 k 3';
+
+  it("white drops black's fifth stone on an offered stone", () => {
+    const state = defaults() as State;
+    configure(state, { dimensions: { width: 15, height: 15 }, variant: 'renju', fen });
+
+    expect(baseNewPiece(state, { role: 'b-piece', playerIndex: 'p2' }, 'c1')).toBe(true);
+
+    expect(state.pieces.get('c1')?.role).toEqual('b-piece');
+  });
+
+  it('the offered stones white passed over leave the board', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions: { width: 15, height: 15 }, variant: 'renju', fen });
+
+    baseNewPiece(state, { role: 'b-piece', playerIndex: 'p2' }, 'c1');
+
+    expect(state.pieces.has('a1')).toBe(false);
+    expect(state.pieces.size).toEqual(5);
+  });
+
+  it('a stone on the board cannot be dropped on', () => {
+    const state = defaults() as State;
+    configure(state, { dimensions: { width: 15, height: 15 }, variant: 'renju', fen });
+
+    expect(baseNewPiece(state, { role: 'b-piece', playerIndex: 'p2' }, 'g9')).toBe(false);
+  });
+});
+
+describe('selectSquare() selectOnly test', () => {
+  it('selects a single stone outside go', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions: { width: 15, height: 15 },
+      variant: 'renju',
+      fen: '15/15/15/15/15/15/15/15/6BB7/15/15/15/15/15/15 b 1 - 2',
+      selectOnly: true,
+    });
+
+    selectSquare(state, 'g7');
+
+    expect([...state.selectedPieces.keys()]).toEqual(['g7']);
+    expect(state.simpleGoScores).toBeUndefined();
+  });
+});
+
+describe('baseNewPiece() go test', () => {
+  it('a capture is reported to the drop event', async () => {
+    const state = defaults() as State;
+    const captured = new Promise<Piece | undefined>(resolve =>
+      configure(state, {
+        dimensions: { width: 9, height: 9 },
+        variant: 'go9x9',
+        fen: '9/9/9/9/9/9/9/9/Ss7[] b - 0 0 0 0 1',
+        events: { dropNewPiece: (_piece, _key, c) => resolve(c) },
+      }),
+    );
+
+    baseNewPiece(state, { role: 's-piece', playerIndex: 'p2' }, 'a2');
+
+    expect((await captured)?.playerIndex).toEqual('p1');
+    expect(state.pieces.has('a1')).toBe(false);
   });
 });

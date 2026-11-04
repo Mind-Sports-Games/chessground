@@ -811,9 +811,7 @@ export const generateCoordinatesClass = (variant: cg.Variant, coords: cg.Coords)
     'minishogi',
     'oware',
     'octagonflipello',
-    'go9x9',
-    'go13x13',
-    'go19x19',
+    ...cg.goVariants,
   ];
   const forceInnerCoordsVariants: cg.Variant[] = [
     'togyzkumalak',
@@ -821,8 +819,7 @@ export const generateCoordinatesClass = (variant: cg.Variant, coords: cg.Coords)
     'backgammon',
     'hyper',
     'nackgammon',
-    'abalone',
-    'grandabalone',
+    ...cg.abaloneVariants,
   ];
   if (coords === cg.Coords.Inside) {
     if (forceOuterCoordsVariants.includes(variant)) return 'outer-coords';

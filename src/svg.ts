@@ -408,6 +408,9 @@ export function roleToSvgName(state: State, piece: DrawShapePiece): string {
     case 'xiangqi':
       return (piece.playerIndex === 'p1' ? 'R' : 'B') + piece.role[0].toUpperCase();
     case 'entropy':
+    case 'gomoku':
+    case 'pente':
+    case 'renju':
       return piece.role[0].toUpperCase();
     case 'flipello':
     case 'flipello10':
