@@ -70,6 +70,8 @@ export type Variant =
   | 'gomoku'
   | 'pente'
   | 'renju'
+  | 'yonkoma10x10'
+  | 'yonkoma12x12'
   | undefined;
 export type PlayerIndex = (typeof playerIndexs)[number];
 export type Letter = (typeof letters)[number];
