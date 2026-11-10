@@ -391,3 +391,46 @@ describe('gomoku premove() and predrop() test', () => {
     expect(drops).not.toContain('h8');
   });
 });
+
+describe('yonkoma premove() test', () => {
+  it('yonkoma checkers premove like a bishop over empty squares only', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions: { width: 10, height: 10 },
+      variant: 'yonkoma10x10',
+      fen: 'c8C/10/10/10/10/10/3c6/10/1C8/C8c',
+    });
+
+    // from b2: up the long diagonal to c3 only, since the black checker on d4 blocks it;
+    // down-right to c1; up-left to a3; a1 holds its partner
+    const expected = ['a3', 'c1', 'c3'];
+    const premoves = premove(
+      state.pieces,
+      'b2',
+      state.premovable.castle,
+      state.dimensions,
+      state.variant,
+      state.chess960,
+    );
+    expect([...premoves].sort()).toEqual(expected);
+  });
+
+  it('yonkoma checkers reach the far corner of the 12x12 board', () => {
+    const state = defaults() as State;
+    configure(state, {
+      dimensions: { width: 12, height: 12 },
+      variant: 'yonkoma12x12',
+      fen: 'c10C/12/12/12/12/12/12/12/12/12/12/C10c',
+    });
+
+    const premoves = premove(
+      state.pieces,
+      'a12',
+      state.premovable.castle,
+      state.dimensions,
+      state.variant,
+      state.chess960,
+    );
+    expect([...premoves].sort()).toEqual(['b11', 'c10', 'd9', 'e8', 'f7', 'g6', 'h5', 'i4', 'j3', 'k2']);
+  });
+});

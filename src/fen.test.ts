@@ -343,3 +343,31 @@ describe('fen.read() and fen.write() pente and renju test', () => {
     expect(write(pieces, bd, 'renju')).toEqual(board);
   });
 });
+
+describe('fen.read() yonkoma test', () => {
+  it('reads the four checkers of the 10x10 starting position, with two-digit empty runs', () => {
+    const fenString = 'c8C/10/10/10/10/10/10/10/10/C8c w 1';
+    const bd: BoardDimensions = { width: 10, height: 10 };
+
+    const pieces = read(fenString, bd, 'yonkoma10x10');
+
+    expect(pieces.get('a1')).toEqual({ role: 'c-piece', playerIndex: 'p1' });
+    expect(pieces.get('j10')).toEqual({ role: 'c-piece', playerIndex: 'p1' });
+    expect(pieces.get('a10')).toEqual({ role: 'c-piece', playerIndex: 'p2' });
+    expect(pieces.get('j1')).toEqual({ role: 'c-piece', playerIndex: 'p2' });
+    expect(pieces.size).toEqual(4);
+  });
+
+  it('reads an eleven-square run on the 12x12 board', () => {
+    const fenString = '12/12/12/12/12/12/12/12/12/C11/c10C/11c w 3';
+    const bd: BoardDimensions = { width: 12, height: 12 };
+
+    const pieces = read(fenString, bd, 'yonkoma12x12');
+
+    expect(pieces.get('a3')).toEqual({ role: 'c-piece', playerIndex: 'p1' });
+    expect(pieces.get('l2')).toEqual({ role: 'c-piece', playerIndex: 'p1' });
+    expect(pieces.get('a2')).toEqual({ role: 'c-piece', playerIndex: 'p2' });
+    expect(pieces.get('l1')).toEqual({ role: 'c-piece', playerIndex: 'p2' });
+    expect(pieces.size).toEqual(4);
+  });
+});
