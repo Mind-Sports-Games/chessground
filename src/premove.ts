@@ -509,6 +509,14 @@ function dameoMan(pieces: cg.Pieces, playerIndex: cg.PlayerIndex): Mobility {
   };
 }
 
+// a yonkoma checker slides like a bishop through empty squares; which of those squares the
+// rules then allow is for the server to say
+function yonkomaChecker(pieces: cg.Pieces): Mobility {
+  const unblocked = amazonsQueen(pieces);
+  const emptyDest = emptysquares(pieces);
+  return (x1, y1, x2, y2) => bishop(x1, y1, x2, y2) && unblocked(x1, y1, x2, y2) && emptyDest(x1, y1, x2, y2);
+}
+
 function entropyCounter(pieces: cg.Pieces): Mobility {
   const unblocked = amazonsQueen(pieces);
   const emptyDest = emptysquares(pieces);
@@ -1206,6 +1214,11 @@ export function premove(
     case 'pente':
     case 'renju':
       mobility = () => false; // stones never move once placed
+      break;
+
+    case 'yonkoma10x10':
+    case 'yonkoma12x12':
+      mobility = yonkomaChecker(pieces);
       break;
 
     // Variants using standard pieces and additional fairy pieces like S-chess, Capablanca, etc.
