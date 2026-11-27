@@ -221,6 +221,7 @@ export function start(state: State, redrawAll: cg.Redraw): Api {
     },
 
     getKeyAtDomPos(pos): cg.Key | undefined {
+      state.dom.bounds.clear();
       return state.getKeyAtDomPos(pos, state.orientation, state.dom.bounds(), state.dimensions, state.variant);
     },
 

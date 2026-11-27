@@ -82,6 +82,7 @@ function unbindable(
 // slightly misleading name - because it also handles click-moving/dropping of pieces. generally it seems to handle all click events on the board.
 function startDragOrDraw(s: State): MouchBind {
   return e => {
+    s.dom.bounds.clear(); // the board may have moved without resizing or scrolling
     if (s.draggable.current) drag.cancel(s);
     else if (s.drawable.current) draw.cancel(s);
     else if (e.shiftKey || isRightButton(e)) {
